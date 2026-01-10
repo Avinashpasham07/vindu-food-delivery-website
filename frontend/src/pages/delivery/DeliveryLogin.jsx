@@ -38,7 +38,7 @@ const DeliveryLogin = () => {
                 {/* Logo */}
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-black tracking-tighter text-white mb-2">
-                        Savor<span className="text-[#FF5E00]">To.</span>
+                        Vindu<span className="text-[#FF5E00]">.</span>
                     </h1>
                     <p className="text-gray-400 font-medium">Delivery Partner Portal</p>
                 </div>
@@ -102,7 +102,7 @@ const DeliveryLogin = () => {
 
                 <div className="mt-8 text-center bg-[#1a1a1a] p-4 rounded-2xl border border-white/5">
                     <p className="text-gray-400 text-sm">
-                        New to SavorTo?{' '}
+                        New to Vindu?{' '}
                         <Link to="/delivery/register" className="text-[#FF5E00] font-bold hover:underline">
                             Join the Fleet
                         </Link>

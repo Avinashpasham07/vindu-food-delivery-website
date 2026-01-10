@@ -5,6 +5,7 @@ const userRegister = {
         fullname: Joi.string().required().min(3),
         email: Joi.string().required().email(),
         password: Joi.string().required().min(6),
+        phone: Joi.string().required(),
     }),
 };
 
@@ -17,10 +18,12 @@ const userLogin = {
 
 const foodPartnerRegister = {
     body: Joi.object().keys({
-        fullname: Joi.string().required(),
+        name: Joi.string().required(),
         email: Joi.string().required().email(),
         password: Joi.string().required().min(6),
         phone: Joi.string().required(),
+        contactName: Joi.string().allow('', null),
+        address: Joi.string().allow('', null),
         role: Joi.string().default('foodPartner'),
     }),
 };

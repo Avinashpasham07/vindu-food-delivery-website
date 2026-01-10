@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'SavorTo - Food Delivery',
-        short_name: 'SavorTo',
+        name: 'Vindu - Food Delivery',
+        short_name: 'Vindu',
         description: 'Order your favorite food with lightning fast delivery.',
         theme_color: '#FF5E00',
         icons: [

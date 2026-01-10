@@ -55,10 +55,10 @@ const LoginUser = () => {
       <div className="absolute top-12 left-12 lg:top-24 lg:left-24 z-10 hidden lg:block max-w-2xl">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-8 animate-fade-in">
           <span className="w-2 h-2 rounded-full bg-[#FF5E00] animate-pulse"></span>
-          <span className="text-white text-sm font-bold tracking-wide">FoodieApp Experience</span>
+          <span className="text-white text-sm font-bold tracking-wide">Vindu Experience</span>
         </div>
         <h1 className="text-7xl font-black text-white leading-tight mb-6 animate-slide-up">
-          Savor Every <br />
+          Relish Every <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5E00] to-[#FF9057]">Moment.</span>
         </h1>
         <p className="text-xl text-gray-300 font-medium max-w-lg leading-relaxed animate-slide-up animation-delay-200">

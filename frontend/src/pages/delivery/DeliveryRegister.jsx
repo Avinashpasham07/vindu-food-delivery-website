@@ -39,7 +39,7 @@ const DeliveryRegister = () => {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-black tracking-tighter text-white mb-2">
-                        Savor<span className="text-[#FF5E00]">To.</span>
+                        Vindu<span className="text-[#FF5E00]">.</span>
                     </h1>
                     <p className="text-gray-400 font-medium">Join our Delivery Fleet 🛵</p>
                 </div>

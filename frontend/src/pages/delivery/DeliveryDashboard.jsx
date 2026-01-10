@@ -133,7 +133,7 @@ const DeliveryDashboard = () => {
                 {/* Logo */}
                 <div className="flex items-center">
                     <Link to="/delivery/dashboard" className="text-2xl font-black tracking-tighter text-white">
-                        Savor<span className="text-[#FF5E00]">To.</span>
+                        Vindu<span className="text-[#FF5E00]">.</span>
                     </Link>
                 </div>
 

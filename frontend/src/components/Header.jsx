@@ -27,11 +27,9 @@ const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocati
         <div className="sticky top-0 z-50 bg-[#0d0d0d]/95 backdrop-blur-xl border-b border-white/5 pb-0 transition-all duration-300">
             <div className="max-w-7xl mx-auto px-5 pt-4 pb-4 flex items-center gap-8 justify-between">
                 {/* Logo */}
-                <div className="flex-shrink-0">
-                    <Link to="/" className="text-3xl font-black tracking-tighter text-white">
-                        Savor<span className="text-[#FF5E00]">To.</span>
-                    </Link>
-                </div>
+                <Link to="/" className="text-3xl font-black tracking-tighter text-white">
+                    Vindu<span className="text-[#FF5E00]">.</span>
+                </Link>
 
                 {/* Search & Location Capsule - ONLY ON HOME */}
                 {isHome && (

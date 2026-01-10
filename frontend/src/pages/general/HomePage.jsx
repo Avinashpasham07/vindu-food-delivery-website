@@ -175,7 +175,7 @@ const HomePage = () => {
                         {/* Logo */}
                         <div className="flex-shrink-0">
                             <Link to="/" className="text-3xl font-black tracking-tighter text-white">
-                                Savor<span className="text-[#FF5E00]">To.</span>
+                                Vindu<span className="text-[#FF5E00]">.</span>
                             </Link>
                         </div>
 

@@ -120,7 +120,7 @@ const UserProfile = () => {
                     <div className="flex items-center gap-3">
                         <div className="px-4 py-2 rounded-full bg-[#1a1a1a] border border-[#FF5E00]/20 flex items-center gap-2 shadow-lg shadow-[#FF5E00]/5">
                             <div className="w-2 h-2 rounded-full bg-[#FF5E00] animate-pulse"></div>
-                            <span className="text-xs font-bold text-[#FF5E00] uppercase tracking-wider">Savor Gold Member</span>
+                            <span className="text-xs font-bold text-[#FF5E00] uppercase tracking-wider">Vindu Gold Member</span>
                         </div>
                     </div>
                 </header>
@@ -188,7 +188,7 @@ const UserProfile = () => {
                                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-40 mix-blend-overlay"></div>
                                     <div className="relative z-10 max-w-lg">
                                         <h3 className="text-3xl font-black text-white mb-2">Invite friends, get ₹100</h3>
-                                        <p className="text-white/80 font-medium mb-6">Share your referral code and earn bonus credits for every friend who joins SavorTo.</p>
+                                        <p className="text-white/80 font-medium mb-6">Share your referral code and earn bonus credits for every friend who joins Vindu.</p>
                                         <button className="px-6 py-3 bg-white text-[#FF5E00] rounded-xl font-bold shadow-lg hover:bg-gray-100 transition-colors">Share Code</button>
                                     </div>
                                 </div>
