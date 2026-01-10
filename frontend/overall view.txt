@@ -1,0 +1,15 @@
+/user/register => user register page
+/user/login => user login page
+ 
+/food-partner/register => food patner register page
+/food-partner/login => food patner login page
+
+3:38:28
+3
+
+
+
+
+
+
+ 

@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-user-primary: #FF5E00;
+  --color-partner-primary: #10B981;
+}
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #0d0d0d;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+@keyframes likeHeartAnimation {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+
+  30% {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+
+  45% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+}
+
+.like-animation {
+  animation: likeHeartAnimation 0.8s ease-in-out forwards;
+}
