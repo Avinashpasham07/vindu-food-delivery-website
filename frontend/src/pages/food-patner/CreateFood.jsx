@@ -20,6 +20,7 @@ const CreateFood = () => {
         fats: ''
     });
     const [videoFile, setVideoFile] = React.useState(null);
+    const [galleryFiles, setGalleryFiles] = React.useState([]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -51,6 +52,13 @@ const CreateFood = () => {
         data.append('carbs', formData.carbs);
         data.append('fats', formData.fats);
         data.append('video', videoFile);
+
+        // Append all selected gallery images
+        if (galleryFiles.length > 0) {
+            Array.from(galleryFiles).forEach((file) => {
+                data.append('images', file); // 'images' matches backend field name
+            });
+        }
 
         try {
             const response = await axios.post('http://localhost:3000/api/food', data, {
@@ -296,6 +304,26 @@ const CreateFood = () => {
                                 onChange={handleFileChange}
                                 className="w-full p-[10px] bg-[#1a1a1a] border border-[#333] rounded-xl text-white text-[15px] outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#10B981]/10 file:text-[#10B981] hover:file:bg-[#10B981]/20"
                             />
+                        </div>
+                    </div>
+
+                    <div className="mb-5">
+                        <label htmlFor="gallery" className="block text-[13px] font-semibold text-[#a1a1aa] mb-2">Gallery Images (Max 4)</label>
+                        <div className="relative">
+                            <input
+                                type="file"
+                                id="gallery"
+                                accept="image/*"
+                                multiple
+                                onChange={(e) => setGalleryFiles(e.target.files)}
+                                className="w-full p-[10px] bg-[#1a1a1a] border border-[#333] rounded-xl text-white text-[15px] outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#10B981]/10 file:text-[#10B981] hover:file:bg-[#10B981]/20"
+                            />
+                            <div className="flex justify-between mt-2">
+                                <p className="text-xs text-gray-500">Select up to 4 images.</p>
+                                {galleryFiles.length > 0 && (
+                                    <p className="text-xs text-[#10B981] font-bold">{galleryFiles.length} file(s) selected</p>
+                                )}
+                            </div>
                         </div>
                     </div>
 

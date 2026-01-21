@@ -7,17 +7,35 @@ const { v4: uuid } = require("uuid");
 
 async function createfood(req, res) {
     // convert to base64 for ImageKit
-    const base64File = req.file.buffer.toString("base64");
+    // convert to base64 for ImageKit
+    let videoUrl = '';
+    let fileType = 'video';
 
-    const uploadResult = await storageService.uploadImage(
-        base64File,
-        uuid()
-    );
+    if (req.files && req.files.video) {
+        const videoFile = req.files.video[0];
+        const base64File = videoFile.buffer.toString("base64");
+        const uploadResult = await storageService.uploadImage(base64File, uuid());
+        videoUrl = uploadResult.url;
+        fileType = uploadResult.fileType;
+    }
+
+    // Process Gallery Images (Parallel Upload)
+    const galleryImages = [];
+    if (req.files && req.files.images) {
+        const uploadPromises = req.files.images.map(async (file) => {
+            const base64 = file.buffer.toString("base64");
+            const result = await storageService.uploadImage(base64, uuid());
+            return result.url;
+        });
+        const uploadedUrls = await Promise.all(uploadPromises);
+        galleryImages.push(...uploadedUrls);
+    }
 
     const fooditem = await foodmodel.create({
         name: req.body.name,
-        video: uploadResult.url,
-        fileType: uploadResult.fileType, // 'image' or 'non-image' (usually treated as video)
+        video: videoUrl,
+        fileType: fileType,
+        images: galleryImages,
         description: req.body.description,
         foodpartner: req.foodpartner._id,
         price: req.body.price,
@@ -165,11 +183,46 @@ async function updateFood(req, res) {
         };
 
         // If a new video/image is uploaded
-        if (req.file) {
-            const base64File = req.file.buffer.toString("base64");
+        // If a new video/image is uploaded
+        if (req.files && req.files.video) {
+            const videoFile = req.files.video[0];
+            const base64File = videoFile.buffer.toString("base64");
             const uploadResult = await storageService.uploadImage(base64File, uuid());
             updates.video = uploadResult.url;
             updates.fileType = uploadResult.fileType;
+        }
+
+        // If extra gallery images are uploaded (Append to existing or replace? - For now append)
+        if (req.files && req.files.images) {
+            const uploadPromises = req.files.images.map(async (file) => {
+                const base64 = file.buffer.toString("base64");
+                const result = await storageService.uploadImage(base64, uuid());
+                return result.url;
+            });
+            const uploadedUrls = await Promise.all(uploadPromises);
+
+            // To append, we need `$push`. To replace we just set. 
+            // Here `updates.images` would replace. Let's do a simple replace logic for now OR fetch current and append.
+            // For simplicity in this `updates` object based flow, let's assume replacement or user sends old images back?
+            // Actually `findOneAndUpdate` with simple object does $set. 
+            // A better UX is probably "Add these images". Let's use $push if desired, but `updates` object overwrites entire fields usually.
+            // Let's stick to: New upload = Add to array. But `updates` map is static values. 
+            // We'll separate the $push operation if needed, or query first.
+            // EASIEST ROBUST WAY: Fetch doc first, merge arrays, save. But we want atomic.
+            // Let's use $push for images if present.
+
+            // Wait, `req.body` only has text fields. 
+            // Let's modify the query below.
+
+            // NOTE: `req.body.name` etc overwrites. 
+            // Creating a robust update requires thinking about deleting old images too.
+            // For MVP: New images get ADDED to the array.
+            const currentFood = await foodmodel.findById(id);
+            if (currentFood) {
+                updates.images = [...currentFood.images, ...uploadedUrls];
+            } else {
+                updates.images = uploadedUrls;
+            }
         }
 
         const food = await foodmodel.findOneAndUpdate(

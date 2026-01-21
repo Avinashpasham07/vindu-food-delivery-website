@@ -18,6 +18,7 @@ const Profile = React.lazy(() => import('../pages/food-patner/profile'));
 const PartnerDashboard = React.lazy(() => import('../pages/food-patner/PartnerDashboard'));
 const PartnerProfile = React.lazy(() => import('../pages/food-patner/PartnerProfile'));
 const UserProfile = React.lazy(() => import('../pages/user/UserProfile'));
+const GoldMembership = React.lazy(() => import('../pages/user/GoldMembership'));
 const ReelsPage = React.lazy(() => import('../pages/general/ReelsPage'));
 const FoodDetails = React.lazy(() => import('../pages/general/FoodDetails'));
 const CartPage = React.lazy(() => import('../pages/general/CartPage'));
@@ -69,6 +70,7 @@ const AppRoutes = () => {
             <Route path="/partner/dashboard" element={<PartnerDashboard />} />
             <Route path="/partner/profile" element={<PartnerProfile />} />
             <Route path="/user/profile" element={<UserProfile />} />
+            <Route path="/user/gold" element={<GoldMembership />} />
             <Route path="/create-food" element={
               <AuthPartner>
                 <CreateFood />

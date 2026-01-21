@@ -4,9 +4,11 @@ import axios from 'axios';
 import AuthService from '../services/auth.service';
 import { useNavigate, Link } from 'react-router-dom';
 import RoleToggle from '../components/RoleToggle';
+import { useToast } from '../context/ToastContext';
 
 const RegisterUser = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [formData, setFormData] = React.useState({
     firstName: '',
     lastName: '',
@@ -37,13 +39,13 @@ const RegisterUser = () => {
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
         localStorage.setItem('userType', 'user');
-        alert('Registration Successful!');
+        showToast('Registration Successful! Welcome to Vindu.', 'success');
         navigate('/');
       }
     } catch (error) {
       console.error('Error:', error);
       const errorMessage = error.response?.data?.message || 'Registration failed';
-      alert(errorMessage);
+      showToast(errorMessage, 'error');
       setIsLoading(false);
     }
   };

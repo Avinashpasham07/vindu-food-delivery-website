@@ -30,7 +30,7 @@ const PartnerDashboard = () => {
                 fetchOrders(parsedPartner.id || parsedPartner._id);
                 // Or simplified:
                 // setOrders(prev => [newOrder, ...prev]);
-                alert("New Order Received! 🔔");
+                alert("New Order Received! ");
             });
 
             socket.on('order-updated', (updatedOrder) => {
@@ -153,13 +153,13 @@ const PartnerDashboard = () => {
                     onClick={() => setActiveTab('orders')}
                     className={`pb-4 text-lg font-bold transition-all ${activeTab === 'orders' ? 'text-[#10B981] border-b-2 border-[#10B981]' : 'text-gray-400 hover:text-white'}`}
                 >
-                    Live Orders 🔔
+                    Live Orders
                 </button>
                 <button
                     onClick={() => setActiveTab('menu')}
                     className={`pb-4 text-lg font-bold transition-all ${activeTab === 'menu' ? 'text-[#10B981] border-b-2 border-[#10B981]' : 'text-gray-400 hover:text-white'}`}
                 >
-                    Menu Management 🍔
+                    Menu Management
                 </button>
             </div>
 

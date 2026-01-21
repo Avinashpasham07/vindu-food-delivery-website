@@ -20,7 +20,14 @@ const userSchema = new mongoose.Schema({
     favorites: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'fooditem'
-    }]
+    }],
+    isGoldMember: {
+        type: Boolean,
+        default: false
+    },
+    goldExpiry: {
+        type: Date
+    }
 },
     {
         timestamps: true

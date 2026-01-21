@@ -227,4 +227,42 @@ async function getUserFavorites(req, res) {
     }
 }
 
-module.exports = { registerUser, loginUser, logoutUser, registerfoodpartner, loginfoodpartner, logoutfoodpartner, getPartnerById, getUserFavorites };
+async function buyGoldMembership(req, res) {
+    try {
+        const userId = req.user._id;
+        const user = await usermodel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Simulate Payment Success
+        // In real app, verify Razorpay/Stripe payment here
+
+        user.isGoldMember = true;
+
+        // set expiry to 30 days from now
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + 30);
+        user.goldExpiry = expiryDate;
+
+        await user.save();
+
+        res.status(200).json({
+            message: "Welcome to Vindu Gold!",
+            user: {
+                id: user._id,
+                fullname: user.fullname,
+                email: user.email,
+                isGoldMember: user.isGoldMember,
+                goldExpiry: user.goldExpiry
+            }
+        });
+
+    } catch (error) {
+        console.error("Error buying gold:", error);
+        res.status(500).json({ message: "Transaction failed" });
+    }
+}
+
+module.exports = { registerUser, loginUser, logoutUser, registerfoodpartner, loginfoodpartner, logoutfoodpartner, getPartnerById, getUserFavorites, buyGoldMembership };

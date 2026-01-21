@@ -128,8 +128,8 @@ const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocati
                 <div className="flex items-center gap-6">
                     {user ? (
                         <div className="flex items-center gap-4">
-                            <Link to="/user/profile" className="flex items-center gap-2 hover:bg-white/5 p-2 rounded-lg transition-colors">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FF5E00] to-[#FF9050] flex items-center justify-center text-white font-bold text-sm">
+                            <Link to="/user/profile" className="flex items-center gap-2 hover:bg-white/5 p-2 rounded-lg transition-colors group">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm bg-gradient-to-tr ${user.isGoldMember ? 'from-[#FFD700] via-[#FDB931] to-[#9E7204] shadow-[0_0_10px_#FFD700]' : 'from-[#FF5E00] to-[#FF9050]'}`}>
                                     {user.fullname ? user.fullname[0].toUpperCase() : 'U'}
                                 </div>
                                 <span className="text-gray-300 font-medium hidden sm:block">{user.fullname}</span>

@@ -18,5 +18,6 @@ router.get('/foodpartner/logout', authController.logoutfoodpartner);
 router.get('/partner/:id', authController.getPartnerById);
 
 router.get('/user/favorites', authMiddleware.authUser, authController.getUserFavorites);
+router.post('/buy-gold', authMiddleware.authUser, authController.buyGoldMembership);
 
 module.exports = router;

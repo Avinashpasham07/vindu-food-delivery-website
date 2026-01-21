@@ -13,7 +13,7 @@ const upload = multer({
 // /api/food/ [protected]
 router.post("/",
     authmiddleware.authfoodpatner,
-    upload.single("video"),
+    upload.fields([{ name: 'video', maxCount: 1 }, { name: 'images', maxCount: 4 }]),
     foodcontroller.createfood);
 
 router.get("/",
@@ -41,7 +41,7 @@ router.delete("/:id",
 
 router.put("/:id",
     authmiddleware.authfoodpatner,
-    upload.single("video"),
+    upload.fields([{ name: 'video', maxCount: 1 }, { name: 'images', maxCount: 4 }]),
     foodcontroller.updateFood
 );
 

@@ -14,7 +14,7 @@ export const ToastProvider = ({ children }) => {
         // Auto remove after 3 seconds
         setTimeout(() => {
             setToasts(prev => prev.filter(toast => toast.id !== id));
-        }, 3000);
+        }, 6000);
     }, []);
 
     const removeToast = (id) => {

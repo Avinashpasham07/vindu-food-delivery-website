@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 
 const authRoutes = require('./routes/auth.routes');
 const foodRoutes = require('./routes/food.routes');
@@ -13,6 +14,7 @@ const app = express();
 
 // Security Middlewares
 app.use(helmet()); // Secure HTTP Headers
+app.use(compression()); // Compress all responses
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes

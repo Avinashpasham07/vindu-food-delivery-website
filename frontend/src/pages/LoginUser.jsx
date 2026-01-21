@@ -3,9 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import '../App.css';
 import AuthService from '../services/auth.service';
 import RoleToggle from '../components/RoleToggle';
+import { useToast } from '../context/ToastContext';
 
 const LoginUser = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [formData, setFormData] = React.useState({
     email: '',
     password: ''
@@ -27,6 +29,7 @@ const LoginUser = () => {
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
         localStorage.setItem('userType', 'user');
+        showToast('Login Successful! Welcome back.', 'success');
 
         // Small delay for animation
         setTimeout(() => {
@@ -36,7 +39,7 @@ const LoginUser = () => {
     } catch (error) {
       console.error('Error:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Login failed';
-      alert('Error Details: ' + errorMessage);
+      showToast(errorMessage, 'error');
       setIsLoading(false);
     }
   };

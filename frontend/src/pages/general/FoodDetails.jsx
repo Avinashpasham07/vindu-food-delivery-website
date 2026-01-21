@@ -224,9 +224,10 @@ const FoodDetails = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d0d] via-[#0d0d0d]/40 to-transparent"></div>
             </div>
 
+
+
             {/* Content Container */}
             <div className="px-5 md:px-8 -mt-16 relative z-10">
-
                 {/* Title Section */}
                 <div className="flex justify-between items-start mb-6 animate-slide-up">
                     <h1 className="text-3xl md:text-5xl font-black leading-[1.1] text-white drop-shadow-xl flex-1 mr-4 tracking-tight">
@@ -262,7 +263,18 @@ const FoodDetails = () => {
                 <p className="text-gray-300 leading-relaxed text-[15px] md:text-base font-medium opacity-90 mb-8 animate-slide-up animation-delay-200">
                     {food.description || "Experience the perfect balance of flavors with this signature dish. Freshly prepared with premium ingredients for an unforgettable taste."}
                 </p>
-
+                {food.images && food.images.length > 0 && (
+                    <div className="mb-10 animate-slide-up animation-delay-300">
+                        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Details</h3>
+                        <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar snap-x">
+                            {food.images.map((img, i) => (
+                                <div key={i} className="flex-shrink-0 w-32 h-32 md:w-48 md:h-48 rounded-xl overflow-hidden border border-white/10 snap-center bg-zinc-900">
+                                    <img src={img} alt={`Gallery ${i}`} className="w-full h-full object-cover " />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
                 {/* Nutrition / Macros Section */}
                 <div className="mb-8 animate-slide-up animation-delay-300">
                     <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Nutrition</h3>
@@ -291,6 +303,9 @@ const FoodDetails = () => {
                         ))}
                     </div>
                 </div>
+
+                {/* Gallery Section (Correct Placement) */}
+
 
                 {/* Reviews Section */}
                 <div className="mb-12 animate-slide-up animation-delay-300">

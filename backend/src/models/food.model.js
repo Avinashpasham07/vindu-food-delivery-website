@@ -13,6 +13,10 @@ const foodItemSchema = new mongoose.Schema({
         type: String,
         default: 'video'
     },
+    images: {
+        type: [String],
+        default: []
+    },
     description: {
         type: String,
     },

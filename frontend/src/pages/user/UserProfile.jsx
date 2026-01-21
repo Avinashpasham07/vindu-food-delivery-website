@@ -3,6 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import apiClient from '../../api/client';
 import { useCart } from '../../context/CartContext';
+import Skeleton from '../../components/Skeleton';
 
 const UserProfile = () => {
     const navigate = useNavigate();
@@ -118,10 +119,16 @@ const UserProfile = () => {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <div className="px-4 py-2 rounded-full bg-[#1a1a1a] border border-[#FF5E00]/20 flex items-center gap-2 shadow-lg shadow-[#FF5E00]/5">
-                            <div className="w-2 h-2 rounded-full bg-[#FF5E00] animate-pulse"></div>
-                            <span className="text-xs font-bold text-[#FF5E00] uppercase tracking-wider">Vindu Gold Member</span>
-                        </div>
+                        {user.isGoldMember ? (
+                            <div className="px-4 py-2 rounded-full bg-[#1a1a1a] border border-[#FFD700]/40 flex items-center gap-2 shadow-lg shadow-[#FFD700]/10 animate-pulse-slow">
+                                <span className="text-xl">👑</span>
+                                <span className="text-xs font-bold text-[#FFD700] uppercase tracking-wider">Vindu Gold Member</span>
+                            </div>
+                        ) : (
+                            <Link to="/user/gold" className="px-4 py-2 rounded-full bg-gradient-to-r from-[#FFD700] to-[#FDB931] text-black font-bold text-xs shadow-lg hover:shadow-[#FFD700]/40 transition-all flex items-center gap-2 transform hover:scale-105">
+                                <span>✨</span> Upgrade to Gold
+                            </Link>
+                        )}
                     </div>
                 </header>
 
@@ -132,7 +139,7 @@ const UserProfile = () => {
 
                             <div className="relative flex flex-col items-center text-center">
                                 <div className="relative mb-6">
-                                    <div className="w-32 h-32 rounded-full p-[3px] bg-gradient-to-tr from-[#FF5E00] via-amber-500 to-yellow-500 animate-spin-slow">
+                                    <div className={`w-32 h-32 rounded-full p-[3px] bg-gradient-to-tr ${user.isGoldMember ? 'from-[#FFD700] via-[#FDB931] to-[#9E7204]' : 'from-[#FF5E00] via-amber-500 to-yellow-500'} animate-spin-slow`}>
                                         <div className="w-full h-full rounded-full bg-[#111] border-4 border-[#111] flex items-center justify-center overflow-hidden relative z-10 transition-transform hover:scale-105">
                                             {user.profileImage ? (
                                                 <img src={user.profileImage} alt="Profile" className="w-full h-full object-cover" />
@@ -198,8 +205,22 @@ const UserProfile = () => {
                         {activeTab === 'orders' && (
                             <div className="space-y-6 animate-fade-in-up">
                                 {loadingOrders ? (
-                                    <div className="flex justify-center p-12">
-                                        <div className="w-8 h-8 border-4 border-[#FF5E00] border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="space-y-4">
+                                        {[1, 2, 3].map(i => (
+                                            <div key={i} className="bg-[#111] border border-white/5 rounded-[32px] p-6 lg:p-8">
+                                                <div className="flex justify-between mb-6">
+                                                    <div className="space-y-2">
+                                                        <Skeleton width="100px" height="20px" />
+                                                        <Skeleton width="150px" height="14px" />
+                                                    </div>
+                                                    <div className="space-y-2 text-right">
+                                                        <Skeleton width="80px" height="24px" className="ml-auto" />
+                                                        <Skeleton width="60px" height="12px" className="ml-auto" />
+                                                    </div>
+                                                </div>
+                                                <Skeleton width="100%" height="80px" className="rounded-2xl" />
+                                            </div>
+                                        ))}
                                     </div>
                                 ) : orders.length === 0 ? (
                                     <div className="bg-[#111] border border-white/5 rounded-[32px] p-12 text-center animate-fade-in-up">
@@ -282,8 +303,19 @@ const UserProfile = () => {
                         {activeTab === 'favorites' && (
                             <div className="space-y-6 animate-fade-in-up">
                                 {loadingFavorites ? (
-                                    <div className="flex justify-center p-12">
-                                        <div className="w-8 h-8 border-4 border-[#FF5E00] border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {[1, 2, 3, 4].map(i => (
+                                            <div key={i} className="bg-[#111] border border-white/5 rounded-[24px] p-4 flex gap-4">
+                                                <Skeleton width="96px" height="96px" className="rounded-2xl flex-shrink-0" />
+                                                <div className="flex-1 flex flex-col justify-between py-1">
+                                                    <div className="space-y-2">
+                                                        <Skeleton width="80%" height="20px" />
+                                                        <Skeleton width="100%" height="14px" />
+                                                    </div>
+                                                    <Skeleton width="40%" height="24px" />
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 ) : favorites.length === 0 ? (
                                     <div className="bg-[#111] border border-white/5 rounded-[32px] p-12 text-center animate-fade-in-up">
