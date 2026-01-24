@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../../components/Footer';
+import FoodCursor from '../../components/FoodCursor';
 // Inline Icons to avoid dependency issues
 const Bike = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="5.5" cy="17.5" r="3.5" /><circle cx="18.5" cy="17.5" r="3.5" /><path d="M15 6h-5a1 1 0 0 0-1 1v4h12V7a1 1 0 0 0-1-1h-2" /><path d="M12 17.5V11" /><path d="M5.5 14h13" /></svg>;
 const Clock = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>;
@@ -21,6 +22,7 @@ const DeliveryLanding = () => {
 
     return (
         <div className="min-h-screen bg-[#050505] text-white font-['Plus_Jakarta_Sans'] selection:bg-green-500 selection:text-white overflow-x-hidden">
+            <FoodCursor />
             {/* --- Navbar --- */}
             <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black/90 backdrop-blur-xl border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
                 <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">

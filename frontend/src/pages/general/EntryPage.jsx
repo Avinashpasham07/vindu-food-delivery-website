@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../../components/Footer';
+import FoodCursor from '../../components/FoodCursor';
 
 // --- Assets & Icons ---
 const ArrowRight = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>;
@@ -235,31 +236,16 @@ const BentoGrid = () => (
 
 // --- Main Page ---
 const EntryPage = () => {
-    // Custom Cursor Logic
-    const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
-    const [isHovering, setIsHovering] = useState(false);
+    // Custom Cursor Logic handled by FoodCursor component now
 
-    useEffect(() => {
-        const moveCursor = (e) => {
-            setCursorPos({ x: e.clientX, y: e.clientY });
-        };
-        window.addEventListener('mousemove', moveCursor);
-        return () => window.removeEventListener('mousemove', moveCursor);
-    }, []);
-
-    const handleMouseEnter = () => setIsHovering(true);
-    const handleMouseLeave = () => setIsHovering(false);
+    const handleMouseEnter = () => { };
+    const handleMouseLeave = () => { };
 
     return (
         <div className="min-h-screen bg-[#050505] text-white font-['Plus_Jakarta_Sans'] selection:bg-[#FF5E00] selection:text-white overflow-x-hidden cursor-none">
 
             {/* Custom Cursor */}
-            <div
-                className={`fixed top-0 left-0 w-8 h-8 rounded-full border border-[#FF5E00] pointer-events-none z-[9999] transition-all duration-150 ease-out flex items-center justify-center mix-blend-difference ${isHovering ? 'scale-[2.5] bg-[#FF5E00]/20 border-transparent' : 'scale-100'}`}
-                style={{ transform: `translate3d(${cursorPos.x - 16}px, ${cursorPos.y - 16}px, 0)` }}
-            >
-                {isHovering && <div className="w-1 h-1 bg-[#FF5E00] rounded-full"></div>}
-            </div>
+            <FoodCursor />
 
             {/* Navbar */}
             <nav className="fixed top-0 w-full z-50 p-6 flex justify-between items-center bg-black/50 backdrop-blur-xl border-b border-white/5 transition-all">
@@ -288,10 +274,10 @@ const EntryPage = () => {
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF5E00] opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5E00]"></span>
                                 </span>
-                                <span className="text-xs font-mono font-bold tracking-widest text-gray-400 uppercase">Vindu Live Beta</span>
+                                <span className="text-xs font-mono font-bold tracking-widest text-gray-400 uppercase">Vindu Live </span>
                             </div>
 
-                            <h1 className="text-7xl md:text-9xl font-black tracking-tighter leading-[0.9] mb-8">
+                            <h1 className="text-5xl md:text-9xl font-black tracking-tighter leading-[0.9] mb-8">
                                 SOCIAL <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5E00] to-yellow-500">EATING</span> <br />
                                 IS HERE.
@@ -307,10 +293,10 @@ const EntryPage = () => {
                                 <button onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onClick={() => document.getElementById('gateway').scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 bg-[#FF5E00] text-black rounded-full font-black text-lg hover:bg-[#ff7b33] hover:scale-105 transition-all shadow-[0_0_40px_rgba(255,94,0,0.4)] flex items-center gap-3">
                                     Start Squad Order <ArrowRight className="w-5 h-5" />
                                 </button>
-                                <button className="px-8 py-4 text-white font-bold text-lg hover:text-[#FF5E00] transition-colors flex items-center gap-2 group">
+                                <Link to="/reels" className="px-8 py-4 text-white font-bold text-lg hover:text-[#FF5E00] transition-colors flex items-center gap-2 group">
                                     <span>Watch Manifesto</span>
                                     <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-[#FF5E00] group-hover:text-black transition-all"><Play className="w-3 h-3 fill-current" /></div>
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </Reveal>
@@ -318,9 +304,9 @@ const EntryPage = () => {
                     {/* Right: Floating Product Composition */}
                     <div className="relative h-[600px] w-full hidden lg:block perspective-1000">
                         {/* Card 1: The Squad Cart */}
-                        <div className="absolute top-[10%] right-[10%] w-[320px] bg-[#1a1a1a] rounded-[32px] border border-white/10 p-6 shadow-2xl rotate-[-6deg] hover:rotate-0 hover:scale-105 transition-all duration-700 z-20 group">
+                        <div className="absolute top-[10%] right-[10%] w-[320px] bg-[#1a1a1a] rounded-[32px] border border-white/10 p-6 shadow-2xl rotate-[-6deg] z-20 transition-all duration-700">
                             <div className="flex justify-between items-center mb-6">
-                                <h4 className="font-bold text-white text-lg">Friday Night 🍔</h4>
+                                <h4 className="font-bold text-white text-lg">Friday Night </h4>
                                 <div className="flex -space-x-2">
                                     <div className="w-8 h-8 rounded-full bg-blue-500 border-2 border-[#1a1a1a]"></div>
                                     <div className="w-8 h-8 rounded-full bg-purple-500 border-2 border-[#1a1a1a]"></div>
@@ -337,13 +323,16 @@ const EntryPage = () => {
                                     <span>₹60</span>
                                 </div>
                             </div>
-                            <div className="w-full py-3 bg-[#FF5E00] rounded-xl text-center font-bold text-black group-hover:bg-white transition-colors">
-                                Pay My Share (₹510)
+                            <div className="w-full py-3  bg-[#FF5E00] rounded-xl text-center font-bold text-black transition-colors">
+                                Total (₹510)
+                            </div>
+                            <div className="w-full py-3 mt-2 bg-green-500 rounded-xl text-center font-bold text-black transition-colors">
+                                Pay My Share (₹255)
                             </div>
                         </div>
 
                         {/* Card 2: The Food Reel */}
-                        <div className="absolute top-[30%] right-[45%] w-[260px] bg-black rounded-[32px] border-[6px] border-[#222] shadow-2xl rotate-[5deg] hover:rotate-0 hover:z-30 transition-all duration-700 overflow-hidden aspect-[9/16]">
+                        <div className="absolute top-[30%] right-[45%] w-[260px] bg-black rounded-[32px] border-[6px] border-[#222] shadow-2xl rotate-[5deg] transition-all duration-700 overflow-hidden aspect-[9/16]">
                             <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop" className="w-full h-full object-cover opacity-80" />
                             <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black to-transparent">
                                 <div className="flex gap-2 mb-2">
@@ -368,25 +357,74 @@ const EntryPage = () => {
                 </div>
             </section>
 
-            {/* 2. Global Stats */}
-            <section className="py-24 border-y border-white/5 bg-black/50 backdrop-blur-3xl">
+            {/* 7. Role Gateway (Revised with New 3-Card Design) */}
+
+
+            {/* 2. New Features Showcase (Replaces Stats) */}
+            <section className="py-24 border-y border-white/5 bg-black/50 backdrop-blur-3xl relative overflow-hidden">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[400px] bg-[#FF5E00]/5 blur-[100px] rounded-full pointer-events-none"></div>
                 <Reveal>
-                    <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-16 text-center">
-                        {[{ l: "Active Users", v: "2M+" }, { l: "Partners", v: "45K" }, { l: "Cities", v: "18" }, { l: "Orders", v: "850K+" }].map((s, i) => (
-                            <div key={i} className="group cursor-default" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-                                <div className="text-5xl md:text-6xl font-black text-white mb-2 group-hover:text-[#FF5E00] transition-colors duration-300">{s.v}</div>
-                                <div className="text-gray-500 uppercase tracking-[0.2em] text-xs font-bold">{s.l}</div>
+                    <div className="max-w-7xl mx-auto px-6">
+                        <div className="text-center mb-16">
+                            <span className="text-[#FF5E00] font-bold tracking-widest uppercase text-xs border border-[#FF5E00]/20 px-3 py-1 rounded-full bg-[#FF5E00]/5">New in Vindu</span>
+                            <h2 className="text-4xl md:text-5xl font-black mt-6 mb-4 text-white">
+                                One ecosystem. <span className="text-[#FF5E00] block md:inline">Infinite possibilities.</span>
+                            </h2>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                            {/* Feature 1: Squad Mode */}
+                            <div className="bg-[#0f0f0f] p-6 md:p-8 rounded-3xl border border-white/5 hover:border-[#FF5E00]/30 transition-all group">
+                                <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 mb-6 group-hover:scale-110 transition-transform">
+                                    <Users className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">Squad Mode™</h3>
+                                <p className="text-gray-400 text-sm mb-4 leading-relaxed">
+                                    The world's first synchronized group ordering. Add friends to a room, order together, pay separately.
+                                </p>
+                                <div className="flex -space-x-2">
+                                    {[1, 2, 3].map(i => <img key={i} src={`https://i.pravatar.cc/100?img=${i + 5}`} className="w-8 h-8 rounded-full border-2 border-[#0f0f0f]" />)}
+                                </div>
                             </div>
-                        ))}
+
+                            {/* Feature 2: Partner Analytics */}
+                            <div className="bg-[#0f0f0f] p-6 md:p-8 rounded-3xl border border-white/5 hover:border-green-500/30 transition-all group">
+                                <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-500 mb-6 group-hover:scale-110 transition-transform">
+                                    <TrendingUp className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">Partner Insights</h3>
+                                <p className="text-gray-400 text-sm mb-4 leading-relaxed">
+                                    Advanced realtime analytics dashboard for restaurant partners to track revenue, orders, and peak hours.
+                                </p>
+                                <div className="h-10 w-full flex items-end gap-1 opacity-50">
+                                    {[40, 70, 50, 90, 60, 80].map((h, i) => <div key={i} className="flex-1 bg-green-500 rounded-t-sm animate-pulse" style={{ height: `${h}%`, animationDelay: `${i * 100}ms` }}></div>)}
+                                </div>
+                            </div>
+
+                            {/* Feature 3: Live Tracking */}
+                            <div className="bg-[#0f0f0f] p-6 md:p-8 rounded-3xl border border-white/5 hover:border-yellow-500/30 transition-all group">
+                                <div className="w-12 h-12 bg-yellow-500/10 rounded-2xl flex items-center justify-center text-yellow-500 mb-6 group-hover:scale-110 transition-transform">
+                                    <Rocket className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">Hyper-Live Tracking</h3>
+                                <p className="text-gray-400 text-sm mb-4 leading-relaxed">
+                                    Watch your food move in real-time on our 3D interactive map. Accurate to the meter.
+                                </p>
+                                <div className="flex items-center gap-2 text-xs font-mono text-yellow-500">
+                                    <span className="w-2 h-2 bg-yellow-500 rounded-full animate-ping"></span>
+                                    Rider arriving in 4 mins
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </Reveal>
             </section>
 
             {/* 3. Features (Bento) */}
-            <section id="features" className="py-40 bg-[#09090b]">
+            <section id="features" className="py-20 md:py-40 bg-[#09090b]">
                 <Reveal>
                     <div className="text-center mb-24 px-6">
-                        <h2 className="text-4xl md:text-6xl font-black mb-6">More than delivery.</h2>
+                        <h2 className="text-4xl md:text-6xl font-black mb-6">More than <span className="text-[#FF5E00] block md:inline"> delivery.</span></h2>
                         <p className="text-gray-400 text-xl max-w-2xl mx-auto">A complete ecosystem designed for the modern foodie.</p>
                     </div>
                     <BentoGrid />
@@ -394,33 +432,104 @@ const EntryPage = () => {
             </section>
 
             {/* 4. Roadmap */}
-            <section className="py-40 bg-[#050505] relative overflow-hidden">
+            <section className="py-20 md:py-40 bg-[#050505] relative overflow-hidden">
                 <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
                 <Reveal>
                     <div className="text-center mb-24 px-6">
-                        <h2 className="text-4xl md:text-6xl font-black mb-6">Your Journey.</h2>
+                        <h2 className="text-3xl md:text-6xl font-black mb-6">Your <span className="text-[#FF5E00] block md:inline"> Journey.</span></h2>
                         <p className="text-gray-400 text-xl">Simple steps to get started.</p>
                     </div>
                     <Roadmap />
                 </Reveal>
             </section>
+            <section id="gateway" className="py-20 md:py-40 relative">
+                <Reveal>
+                    <div className="max-w-7xl mx-auto px-6 text-center mb-20">
+                        <h2 className="text-4xl md:text-8xl font-black mb-6 leading-none tracking-tight">Your <span className='text-[#FF5E00]'>Journey.</span> Starts Here.</h2>
+                        <p className="text-gray-400 text-xl font-light">Select your role to unlock the ecosystem.</p>
+                    </div>
 
+                    <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {[
+                            {
+                                id: 'eat',
+                                title: 'Order Food',
+                                subtitle: 'Hungry? Get the best food delivered.',
+                                link: '/landing',
+                                img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=2562&auto=format&fit=crop',
+                                color: 'from-orange-500/80',
+                                btnColor: 'bg-[#FF5E00]'
+                            },
+                            {
+                                id: 'partner',
+                                title: 'Partner with Us',
+                                subtitle: 'Grow your business with Vindu.',
+                                link: '/partner',
+                                img: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000&auto=format&fit=crop',
+                                color: 'from-blue-600/80',
+                                btnColor: 'bg-blue-600'
+                            },
+                            {
+                                id: 'rider',
+                                title: 'Join as Delivery Boy',
+                                subtitle: 'Earn money on your own schedule.',
+                                link: '/rider',
+                                img: 'https://images.unsplash.com/photo-1617347454431-f49d7ff5c3b1?q=80&w=1115&auto=format&fit=crop',
+                                color: 'from-green-600/80',
+                                btnColor: 'bg-green-600'
+                            }
+                        ].map((card, index) => (
+                            <Link
+                                key={card.id}
+                                to={card.link}
+                                className="block relative h-[400px] w-full rounded-[40px] overflow-hidden group cursor-pointer border border-white/10 shadow-2xl transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl"
+                            >
+                                {/* Background Image */}
+                                <div className="absolute inset-0">
+                                    <img
+                                        src={card.img}
+                                        alt={card.title}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    />
+                                    {/* Gradient Overlay */}
+                                    <div className={`absolute inset-0 bg-gradient-to-t ${card.color} via-black/40 to-black/80`}></div>
+                                </div>
+
+                                {/* Content */}
+                                <div className="relative h-full flex flex-col justify-end p-8 z-10">
+                                    <h2 className="text-4xl font-black text-white leading-none mb-3 drop-shadow-lg">
+                                        {card.title}
+                                    </h2>
+                                    <p className="text-gray-200 text-lg font-medium mb-6 opacity-90">
+                                        {card.subtitle}
+                                    </p>
+
+                                    {/* Action Button */}
+                                    <div className={`w-14 h-14 rounded-full ${card.btnColor} flex items-center justify-center text-white shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-45deg] self-end`}>
+                                        <ArrowRight className="w-6 h-6" />
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </Reveal>
+            </section>
             {/* 5. Testimonials */}
-            <section className="py-40 border-t border-white/5 bg-[#09090b]">
+            <section className="py-20 md:py-40 border-t border-white/5 bg-[#09090b]">
                 <Reveal>
                     <div className="max-w-7xl mx-auto px-6">
-                        <h2 className="text-4xl font-black mb-16 text-center">Community Love</h2>
+                        <h2 className="text-4xl font-black mb-16 text-center">Community <span className='text-[#FF5E00]'>Love</span></h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {[
-                                { name: "Sneha R.", role: "User", text: "Squad mode is a lifesaver for office lunches. We use it every Friday!" },
-                                { name: "Arjun M.", role: "Partner", text: "Weekly payouts help my cash flow immensely. Best partner support." },
-                                { name: "Rahul K.", role: "Rider", text: "Insurance coverage gives me peace of mind for my family." }
+                                { name: "Sneha R.", role: "User", text: "Squad mode is a lifesaver for office lunches. We use it every Friday!", img: "https://i.pravatar.cc/150?img=32" },
+                                { name: "Arjun M.", role: "Partner", text: "Weekly payouts help my cash flow immensely. Best partner support.", img: "https://i.pravatar.cc/150?img=11" },
+                                { name: "Rahul K.", role: "Rider", text: "Insurance coverage gives me peace of mind for my family.", img: "https://i.pravatar.cc/150?img=53" }
                             ].map((r, i) => (
                                 <SpotlightCard key={i} className="bg-[#0f0f0f] p-10 rounded-[32px] border border-white/5 hover:border-[#FF5E00]/20 group">
                                     <div className="flex text-[#FF5E00] gap-1 mb-6"><Star className="w-5 h-5 fill-[#FF5E00]" /><Star className="w-5 h-5 fill-[#FF5E00]" /><Star className="w-5 h-5 fill-[#FF5E00]" /><Star className="w-5 h-5 fill-[#FF5E00]" /><Star className="w-5 h-5 fill-[#FF5E00]" /></div>
                                     <p className="text-gray-300 italic mb-8 text-lg leading-relaxed">"{r.text}"</p>
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-white/10 rounded-full"></div>
+                                        <img src={r.img} alt={r.name} className="w-12 h-12 rounded-full object-cover border-2 border-[#FF5E00]/20" />
                                         <div>
                                             <div className="font-bold text-white">{r.name}</div>
                                             <div className="text-xs font-bold uppercase tracking-wider text-gray-500">{r.role}</div>
@@ -434,68 +543,15 @@ const EntryPage = () => {
             </section>
 
             {/* 6. FAQ */}
-            <section className="py-40 bg-[#050505]">
+            <section className="py-20 md:py-40 bg-[#050505]">
                 <Reveal>
                     <div className="max-w-3xl mx-auto px-6 space-y-4">
-                        <h2 className="text-4xl font-black mb-16 text-center">FAQ</h2>
+                        <h2 className="text-4xl font-black mb-16 text-center">FA<span className="text-[#FF5E00] block md:inline">Q</span></h2>
                         <Accordion items={[
                             { q: "Is it free to use?", a: "Yes, complete free to join for everyone." },
                             { q: "Where do you deliver?", a: "We are currently live in 18 metro cities across India." },
                             { q: "How do I become a partner?", a: "Click the 'Sell' card below and fill out the form." }
                         ]} />
-                    </div>
-                </Reveal>
-            </section>
-
-            {/* 7. Role Gateway (Revised Copy) */}
-            <section id="gateway" className="py-40 relative">
-                <Reveal>
-                    <div className="max-w-7xl mx-auto px-6 text-center mb-24">
-                        <h2 className="text-5xl md:text-8xl font-black mb-8 leading-none">Your Journey Starts Here.</h2>
-                        <p className="text-gray-400 text-xl font-light">Select your role to unlock the ecosystem.</p>
-                    </div>
-                    <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 h-[700px]">
-                        {[
-                            {
-                                id: 'eat',
-                                title: 'Order Food',
-                                subtitle: 'Hungry? Discover the best food near you.',
-                                link: '/landing',
-                                img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=2562&auto=format&fit=crop'
-                            },
-                            {
-                                id: 'sell',
-                                title: 'Partner with Us',
-                                subtitle: 'List your restaurant & grow your business.',
-                                link: '/partner',
-                                img: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?q=80&w=687&auto=format&fit=crop'
-                            },
-                            {
-                                id: 'ride',
-                                title: 'Join as Delivery Boy',
-                                subtitle: 'Earn weekly payouts with flexible hours.',
-                                link: '/rider',
-                                img: 'https://images.unsplash.com/photo-1613274554329-70f997f5789f?q=80&w=2574&auto=format&fit=crop'
-                            }
-                        ].map((card) => (
-                            <Link
-                                key={card.id}
-                                to={card.link}
-                                className="relative group rounded-[48px] overflow-hidden border border-white/10 flex items-end p-12 hover:-translate-y-4 hover:shadow-[0_20px_50px_rgba(255,94,0,0.2)] transition-all duration-500 cursor-pointer"
-                                onMouseEnter={handleMouseEnter}
-                                onMouseLeave={handleMouseLeave}
-                            >
-                                <img src={card.img} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90"></div>
-                                <div className="relative z-10 w-full flex flex-col justify-end items-start h-full">
-                                    <h3 className="text-5xl font-black text-white mb-4 leading-tight">{card.title}</h3>
-                                    <p className="text-gray-300 text-lg font-medium opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100">
-                                        {card.subtitle}
-                                    </p>
-                                    <div className="absolute top-10 right-10 w-16 h-16 rounded-full bg-[#FF5E00] flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform shadow-lg"><ArrowRight /></div>
-                                </div>
-                            </Link>
-                        ))}
                     </div>
                 </Reveal>
             </section>

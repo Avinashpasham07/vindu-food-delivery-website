@@ -19,25 +19,15 @@ const Footer = () => {
                         <h4 className="font-bold mb-4 text-white">Company</h4>
                         <ul className="space-y-2 text-sm text-gray-500">
                             <li className="hover:text-[#FF5E00] cursor-pointer transition-colors"><Link to="/about">About Us</Link></li>
-                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors"><Link to="/team">Team</Link></li>
-                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors"><Link to="/careers">Careers</Link></li>
-                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors"><Link to="/gold-membership">Vindu Gold</Link></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 className="font-bold mb-4 text-white">Contact</h4>
-                        <ul className="space-y-2 text-sm text-gray-500">
-                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors"><Link to="/help">Help & Support</Link></li>
-                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors"><Link to="/partner">Partner with us</Link></li>
-                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors"><Link to="/rider">Ride with us</Link></li>
+                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors"><Link to="/user/gold">Vindu Gold</Link></li>
                         </ul>
                     </div>
                     <div>
                         <h4 className="font-bold mb-4 text-white">Legal</h4>
                         <ul className="space-y-2 text-sm text-gray-500">
-                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors">Terms & Conditions</li>
-                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors">Privacy Policy</li>
-                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors">Cookie Policy</li>
+                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors"><Link to="/terms">Terms & Conditions</Link></li>
+                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors"><Link to="/privacy">Privacy Policy</Link></li>
+                            <li className="hover:text-[#FF5E00] cursor-pointer transition-colors"><Link to="/cookies">Cookie Policy</Link></li>
                         </ul>
                     </div>
                 </div>

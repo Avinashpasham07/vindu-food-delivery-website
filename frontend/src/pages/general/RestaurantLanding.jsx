@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../../components/Footer';
+import FoodCursor from '../../components/FoodCursor';
 
 // --- Icons ---
 const TrendingUp = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>;
@@ -46,6 +47,7 @@ const Star = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox=
 const RestaurantLanding = () => {
     return (
         <div className="min-h-screen bg-[#09090b] text-white font-['Plus_Jakarta_Sans'] selection:bg-[#FF5E00] selection:text-white overflow-x-hidden">
+            <FoodCursor />
 
             {/* --- Navbar --- */}
             <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/5 py-4">
@@ -55,8 +57,8 @@ const RestaurantLanding = () => {
                         <span className="text-2xl font-black tracking-tighter">Vindu<span className="text-[#FF5E00]">Partner</span></span>
                     </Link>
                     <div className="flex items-center gap-4">
-                        <Link to="/food-partner/login" className="hidden md:block text-sm font-bold text-gray-400 hover:text-white transition-colors">Login</Link>
-                        <Link to="/food-partner/register" className="px-6 py-2.5 bg-white text-black hover:bg-gray-200 rounded-full font-bold text-sm transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+
+                        <Link to="/food-partner/register" className="px-5 py-2 md:px-6 md:py-2.5 bg-white text-black hover:bg-gray-200 rounded-full font-bold text-xs md:text-sm transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                             Add Restaurant
                         </Link>
                     </div>
@@ -64,41 +66,41 @@ const RestaurantLanding = () => {
             </nav>
 
             {/* --- Hero Section --- */}
-            <header className="relative pt-40 pb-20 px-6">
+            <header className="relative pt-24 md:pt-40 pb-20 px-6">
                 <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#FF5E00]/10 rounded-full blur-[120px] -z-10 animate-pulse-slow"></div>
-                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
                     <div>
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FF5E00]/10 border border-[#FF5E00]/20 mb-8">
                             <span className="w-2 h-2 rounded-full bg-[#FF5E00] animate-pulse"></span>
                             <span className="text-xs font-bold tracking-wide text-[#FF5E00] uppercase">Trusted by 5,000+ Partners</span>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-6">
+                        <h1 className="text-4xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-6">
                             Scalable growth <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5E00] to-orange-300">without the chaos.</span>
                         </h1>
-                        <p className="text-xl text-gray-400 mb-8 max-w-lg leading-relaxed">
+                        <p className="text-lg md:text-xl text-gray-400 mb-8 max-w-lg leading-relaxed">
                             The all-in-one platform for modern restaurants. Manage orders, track earnings, and reach social-first customers.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4">
                             <Link to="/food-partner/register" className="px-8 py-4 bg-[#FF5E00] text-white rounded-full font-bold text-lg hover:bg-[#e05200] transition-colors flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(255,94,0,0.3)]">
                                 Register Now <ArrowRight className="w-5 h-5" />
                             </Link>
-                            <button className="px-8 py-4 bg-[#1a1a1a] border border-white/10 text-white rounded-full font-bold text-lg hover:bg-[#252525] transition-colors flex items-center gap-2">
+                            <button className="px-8 py-4 bg-[#1a1a1a] border border-white/10 text-white rounded-full font-bold text-lg hover:bg-[#252525] transition-colors flex items-center justify-center gap-2">
                                 <DollarSign className="w-5 h-5" /> View Pricing
                             </button>
                         </div>
                     </div>
 
-                    <div className="relative perspective-1000">
+                    <div className="relative perspective-1000 mt-10 md:mt-0">
                         {/* 3D Dashboard Mockup */}
-                        <div className="relative z-10 bg-[#0f0f0f] rounded-3xl p-8 border border-white/10 shadow-2xl transform rotate-y-12 hover:rotate-y-0 transition-transform duration-700">
+                        <div className="relative z-10 bg-[#0f0f0f] rounded-3xl p-6 pb-24 md:p-8 border border-white/10 shadow-2xl transform rotate-y-6 md:rotate-y-12 hover:rotate-y-0 transition-transform duration-700">
                             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none rounded-3xl"></div>
 
                             {/* Header */}
                             <div className="flex justify-between items-center mb-8 border-b border-white/5 pb-6">
                                 <div>
                                     <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-1">LIVE DASHBOARD</p>
-                                    <h3 className="text-3xl font-black text-white">The Spicy Grill</h3>
+                                    <h3 className="text-2xl md:text-3xl font-black text-white">The Spicy Grill</h3>
                                 </div>
                                 <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-500 animate-pulse">
                                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -109,11 +111,11 @@ const RestaurantLanding = () => {
                             <div className="grid grid-cols-2 gap-4 mb-8">
                                 <div className="bg-black/40 p-4 rounded-2xl border border-white/5">
                                     <p className="text-gray-400 text-xs mb-1">Today's Sales</p>
-                                    <p className="text-2xl font-black text-white">₹24,500</p>
+                                    <p className="text-xl md:text-2xl font-black text-white">₹24,500</p>
                                 </div>
                                 <div className="bg-black/40 p-4 rounded-2xl border border-white/5">
                                     <p className="text-gray-400 text-xs mb-1">Active Orders</p>
-                                    <p className="text-2xl font-black text-[#FF5E00]">12</p>
+                                    <p className="text-xl md:text-2xl font-black text-[#FF5E00]">12</p>
                                 </div>
                             </div>
 
@@ -128,7 +130,7 @@ const RestaurantLanding = () => {
                                     <div key={i} className="bg-black/20 p-4 rounded-xl flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer">
                                         <div className="flex items-center gap-3">
                                             <div className="text-xs font-mono text-gray-500">{o.id}</div>
-                                            <div className="text-sm font-bold text-white">{o.item}</div>
+                                            <div className="text-xs md:text-sm font-bold text-white max-w-[120px] md:max-w-none truncate">{o.item}</div>
                                         </div>
                                         <div className={`text-xs font-bold px-2 py-1 rounded ${o.status === 'New' ? 'bg-[#FF5E00] text-white animate-pulse' : o.status === 'Ready' ? 'bg-green-500/20 text-green-500' : 'bg-blue-500/20 text-blue-500'}`}>
                                             {o.status}
@@ -139,15 +141,15 @@ const RestaurantLanding = () => {
                         </div>
 
                         {/* Floating Success Badge */}
-                        <div className="absolute -bottom-8 -left-8 bg-white text-black p-6 rounded-2xl shadow-xl z-20 animate-bounce-slow">
+                        <div className="absolute -bottom-6 -left-4 md:-bottom-8 md:-left-8 bg-white text-black p-4 md:p-6 rounded-2xl shadow-xl z-20 animate-bounce-slow">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
-                                    <TrendingUp className="w-6 h-6" />
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                                    <TrendingUp className="w-5 h-5 md:w-6 md:h-6" />
                                 </div>
                                 <div>
                                     <p className="text-xs font-bold text-gray-500 uppercase">Growth</p>
                                     <div className="flex items-baseline gap-1">
-                                        <span className="text-2xl font-black">+45%</span>
+                                        <span className="text-xl md:text-2xl font-black">+45%</span>
                                         <span className="text-xs text-green-600 font-bold">this month</span>
                                     </div>
                                 </div>
@@ -161,22 +163,22 @@ const RestaurantLanding = () => {
             <section className="py-24 bg-[#0a0a0a] border-y border-white/5">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-black mb-4">Built for scale.</h2>
+                        <h2 className="text-3xl md:text-4xl font-black mb-4">Built for scale.</h2>
                         <p className="text-gray-400 max-w-2xl mx-auto text-lg">Everything you need to run a modern restaurant business.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                         {[
                             { title: 'Smart Analytics', desc: 'Real-time insights on your best sellers and peak hours.', icon: BarChart3 },
                             { title: 'Easy Management', desc: 'Accept orders and manage menu with a single tap.', icon: Smartphone },
                             { title: 'Instant Payouts', desc: 'Direct bank transfers every Wednesday. No delays.', icon: DollarSign }
                         ].map((f, i) => (
-                            <div key={i} className="bg-[#0f0f0f] p-8 rounded-[32px] border border-white/5 hover:border-[#FF5E00]/50 transition-all group hover:-translate-y-2">
+                            <div key={i} className="bg-[#0f0f0f] p-6 md:p-8 rounded-[32px] border border-white/5 hover:border-[#FF5E00]/50 transition-all group hover:-translate-y-2">
                                 <div className="w-16 h-16 bg-[#FF5E00]/10 rounded-2xl flex items-center justify-center text-[#FF5E00] mb-8 group-hover:scale-110 transition-transform">
                                     <f.icon className="w-8 h-8" />
                                 </div>
-                                <h3 className="text-2xl font-black mb-4">{f.title}</h3>
-                                <p className="text-gray-400 leading-relaxed">{f.desc}</p>
+                                <h3 className="text-xl md:text-2xl font-black mb-4">{f.title}</h3>
+                                <p className="text-gray-400 leading-relaxed text-sm md:text-base">{f.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -194,16 +196,16 @@ const RestaurantLanding = () => {
                                 { title: "Setup Menu", desc: "Use our AI tool to auto-upload your menu." },
                                 { title: "Go Live", desc: "Turn on the toggle and start cooking!" }
                             ].map((step, idx) => (
-                                <div key={idx} className="flex gap-8 group">
+                                <div key={idx} className="flex gap-4 md:gap-8 group">
                                     <div className="flex flex-col items-center">
                                         <div className="w-12 h-12 rounded-full bg-[#1a1a1a] border border-white/10 flex items-center justify-center font-bold text-gray-500 group-hover:bg-[#FF5E00] group-hover:text-black group-hover:border-[#FF5E00] transition-colors">
                                             {idx + 1}
                                         </div>
                                         {idx !== 2 && <div className="w-0.5 h-16 bg-white/10 my-2"></div>}
                                     </div>
-                                    <div className="pb-8">
-                                        <h3 className="text-2xl font-bold mb-2 text-white group-hover:text-[#FF5E00] transition-colors">{step.title}</h3>
-                                        <p className="text-gray-400">{step.desc}</p>
+                                    <div className="pb-8 pt-2">
+                                        <h3 className="text-xl md:text-2xl font-bold mb-2 text-white group-hover:text-[#FF5E00] transition-colors">{step.title}</h3>
+                                        <p className="text-sm md:text-base text-gray-400">{step.desc}</p>
                                     </div>
                                 </div>
                             ))}

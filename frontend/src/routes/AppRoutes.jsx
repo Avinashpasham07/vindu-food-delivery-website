@@ -29,6 +29,11 @@ const ReelsPage = React.lazy(() => import('../pages/general/ReelsPage'));
 const FoodDetails = React.lazy(() => import('../pages/general/FoodDetails'));
 const CartPage = React.lazy(() => import('../pages/general/CartPage'));
 const CheckoutPage = React.lazy(() => import('../pages/general/CheckoutPage'));
+const AboutPage = React.lazy(() => import('../pages/general/AboutPage'));
+const HelpPage = React.lazy(() => import('../pages/general/HelpPage'));
+const TermsPage = React.lazy(() => import('../pages/general/TermsPage'));
+const PrivacyPage = React.lazy(() => import('../pages/general/PrivacyPage'));
+const CookiesPage = React.lazy(() => import('../pages/general/CookiesPage'));
 
 // Loading Fallback
 const PageLoader = () => (
@@ -47,9 +52,13 @@ const DeliveryDashboard = React.lazy(() => import('../pages/delivery/DeliveryDas
 const DeliveryProfile = React.lazy(() => import('../pages/delivery/DeliveryProfile'));
 const OrderTracking = React.lazy(() => import('../pages/user/OrderTracking'));
 
+// Local Components
+import ScrollToTop from '../components/ScrollToTop';
+
 const AppRoutes = () => {
   return (
     <Router>
+      <ScrollToTop />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* User Routes */}
@@ -87,15 +96,21 @@ const AppRoutes = () => {
                 <CheckoutPage />
               </AuthUser>
             } />
-            <Route path="/partner/dashboard" element={<PartnerDashboard />} />
-            <Route path="/partner/profile" element={<PartnerProfile />} />
+            <Route path="/partner/dashboard" element={
+              <AuthPartner><PartnerDashboard /></AuthPartner>} />
+            <Route path="/partner/profile" element={
+              <AuthPartner>
+                <PartnerProfile />
+              </AuthPartner>
+            } />
             <Route path="/user/profile" element={
               <AuthUser>
                 <UserProfile />
               </AuthUser>
             } />
             <Route path="/user/gold" element={<GoldMembership />} />
-            <Route path="/user/payment" element={<PaymentMock />} />
+            <Route path="/user/payment" element={
+              <AuthUser><PaymentMock /></AuthUser>} />
             <Route path="/create-food" element={
               <AuthPartner>
                 <CreateFood />
@@ -108,6 +123,13 @@ const AppRoutes = () => {
             } />
             <Route path="/food-patner/:id" element={<Profile />} />
             <Route path="/food/:id" element={<FoodDetails />} />
+
+            {/* General Info Pages */}
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/help" element={<HelpPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/cookies" element={<CookiesPage />} />
           </Route>
         </Routes>
       </Suspense>

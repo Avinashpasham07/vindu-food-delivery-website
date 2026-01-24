@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Footer from '../../components/Footer';
+import FoodCursor from '../../components/FoodCursor';
 
 // --- Icons (Inline SVGs to prevent version errors) ---
 const MapPin = ({ className }) => (
@@ -83,6 +85,7 @@ const LandingPage = () => {
 
     return (
         <div className="min-h-screen bg-[#09090b] text-white font-['Plus_Jakarta_Sans'] selection:bg-[#FF5E00] selection:text-white overflow-x-hidden">
+            <FoodCursor />
 
             {/* --- Navbar --- */}
             <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black/80 backdrop-blur-xl border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
