@@ -15,14 +15,18 @@ const errorConverter = (err, req, res, next) => {
 
 const errorHandler = (err, req, res, next) => {
     let { statusCode, message } = err;
+
+    // Convert to number if it's not
+    statusCode = Number(statusCode);
+
     if (!err.isOperational && process.env.NODE_ENV === 'production') {
         statusCode = httpStatus.INTERNAL_SERVER_ERROR;
         message = httpStatus[httpStatus.INTERNAL_SERVER_ERROR];
     }
 
-    // Fallback if statusCode is still undefined
-    if (!statusCode) {
-        statusCode = httpStatus.INTERNAL_SERVER_ERROR;
+    // Ultimate fallback if statusCode is invalid (NaN, 0, undefined, null)
+    if (!statusCode || isNaN(statusCode)) {
+        statusCode = httpStatus.INTERNAL_SERVER_ERROR || 500;
         message = message || "Internal Server Error";
     }
 
@@ -35,9 +39,9 @@ const errorHandler = (err, req, res, next) => {
     };
 
     if (process.env.NODE_ENV === 'development') {
-        logger.error(err.stack); // Log full stack in dev
+        logger.error(err.stack);
     } else {
-        logger.error(err.message); // Log message in prod
+        logger.error(err.message);
     }
 
     res.status(statusCode).send(response);

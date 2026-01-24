@@ -46,6 +46,12 @@ app.get("/", (req, res) => {
     res.send("Hello World!");
 });
 
+// Keep-Alive Ping (Prevent Cold Start)
+app.get("/ping", (req, res) => {
+    res.status(200).send("Pong");
+});
+
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/food', foodRoutes);
