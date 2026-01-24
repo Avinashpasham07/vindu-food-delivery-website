@@ -9,7 +9,7 @@ const placeOrder = {
                 name: Joi.string(),
                 price: Joi.number(),
                 quantity: Joi.number(),
-                image: Joi.string(),
+                image: Joi.string().allow('', null),
                 video: Joi.string().allow('')
             })
         ).required().min(1),
