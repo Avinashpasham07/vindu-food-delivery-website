@@ -20,6 +20,12 @@ const errorHandler = (err, req, res, next) => {
         message = httpStatus[httpStatus.INTERNAL_SERVER_ERROR];
     }
 
+    // Fallback if statusCode is still undefined
+    if (!statusCode) {
+        statusCode = httpStatus.INTERNAL_SERVER_ERROR;
+        message = message || "Internal Server Error";
+    }
+
     res.locals.errorMessage = err.message;
 
     const response = {
