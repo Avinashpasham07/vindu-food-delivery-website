@@ -19,10 +19,15 @@ const errorHandler = (err, req, res, next) => {
     // Convert to number if it's not
     statusCode = Number(statusCode);
 
-    if (!err.isOperational && process.env.NODE_ENV === 'production') {
-        statusCode = httpStatus.INTERNAL_SERVER_ERROR;
-        message = httpStatus[httpStatus.INTERNAL_SERVER_ERROR];
+    // Joi/Validation Error Handling
+    if (err.isJoi) {
+        statusCode = 400; // Bad Request
     }
+
+    // if (!err.isOperational && process.env.NODE_ENV === 'production') {
+    //     statusCode = httpStatus.INTERNAL_SERVER_ERROR;
+    //     message = httpStatus[httpStatus.INTERNAL_SERVER_ERROR];
+    // }
 
     // Ultimate fallback if statusCode is invalid (NaN, 0, undefined, null)
     if (!statusCode || isNaN(statusCode)) {
