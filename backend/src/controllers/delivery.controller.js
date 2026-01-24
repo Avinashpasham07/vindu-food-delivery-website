@@ -1,6 +1,6 @@
 const DeliveryPartner = require('../models/deliveryPartner.model');
 const Order = require('../models/order.model');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // Auth Functions
