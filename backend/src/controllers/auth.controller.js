@@ -3,39 +3,38 @@ const foodpartnermodel = require('../models/foodpartner.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const logger = require('../utils/logger');
+
 async function registerUser(req, res) {
     try {
         const { fullname, email, password, phone } = req.body;
 
-
-        const isuserexist = await usermodel.findOne({ email });
-        if (isuserexist) {
+        const isUserExist = await usermodel.findOne({ email });
+        if (isUserExist) {
+            logger.warn(`Registration Failed: User already exists - ${email}`);
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        const Hashpass = await bcrypt.hash(password, 10);
-
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = new usermodel({
             fullname,
             email,
             phone,
-            password: Hashpass
+            password: hashedPassword
         });
 
         await newUser.save();
-
+        logger.info(`User Registered: ${newUser._id}`);
 
         const token = jwt.sign(
             { userId: newUser._id },
             process.env.JWT_SECRET,
         );
 
-
         res.cookie("token", token, {
             httpOnly: true,
-            // secure: process.env.NODE_ENV === 'production', // Uncomment in production
-            // sameSite: 'strict' 
+            // secure: process.env.NODE_ENV === 'production', 
         });
 
         res.status(201).json({
@@ -49,54 +48,74 @@ async function registerUser(req, res) {
         });
 
     } catch (err) {
-        console.error("Registration Error:", err);
+        logger.error(`Registration Error: ${err.message}`);
         res.status(500).json({ message: "Server error" });
     }
 }
 
 async function loginUser(req, res) {
     const { email, password } = req.body;
-    console.log("Login Attempt:", email); // DEBUG LOG
+    logger.debug(`Login Attempt: ${email}`);
 
-    const user = await usermodel.findOne({ email });
+    try {
+        const user = await usermodel.findOne({ email });
 
-    if (!user) {
-        console.log("Login Failed: User not found for email", email);
-        return res.status(400).json({
-            message: "Debug: User not found with this email"
+        if (!user) {
+            logger.warn(`Login Failed: User not found - ${email}`);
+            return res.status(400).json({
+                message: "Invalid credentials"
+            });
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            logger.warn(`Login Failed: Password mismatch - ${email}`);
+            return res.status(400).json({
+                message: "Invalid credentials"
+            });
+        }
+
+        // Gold Expiry Check
+        if (user.isGoldMember && user.goldExpiry) {
+            if (new Date() > new Date(user.goldExpiry)) {
+                user.isGoldMember = false;
+                user.goldExpiry = null;
+                await user.save();
+                logger.info(`Gold Membership Expired for User: ${user._id}`);
+            }
+        }
+
+        const token = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_SECRET,
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
         });
-    }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log("User found, password valid:", isPasswordValid); // DEBUG LOG
-    if (!isPasswordValid) {
-        console.log("Login Failed: Password mismatch");
-        return res.status(400).json({
-            message: "Debug: Password mismatch"
+
+        logger.info(`User Logged In: ${user._id}`);
+        res.status(200).json({
+            message: "User logged in successfully",
+            user: {
+                id: user._id,
+                fullname: user.fullname,
+                email: user.email,
+                phone: user.phone,
+                isGoldMember: user.isGoldMember,
+                goldExpiry: user.goldExpiry
+            },
+            token
         });
+    } catch (err) {
+        logger.error(`Login Error: ${err.message}`);
+        res.status(500).json({ message: "Server error" });
     }
-
-    const token = jwt.sign(
-        { userId: user._id },
-        process.env.JWT_SECRET,
-    );
-
-    res.cookie("token", token, {
-        httpOnly: true,
-    });
-
-    res.status(200).json({
-        message: "User logged in successfully",
-        user: {
-            id: user._id,
-            fullname: user.fullname,
-            email: user.email
-        },
-        token
-    });
 }
 
 async function logoutUser(req, res) {
     res.clearCookie("token");
+    logger.info("User Logged Out");
     res.status(200).json({
         message: "User logged out successfully"
     });

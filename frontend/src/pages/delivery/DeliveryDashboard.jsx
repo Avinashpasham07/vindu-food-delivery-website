@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../api/client';
 import { io } from 'socket.io-client';
 import { useNavigate, Link } from 'react-router-dom';
 
-const socket = io('http://localhost:3000');
+const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+const socket = io(socketUrl);
 
 const DeliveryDashboard = () => {
     const [partner, setPartner] = useState(JSON.parse(localStorage.getItem('deliveryPartner')));
@@ -65,14 +66,14 @@ const DeliveryDashboard = () => {
 
     const fetchOrders = async () => {
         try {
-            const res = await axios.get('http://localhost:3000/api/delivery/orders/available', { withCredentials: true });
+            const res = await apiClient.get('/delivery/orders/available');
             setAvailableOrders(res.data.orders);
         } catch (err) { console.error(err); }
     };
 
     const fetchCurrentOrder = async () => {
         try {
-            const res = await axios.get('http://localhost:3000/api/delivery/orders/current', { withCredentials: true });
+            const res = await apiClient.get('/delivery/orders/current');
             if (res.data.order) {
                 setActiveOrder(res.data.order);
                 setIsOnline(false);
@@ -82,7 +83,7 @@ const DeliveryDashboard = () => {
 
     const fetchStats = async () => {
         try {
-            const res = await axios.get('http://localhost:3000/api/delivery/history', { withCredentials: true });
+            const res = await apiClient.get('/delivery/history');
             if (res.data.stats) setStats(res.data.stats);
         } catch (err) { console.error(err); }
     };
@@ -90,14 +91,14 @@ const DeliveryDashboard = () => {
     const toggleStatus = async () => {
         try {
             const newStatus = isOnline ? 'offline' : 'online';
-            await axios.post('http://localhost:3000/api/delivery/toggle-status', { status: newStatus }, { withCredentials: true });
+            await apiClient.post('/delivery/toggle-status', { status: newStatus });
             setIsOnline(!isOnline);
         } catch (err) { console.error(err); }
     };
 
     const acceptOrder = async (orderId) => {
         try {
-            const res = await axios.post('http://localhost:3000/api/delivery/orders/accept', { orderId }, { withCredentials: true });
+            const res = await apiClient.post('/delivery/orders/accept', { orderId });
             setActiveOrder(res.data.order);
             setAvailableOrders(prev => prev.filter(o => o._id !== orderId));
             setIsOnline(false);
@@ -109,7 +110,7 @@ const DeliveryDashboard = () => {
 
     const updateStatus = async (status) => {
         try {
-            const res = await axios.put('http://localhost:3000/api/delivery/orders/status', { orderId: activeOrder._id, status }, { withCredentials: true });
+            const res = await apiClient.put('/delivery/orders/status', { orderId: activeOrder._id, status });
             setActiveOrder(res.data.order);
             if (status === 'Delivered') {
                 setActiveOrder(null);

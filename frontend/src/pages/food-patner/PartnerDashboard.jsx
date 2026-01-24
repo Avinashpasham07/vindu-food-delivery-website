@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../api/client';
 import { Link, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import AnalyticsChart from '../../components/AnalyticsChart';
+import TopItemsChart from '../../components/TopItemsChart';
+
+// ... (inside component)
 
 const PartnerDashboard = () => {
     const navigate = useNavigate();
@@ -10,6 +14,66 @@ const PartnerDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [orders, setOrders] = useState([]);
     const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'menu'
+
+    // Calculate Dashboard Stats
+    const calculateStats = () => {
+        // 1. Revenue Chart Data (Hourly for Today)
+        const revenueData = [];
+        const today = new Date();
+        const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+
+        // Initialize 12 AM to 11 PM
+        for (let i = 0; i < 24; i++) {
+            revenueData.push({
+                name: i === 0 ? '12 AM' : i === 12 ? '12 PM' : i > 12 ? `${i - 12} PM` : `${i} AM`,
+                hour: i,
+                revenue: 0,
+                orders: 0
+            });
+        }
+
+        // 2. Top Items Data
+        const itemCounts = {};
+
+        orders.forEach(order => {
+            const orderDate = new Date(order.createdAt);
+
+            // Revenue Logic (Only for today's orders)
+            if (new Date(order.createdAt) >= startOfDay) {
+                const hour = orderDate.getHours();
+                if (revenueData[hour]) {
+                    revenueData[hour].revenue += order.totalAmount;
+                    revenueData[hour].orders += 1;
+                }
+            }
+
+            // Top Items Logic (All time)
+            order.items.forEach(item => {
+                if (itemCounts[item.name]) {
+                    itemCounts[item.name] += item.quantity;
+                } else {
+                    itemCounts[item.name] = item.quantity;
+                }
+            });
+        });
+
+        // Filter out hours with 0 revenue to keep chart clean (optional, keeping for timeline consistency)
+        // Let's just take the active hours range (e.g. 9 AM to 11 PM) for better config?
+        // For now, let's just pass the full day or slice it.
+        // Optimization: Filter to only show hours with activity or current time range.
+        const currentHour = new Date().getHours();
+        const relevantRevenueData = revenueData.filter(d => d.hour <= currentHour && d.hour >= 9); // Show 9 AM to Now
+
+        // Format Top Items
+        const topItemsData = Object.keys(itemCounts)
+            .map(key => ({ name: key, value: itemCounts[key] }))
+            .sort((a, b) => b.value - a.value)
+            .slice(0, 5); // Top 5
+
+        return { revenueData: relevantRevenueData, topItemsData };
+    };
+
+    const { revenueData, topItemsData } = calculateStats();
 
     useEffect(() => {
         // Retrieve partner data from local storage
@@ -21,7 +85,8 @@ const PartnerDashboard = () => {
             fetchOrders(parsedPartner.id || parsedPartner._id);
 
             // Socket Setup
-            const socket = io('http://localhost:3000');
+            const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+            const socket = io(socketUrl);
             socket.emit('join_partner_room', parsedPartner.id || parsedPartner._id); // Assume room logic exists or broadcast globally
 
             socket.on('new-order', (newOrder) => {
@@ -45,7 +110,7 @@ const PartnerDashboard = () => {
 
     const fetchOrders = async (partnerId) => {
         try {
-            const res = await axios.get(`http://localhost:3000/api/orders/partner/${partnerId}`);
+            const res = await apiClient.get(`/orders/partner/${partnerId}`);
             setOrders(res.data);
         } catch (err) {
             console.error("Error fetching orders:", err);
@@ -54,7 +119,7 @@ const PartnerDashboard = () => {
 
     const updateOrderStatus = async (orderId, status) => {
         try {
-            await axios.put(`http://localhost:3000/api/orders/${orderId}/status`, { status });
+            await apiClient.put(`/orders/${orderId}/status`, { status });
             // Optimistic update
             setOrders(prev => prev.map(o => o._id === orderId ? { ...o, status } : o));
         } catch (err) {
@@ -65,7 +130,7 @@ const PartnerDashboard = () => {
 
     const fetchMyFood = async (partnerId) => {
         try {
-            const response = await axios.get(`http://localhost:3000/api/food/partner/${partnerId}`);
+            const response = await apiClient.get(`/food/partner/${partnerId}`);
             if (response.data && response.data.fooditems) {
                 setMyItems(response.data.fooditems);
             }
@@ -79,9 +144,7 @@ const PartnerDashboard = () => {
     const handleDelete = async (itemId) => {
         if (window.confirm("Are you sure you want to delete this item?")) {
             try {
-                const response = await axios.delete(`http://localhost:3000/api/food/${itemId}`, {
-                    withCredentials: true
-                });
+                const response = await apiClient.delete(`/food/${itemId}`);
                 if (response.status === 200) {
                     setMyItems(myItems.filter(item => item._id !== itemId));
                 }
@@ -131,7 +194,7 @@ const PartnerDashboard = () => {
             </div>
 
             {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div className="bg-[#1a1a1a] p-6 rounded-2xl border border-white/5">
                     <div className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Live Orders</div>
                     <div className="text-4xl font-black text-white">{orders.filter(o => o.status !== 'Delivered').length}</div>
@@ -144,6 +207,20 @@ const PartnerDashboard = () => {
                 <div className="bg-[#1a1a1a] p-6 rounded-2xl border border-white/5">
                     <div className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Total Revenue</div>
                     <div className="text-4xl font-black text-white">₹{orders.reduce((acc, curr) => acc + curr.totalAmount, 0)}</div>
+                </div>
+            </div>
+
+
+
+    // ... (return JSX)
+
+            {/* Analytics Charts Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12 animate-fade-in-up">
+                <div className="lg:col-span-2">
+                    <AnalyticsChart data={revenueData} />
+                </div>
+                <div className="lg:col-span-1">
+                    <TopItemsChart data={topItemsData} />
                 </div>
             </div>
 
@@ -258,7 +335,7 @@ const PartnerDashboard = () => {
                             <Link to="/create-food" className="text-[#10B981] font-bold hover:underline">Start Uploading</Link>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {myItems.map((item) => (
                                 <div key={item._id} className="group bg-[#1a1a1a] rounded-xl overflow-hidden border border-white/5 hover:border-[#10B981]/50 transition-all">
                                     <div className="aspect-[3/4] relative">

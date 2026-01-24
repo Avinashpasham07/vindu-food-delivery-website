@@ -1,9 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import { useCart } from '../context/CartContext';
 import { useSquad } from '../context/SquadContext';
+import { useTranslation } from 'react-i18next';
 
 const FoodCard = ({ item }) => {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
     const { addToCart, decrementItem, getItemQuantity } = useCart();
     const { roomId, sharedCart, updateSquadCart, socket } = useSquad();
 
@@ -36,7 +40,14 @@ const FoodCard = ({ item }) => {
                 });
             }
             updateSquadCart(newCart, 'added ' + item.name);
+            updateSquadCart(newCart, 'added ' + item.name);
         } else {
+            const user = localStorage.getItem('user');
+            if (!user) {
+                toast.error("Please login to order 🍔");
+                navigate('/user/login');
+                return;
+            }
             addToCart(item);
         }
     };
@@ -73,7 +84,7 @@ const FoodCard = ({ item }) => {
                 onClick={handleAdd}
                 className="w-24 md:w-auto bg-[#FF5E00] text-white font-bold text-xs uppercase tracking-wider px-6 py-2 rounded-xl transition-all shadow-lg hover:shadow-orange-500/30 active:scale-95 border border-transparent"
             >
-                Add
+                {t('add')}
             </button>
         ) : (
             <div className="flex items-center justify-between bg-[#1a1a1a] rounded-xl border border-[#FF5E00] h-9 md:h-10 overflow-hidden relative shadow-lg min-w-[90px]">
@@ -204,10 +215,10 @@ const FoodCard = ({ item }) => {
                     <div className="hidden md:flex items-center justify-between mt-3 pt-3 border-t border-white/5" onClick={(e) => e.preventDefault()}>
                         <div className="flex items-center gap-1.5 opacity-60">
                             <img src="https://b.zmtcdn.com/data/o2_assets/4bf016f32f05d26242cea342f30d47a31595763089.png" alt="safety" className="w-3 h-3 grayscale" />
-                            <span className="text-[10px] text-gray-400 font-medium">Safe</span>
+                            <span className="text-[10px] text-gray-400 font-medium">{t('safe')}</span>
                         </div>
                         <div className="flex items-center gap-1 text-[#FF5E00] opacity-80 group-hover:opacity-100 transition-opacity">
-                            <span className="text-[11px] font-bold tracking-wide uppercase">View Details</span>
+                            <span className="text-[11px] font-bold tracking-wide uppercase">{t('view_details')}</span>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                                 <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
                             </svg>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../../api/client';
 import '../../App.css';
 
 const VideoContent = ({ data, isActive, isMuted, toggleMute }) => {
@@ -66,9 +66,7 @@ const VideoContent = ({ data, isActive, isMuted, toggleMute }) => {
         setLikeCount(prev => newLikedState ? prev + 1 : prev - 1);
 
         try {
-            const response = await axios.put(`http://localhost:3000/api/food/${data._id}/like`, {}, {
-                withCredentials: true
-            });
+            const response = await apiClient.put(`/food/${data._id}/like`);
 
             if (response.status === 200) {
                 setLiked(response.data.isLiked);
@@ -288,9 +286,7 @@ const ReelsPage = () => {
     useEffect(() => {
         const fetchFood = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/food', {
-                    withCredentials: true
-                });
+                const response = await apiClient.get('/food');
                 if (response.data && response.data.fooditems) {
                     setReels(response.data.fooditems);
                     if (response.data.fooditems.length > 0) {

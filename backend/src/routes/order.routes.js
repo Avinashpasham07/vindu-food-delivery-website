@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/order.model');
 const { authuser } = require('../middlewares/auth.middleware');
+const validate = require('../middlewares/validate');
+const orderValidation = require('../validations/order.validation');
 
 // Place a new Order
-router.post('/place', authuser, async (req, res) => {
+router.post('/place', authuser, validate(orderValidation.placeOrder), async (req, res) => {
     try {
         const { items, totalAmount, address, paymentMethod } = req.body;
 
@@ -112,7 +114,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Update Order Status (Restaurant)
-router.put('/:orderId/status', async (req, res) => {
+router.put('/:orderId/status', validate(orderValidation.updateStatus), async (req, res) => {
     try {
         const { orderId } = req.params;
         const { status } = req.body; // 'Preparing', 'Ready', 'Out_for_Delivery'

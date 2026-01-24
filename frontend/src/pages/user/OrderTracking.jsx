@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import OrderService from '../../services/order.service';
-import mapBackground from '../../assets/map_background.png'; // Import the simulated map image
+import mapBackground from '../../assets/map_background.png';
+import { useTranslation } from 'react-i18next';
 
-const socket = io('http://localhost:3000');
+const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+const socket = io(socketUrl);
 
 const OrderTracking = () => {
     const { orderId } = useParams();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [progress, setProgress] = useState(0); // 0 to 100 for rider position
@@ -136,7 +139,7 @@ const OrderTracking = () => {
 
             {/* Header Actions */}
             <div className="p-4 flex justify-between items-center absolute top-0 left-0 right-0 z-[1000] pointer-events-none">
-                <button onClick={() => navigate('/')} className="w-10 h-10 pointer-events-auto bg-[#111]/80 backdrop-blur rounded-full flex items-center justify-center border border-white/10 shadow-lg active:scale-95 transition-transform">
+                <button onClick={() => navigate('/home')} className="w-10 h-10 pointer-events-auto bg-[#111]/80 backdrop-blur rounded-full flex items-center justify-center border border-white/10 shadow-lg active:scale-95 transition-transform">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-gray-200">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                     </svg>
@@ -144,7 +147,7 @@ const OrderTracking = () => {
                 <div className="flex items-center gap-3">
                     <div id="live-signal" className="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e] opacity-50 transition-opacity duration-300" title="Live Signal"></div>
                     <div className="px-4 py-1.5 bg-[#FF5E00] rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-orange-500/20">
-                        {order.deliveryStatus?.replace('_', ' ')}
+                        {t(order.deliveryStatus?.toLowerCase() || 'order_placed')}
                     </div>
                 </div>
             </div>
@@ -171,7 +174,7 @@ const OrderTracking = () => {
                     <div className="w-10 h-10 bg-[#111] border-2 border-gray-500 rounded-full flex items-center justify-center text-xl shadow-[0_0_20px_rgba(0,0,0,0.6)]">
                         👨‍🍳
                     </div>
-                    <span className="mt-1 text-[10px] font-bold bg-black/50 px-2 rounded text-gray-300 backdrop-blur-sm">Restaurant</span>
+                    <span className="mt-1 text-[10px] font-bold bg-black/50 px-2 rounded text-gray-300 backdrop-blur-sm">{t('restaurant')}</span>
                 </div>
 
                 {/* Home Marker */}
@@ -179,7 +182,7 @@ const OrderTracking = () => {
                     <div className="w-10 h-10 bg-[#FF5E00] border-2 border-white rounded-full flex items-center justify-center text-xl shadow-[0_0_20px_rgba(255,94,0,0.6)] animate-pulse">
                         🏠
                     </div>
-                    <span className="mt-1 text-[10px] font-bold bg-black/50 px-2 rounded text-white backdrop-blur-sm">Home</span>
+                    <span className="mt-1 text-[10px] font-bold bg-black/50 px-2 rounded text-white backdrop-blur-sm">{t('home')}</span>
                 </div>
 
                 {/* Animated Rider */}
@@ -192,7 +195,7 @@ const OrderTracking = () => {
                     </div>
                     {/* Label below rider */}
                     <div className="absolute top-14 left-1/2 -translate-x-1/2 bg-black/80 text-white text-[10px] font-bold px-2 py-0.5 rounded whitespace-nowrap">
-                        {order.deliveryStatus === 'Out_for_Delivery' ? 'On the way' : 'Waiting...'}
+                        {order.deliveryStatus === 'Out_for_Delivery' ? t('out_for_delivery_desc') : t('preparing_desc')}
                     </div>
                 </div>
 
@@ -204,11 +207,11 @@ const OrderTracking = () => {
                 {/* ETA Header */}
                 <div className="flex justify-between items-end mb-8">
                     <div>
-                        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Estimated Arrival</p>
-                        <h2 className="text-4xl font-black text-white">35 <span className="text-xl text-gray-500 font-bold">min</span></h2>
+                        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">{t('estimated_arrival')}</p>
+                        <h2 className="text-4xl font-black text-white">35 <span className="text-xl text-gray-500 font-bold">{t('min')}</span></h2>
                     </div>
                     <div className="text-right">
-                        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Order ID</p>
+                        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">{t('order_id')}</p>
                         <p className="text-white font-mono font-bold">#{order._id.slice(-6).toUpperCase()}</p>
                     </div>
                 </div>
@@ -223,24 +226,24 @@ const OrderTracking = () => {
                         <div className="flex items-center gap-4 relative">
                             <div className={`w-5 h-5 rounded-full z-10 border-4 border-[#111] ${getStepStatus('Placed') === 'completed' ? 'bg-green-500' : 'bg-gray-700'}`}></div>
                             <div className={getStepStatus('Placed') === 'completed' ? 'text-white' : 'text-gray-500'}>
-                                <p className="text-sm font-bold">Order Placed</p>
-                                <p className="text-[10px] opacity-60">We have received your order.</p>
+                                <p className="text-sm font-bold">{t('order_placed')}</p>
+                                <p className="text-[10px] opacity-60">{t('order_placed_desc')}</p>
                             </div>
                         </div>
                         {/* Step 2: Preparing */}
                         <div className="flex items-center gap-4 relative">
                             <div className={`w-5 h-5 rounded-full z-10 border-4 border-[#111] ${getStepStatus('Preparing') === 'completed' ? 'bg-[#FF5E00]' : 'bg-gray-700'}`}></div>
                             <div className={getStepStatus('Preparing') === 'completed' ? 'text-white' : 'text-gray-500'}>
-                                <p className="text-sm font-bold">Preparing Details</p>
-                                <p className="text-[10px] opacity-60">Kitchen is preparing your food.</p>
+                                <p className="text-sm font-bold">{t('preparing')}</p>
+                                <p className="text-[10px] opacity-60">{t('preparing_desc')}</p>
                             </div>
                         </div>
                         {/* Step 3: Out for Delivery */}
                         <div className="flex items-center gap-4 relative">
                             <div className={`w-5 h-5 rounded-full z-10 border-4 border-[#111] animate-pulse ${getStepStatus('Out_for_Delivery') === 'completed' ? 'bg-[#FF5E00]' : 'bg-gray-700'}`}></div>
                             <div className={getStepStatus('Out_for_Delivery') === 'completed' ? 'text-white' : 'text-gray-500'}>
-                                <p className="text-sm font-bold">Out for Delivery</p>
-                                <p className="text-[10px] opacity-60">Driver is on the way.</p>
+                                <p className="text-sm font-bold">{t('out_for_delivery')}</p>
+                                <p className="text-[10px] opacity-60">{t('out_for_delivery_desc')}</p>
                             </div>
                         </div>
 
@@ -271,17 +274,16 @@ const OrderTracking = () => {
                     </div>
                 ) : (
                     <div className="bg-[#1a1a1a] rounded-2xl p-4 border border-white/5 flex items-center justify-center text-gray-500 text-sm font-medium animate-pulse">
-                        Searching for nearby drivers...
+                        {t('searching_driver')}
                     </div>
                 )}
 
                 {/* Cancel Order (Only if not picked up) */}
                 {order.deliveryStatus === 'Searching' && (
                     <button className="w-full mt-4 py-3 text-red-500 font-bold text-sm hover:bg-red-500/10 rounded-xl transition-colors">
-                        Cancel Order
+                        {t('cancel_order')}
                     </button>
                 )}
-
             </div>
         </div>
     );

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logger = require('../config/logger');
 
 function connectDB() {
     mongoose.connect(process.env.MONGO_URI, {
@@ -8,10 +9,10 @@ function connectDB() {
         socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
     })
         .then(() => {
-            console.log('Connected to MongoDB');
+            logger.info('Connected to MongoDB');
         })
         .catch((err) => {
-            console.error('Error connecting to MongoDB:', err);
+            logger.error(`Error connecting to MongoDB: ${err.message}`);
         })
 }
 module.exports = connectDB;

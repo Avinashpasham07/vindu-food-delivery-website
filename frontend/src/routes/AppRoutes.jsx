@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // Layouts and Guards (Keep static for faster shell load)
 import MainLayout from '../layouts/MainLayout';
 import AuthPartner from '../components/AuthPartner';
+import AuthUser from '../components/AuthUser';
 
 // Lazy Load Pages
 const RegisterUser = React.lazy(() => import('../pages/RegisterUser'));
@@ -19,6 +20,11 @@ const PartnerDashboard = React.lazy(() => import('../pages/food-patner/PartnerDa
 const PartnerProfile = React.lazy(() => import('../pages/food-patner/PartnerProfile'));
 const UserProfile = React.lazy(() => import('../pages/user/UserProfile'));
 const GoldMembership = React.lazy(() => import('../pages/user/GoldMembership'));
+const PaymentMock = React.lazy(() => import('../pages/user/PaymentMock'));
+const LandingPage = React.lazy(() => import('../pages/general/LandingPage'));
+const RestaurantLanding = React.lazy(() => import('../pages/general/RestaurantLanding'));
+const DeliveryLanding = React.lazy(() => import('../pages/general/DeliveryLanding'));
+const EntryPage = React.lazy(() => import('../pages/general/EntryPage'));
 const ReelsPage = React.lazy(() => import('../pages/general/ReelsPage'));
 const FoodDetails = React.lazy(() => import('../pages/general/FoodDetails'));
 const CartPage = React.lazy(() => import('../pages/general/CartPage'));
@@ -61,16 +67,35 @@ const AppRoutes = () => {
           <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
           <Route path="/delivery/profile" element={<DeliveryProfile />} />
 
+          {/* Entry & Landing Pages */}
+          <Route path="/" element={<EntryPage />} />
+          <Route path="/landing" element={<LandingPage />} />
+          <Route path="/partner" element={<RestaurantLanding />} />
+          <Route path="/rider" element={<DeliveryLanding />} />
+
           {/* Main Layout for App Pages */}
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/reels" element={<ReelsPage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/cart" element={
+              <AuthUser>
+                <CartPage />
+              </AuthUser>
+            } />
+            <Route path="/checkout" element={
+              <AuthUser>
+                <CheckoutPage />
+              </AuthUser>
+            } />
             <Route path="/partner/dashboard" element={<PartnerDashboard />} />
             <Route path="/partner/profile" element={<PartnerProfile />} />
-            <Route path="/user/profile" element={<UserProfile />} />
+            <Route path="/user/profile" element={
+              <AuthUser>
+                <UserProfile />
+              </AuthUser>
+            } />
             <Route path="/user/gold" element={<GoldMembership />} />
+            <Route path="/user/payment" element={<PaymentMock />} />
             <Route path="/create-food" element={
               <AuthPartner>
                 <CreateFood />

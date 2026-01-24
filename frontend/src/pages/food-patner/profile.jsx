@@ -160,7 +160,7 @@ const Profile = () => {
 
             {/* Back Button */}
             <Link
-                to="/"
+                to="/home"
                 className="fixed top-6 right-6 z-50 w-12 h-12 bg-black/50 backdrop-blur-md text-white rounded-full flex items-center justify-center border border-white/10 hover:bg-[#FF5E00] hover:border-[#FF5E00] transition-all duration-300 shadow-xl group"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5 group-hover:rotate-90 transition-transform">

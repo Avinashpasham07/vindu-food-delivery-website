@@ -30,4 +30,17 @@ export default defineConfig({
       }
     })
   ],
+  // Build Optimizations
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom', 'framer-motion'],
+          ui: ['@headlessui/react', 'lucide-react', 'react-hot-toast'],
+          utils: ['axios', 'socket.io-client', 'i18next']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  }
 })

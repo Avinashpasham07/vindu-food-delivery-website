@@ -59,7 +59,14 @@ async function createfood(req, res) {
 }
 
 async function getallfood(req, res) {
-    const fooditems = await foodmodel.find({}).populate('foodpartner', 'name');
+    // Senior Optimization: Limit to 100 items to prevent huge payloads
+    // Ideally, implement pagination (limit/page query params)
+    const limit = parseInt(req.query.limit) || 100;
+    const fooditems = await foodmodel.find({})
+        .populate('foodpartner', 'name')
+        .sort({ createdAt: -1 }) // Newest first
+        .limit(limit);
+
     res.status(200).json({
         message: "Food items retrieved successfully",
         fooditems

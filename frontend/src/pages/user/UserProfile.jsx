@@ -23,7 +23,8 @@ const UserProfile = () => {
             const parsedUser = JSON.parse(storedUser);
             setUser(parsedUser);
 
-            const socket = io('http://localhost:3000');
+            const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+            const socket = io(socketUrl);
             socket.emit('join_user_room', parsedUser.id || parsedUser._id);
 
             socket.on('order-updated', (updatedOrder) => {
@@ -79,9 +80,35 @@ const UserProfile = () => {
 
     if (!user) {
         return (
-            <div className="min-h-screen bg-[#000] flex items-center justify-center text-white font-['Plus_Jakarta_Sans']">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-[#FF5E00]/20 border-t-[#FF5E00] rounded-full animate-spin"></div>
+            <div className="min-h-screen bg-[#050505] text-white font-['Plus_Jakarta_Sans'] p-6 md:p-12">
+                <div className="max-w-7xl mx-auto space-y-12">
+                    {/* Header Skeleton */}
+                    <div className="flex flex-col md:flex-row justify-between gap-6">
+                        <div className="space-y-4">
+                            <Skeleton width="120px" height="20px" />
+                            <Skeleton width="300px" height="60px" />
+                            <Skeleton width="200px" height="24px" />
+                        </div>
+                        <Skeleton width="150px" height="40px" className="rounded-full" />
+                    </div>
+
+                    {/* Profile Card Skeleton */}
+                    <div className="flex gap-8">
+                        <div className="w-full md:w-1/3">
+                            <div className="bg-[#111] border border-white/5 rounded-[32px] p-8 flex flex-col items-center">
+                                <Skeleton width="128px" height="128px" className="rounded-full mb-6" />
+                                <Skeleton width="200px" height="32px" className="mb-2" />
+                                <Skeleton width="150px" height="20px" className="mb-6" />
+                                <div className="flex gap-4 w-full">
+                                    <Skeleton width="100%" height="48px" className="rounded-xl" />
+                                    <Skeleton width="100%" height="48px" className="rounded-xl" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="hidden md:block w-2/3">
+                            <Skeleton width="100%" height="400px" className="rounded-[32px]" />
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -104,7 +131,7 @@ const UserProfile = () => {
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-8 md:py-12">
                 <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-fade-in-up">
                     <div>
-                        <Link to="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-6 group">
+                        <Link to="/home" className="inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-6 group">
                             <div className="p-2 rounded-full border border-white/5 bg-white/5 group-hover:border-[#FF5E00]/50 group-hover:text-[#FF5E00] transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -225,7 +252,7 @@ const UserProfile = () => {
                                 ) : orders.length === 0 ? (
                                     <div className="bg-[#111] border border-white/5 rounded-[32px] p-12 text-center animate-fade-in-up">
                                         <h3 className="text-xl font-bold text-white mb-2">No past orders</h3>
-                                        <Link to="/" className="px-8 py-3 bg-[#FF5E00] text-white rounded-xl font-bold hover:bg-[#e05200] transition-colors">Order Now</Link>
+                                        <Link to="/home" className="px-8 py-3 bg-[#FF5E00] text-white rounded-xl font-bold hover:bg-[#e05200] transition-colors">Order Now</Link>
                                     </div>
                                 ) : (
                                     orders.map(order => (
@@ -320,7 +347,7 @@ const UserProfile = () => {
                                 ) : favorites.length === 0 ? (
                                     <div className="bg-[#111] border border-white/5 rounded-[32px] p-12 text-center animate-fade-in-up">
                                         <h3 className="text-xl font-bold text-white mb-2">No favorites yet</h3>
-                                        <Link to="/" className="px-8 py-3 bg-[#FF5E00] text-white rounded-xl font-bold hover:bg-[#e05200] transition-colors">Explore Food</Link>
+                                        <Link to="/home" className="px-8 py-3 bg-[#FF5E00] text-white rounded-xl font-bold hover:bg-[#e05200] transition-colors">Explore Food</Link>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import apiClient from '../../api/client';
 import { useNavigate, Link } from 'react-router-dom';
 import '../../App.css';
 
@@ -61,8 +61,7 @@ const CreateFood = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:3000/api/food', data, {
-                withCredentials: true,
+            const response = await apiClient.post('/food', data, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -101,7 +100,7 @@ const CreateFood = () => {
 
             <div className="flex-none w-full lg:w-[500px] bg-[#0d0d0d] flex flex-col justify-center p-[30px] lg:p-[40px_60px] relative border-l border-[#333]">
                 <div className="absolute top-[20px] lg:top-[40px] right-[20px] lg:right-[60px]">
-                    <Link to="/" className="text-sm text-[#a1a1aa] no-underline font-medium hover:text-white transition-colors">
+                    <Link to="/home" className="text-sm text-[#a1a1aa] no-underline font-medium hover:text-white transition-colors">
                         Home
                     </Link>
                 </div>
@@ -141,7 +140,7 @@ const CreateFood = () => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 mb-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                         <div>
                             <label htmlFor="price" className="block text-[13px] font-semibold text-[#a1a1aa] mb-2">Price (₹)</label>
                             <input
@@ -167,7 +166,7 @@ const CreateFood = () => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 mb-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                         <div>
                             <label htmlFor="prepTime" className="block text-[13px] font-semibold text-[#a1a1aa] mb-2">Prep Time</label>
                             <input

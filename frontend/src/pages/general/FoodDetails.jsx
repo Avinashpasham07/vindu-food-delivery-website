@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import apiClient from '../../api/client';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
+import Skeleton from '../../components/Skeleton';
 
 const FoodDetails = () => {
     const { id } = useParams();
@@ -66,6 +67,12 @@ const FoodDetails = () => {
     };
 
     const handleAddToCart = () => {
+        const user = localStorage.getItem('user');
+        if (!user) {
+            showToast("Please login to order 🍔", 'error');
+            navigate('/user/login');
+            return;
+        }
         if (!food) return;
 
         // Create cart item object
@@ -121,8 +128,42 @@ const FoodDetails = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center text-white">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF5E00]"></div>
+            <div className="min-h-screen bg-[#0d0d0d] text-white font-['Plus_Jakarta_Sans'] pb-36">
+                {/* Skeleton Media */}
+                <div className="relative w-full h-[55vh] lg:h-[65vh] bg-[#1a1a1a]">
+                    <Skeleton width="100%" height="100%" className="opacity-20" />
+                </div>
+
+                {/* Skeleton Content */}
+                <div className="px-5 md:px-8 -mt-16 relative z-10">
+                    <div className="flex justify-between items-start mb-6">
+                        <Skeleton width="70%" height="48px" className="rounded-xl" />
+                        <Skeleton width="80px" height="32px" className="rounded-xl" />
+                    </div>
+
+                    <div className="flex gap-3 mb-8">
+                        <Skeleton width="40px" height="40px" className="rounded-full" />
+                        <div className="space-y-1">
+                            <Skeleton width="120px" height="16px" />
+                            <Skeleton width="80px" height="12px" />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2 mb-10">
+                        <Skeleton width="100%" height="16px" />
+                        <Skeleton width="100%" height="16px" />
+                        <Skeleton width="80%" height="16px" />
+                    </div>
+
+                    <div className="mb-10">
+                        <Skeleton width="100px" height="14px" className="mb-4" />
+                        <div className="flex gap-3 overflow-hidden">
+                            {[1, 2, 3].map(i => (
+                                <Skeleton key={i} width="120px" height="120px" className="rounded-xl flex-shrink-0" />
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -131,7 +172,7 @@ const FoodDetails = () => {
         return (
             <div className="min-h-screen bg-[#0d0d0d] flex flex-col items-center justify-center text-white p-4">
                 <h2 className="text-2xl font-bold mb-4">Item not found</h2>
-                <button onClick={() => navigate('/')} className="px-6 py-2 bg-[#FF5E00] rounded-full font-bold">Go Home</button>
+                <button onClick={() => navigate('/home')} className="px-6 py-2 bg-[#FF5E00] rounded-full font-bold">Go Home</button>
             </div>
         );
     }
@@ -223,8 +264,6 @@ const FoodDetails = () => {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d0d] via-[#0d0d0d]/40 to-transparent"></div>
             </div>
-
-
 
             {/* Content Container */}
             <div className="px-5 md:px-8 -mt-16 relative z-10">
@@ -422,15 +461,23 @@ const FoodDetails = () => {
                                 </button>
                                 <span className="text-white font-bold text-xl w-8 text-center tabular-nums">{getItemQuantity(food._id)}</span>
                                 <button
-                                    onClick={() => addToCart({
-                                        _id: food._id,
-                                        name: food.name,
-                                        price: food.price,
-                                        image: food.image,
-                                        video: food.video,
-                                        fileType: food.fileType,
-                                        description: food.description
-                                    }, 1)}
+                                    onClick={() => {
+                                        const user = localStorage.getItem('user');
+                                        if (!user) {
+                                            showToast("Please login to order 🍔", 'error');
+                                            navigate('/user/login');
+                                            return;
+                                        }
+                                        addToCart({
+                                            _id: food._id,
+                                            name: food.name,
+                                            price: food.price,
+                                            image: food.image,
+                                            video: food.video,
+                                            fileType: food.fileType,
+                                            description: food.description
+                                        }, 1)
+                                    }}
                                     className="w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/5 hover:bg-white/10 transition-all active:scale-95"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">

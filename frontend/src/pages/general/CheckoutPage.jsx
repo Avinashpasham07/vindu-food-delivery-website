@@ -203,7 +203,7 @@ const CheckoutPage = () => {
                             <button
                                 onClick={() => {
                                     leaveSquad();
-                                    navigate('/');
+                                    navigate('/home');
                                 }}
                                 className="w-full py-3 text-gray-400 hover:text-white font-bold transition-colors"
                             >
@@ -219,7 +219,7 @@ const CheckoutPage = () => {
                                 Track Live Order 📍
                             </button>
                             <button
-                                onClick={() => navigate('/')}
+                                onClick={() => navigate('/home')}
                                 className="w-full py-3 text-gray-400 hover:text-white font-bold transition-colors"
                             >
                                 Back to Home

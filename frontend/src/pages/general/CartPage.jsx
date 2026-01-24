@@ -80,7 +80,7 @@ const CartPage = () => {
                     </div>
                     <h2 className="text-4xl font-black mb-4 tracking-tight animate-slide-up">Your cart is empty</h2>
                     <p className="text-gray-400 mb-10 max-w-md text-lg animate-slide-up animation-delay-100">Looks like you haven't added anything to your cart yet. Discover delicious meals near you.</p>
-                    <Link to="/" className="animate-slide-up animation-delay-200 group bg-white text-black px-10 py-4 rounded-full font-bold text-lg transition-all hover:bg-[#FF5E00] hover:text-white hover:scale-105 active:scale-95 shadow-lg hover:shadow-[#FF5E00]/50">
+                    <Link to="/home" className="animate-slide-up animation-delay-200 group bg-white text-black px-10 py-4 rounded-full font-bold text-lg transition-all hover:bg-[#FF5E00] hover:text-white hover:scale-105 active:scale-95 shadow-lg hover:shadow-[#FF5E00]/50">
                         Browse Food
                     </Link>
                 </div>
@@ -171,7 +171,7 @@ const CartPage = () => {
 
                         {/* Add More Items Button */}
                         <button
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate('/home')}
                             className="w-full py-4 rounded-3xl border-2 border-dashed border-white/10 text-gray-400 hover:text-white hover:border-[#FF5E00]/50 hover:bg-[#FF5E00]/5 transition-all flex items-center justify-center gap-2 group font-bold"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 group-hover:scale-110 transition-transform">

@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useSquad } from '../context/SquadContext';
@@ -158,6 +159,12 @@ const SmartCart = () => {
 
                     <button
                         onClick={() => {
+                            const user = localStorage.getItem('user');
+                            if (!user) {
+                                toast.error("Please login to checkout 🛒");
+                                navigate('/user/login');
+                                return;
+                            }
                             const myShare = roomId
                                 ? sharedCart.reduce((total, item) => total + (item.price * (item.split?.[socket?.id] || 0)), 0)
                                 : 0;

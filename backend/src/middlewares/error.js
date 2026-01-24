@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
+const logger = require('../config/logger');
 
 const errorConverter = (err, req, res, next) => {
     let error = err;
@@ -28,7 +29,9 @@ const errorHandler = (err, req, res, next) => {
     };
 
     if (process.env.NODE_ENV === 'development') {
-        console.error(err);
+        logger.error(err.stack); // Log full stack in dev
+    } else {
+        logger.error(err.message); // Log message in prod
     }
 
     res.status(statusCode).send(response);

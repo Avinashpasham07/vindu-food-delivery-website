@@ -1,43 +1,35 @@
 const Joi = require('joi');
 
-const userRegister = {
+const register = {
     body: Joi.object().keys({
-        fullname: Joi.string().required().min(3),
+        fullname: Joi.string().required().min(2).max(50),
         email: Joi.string().required().email(),
-        password: Joi.string().required().min(6),
-        phone: Joi.string().required(),
-    }),
+        password: Joi.string().required().min(8)
+            .pattern(new RegExp('^[a-zA-Z0-9@#$%^&+=]*$'))
+            .message('Password must contain only alphanumeric characters and @#$%^&+=')
+            .custom((value, helpers) => {
+                if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
+                    return helpers.message('Password must contain at least one letter and one number');
+                }
+                return value;
+            }),
+        phone: Joi.string().pattern(/^[0-9]{10}$/).message('Phone number must be 10 digits').required()
+    })
 };
 
-const userLogin = {
+const login = {
     body: Joi.object().keys({
-        email: Joi.string().required().email(),
-        password: Joi.string().required(),
-    }),
+        email: Joi.string().required(),
+        password: Joi.string().required()
+    })
 };
 
-const foodPartnerRegister = {
-    body: Joi.object().keys({
-        name: Joi.string().required(),
-        email: Joi.string().required().email(),
-        password: Joi.string().required().min(6),
-        phone: Joi.string().required(),
-        contactName: Joi.string().allow('', null),
-        address: Joi.string().allow('', null),
-        role: Joi.string().default('foodPartner'),
-    }),
-};
-
-const foodPartnerLogin = {
-    body: Joi.object().keys({
-        email: Joi.string().required().email(),
-        password: Joi.string().required(),
-    }),
+const logout = {
+    body: Joi.object().keys({})
 };
 
 module.exports = {
-    userRegister,
-    userLogin,
-    foodPartnerRegister,
-    foodPartnerLogin
+    register,
+    login,
+    logout
 };

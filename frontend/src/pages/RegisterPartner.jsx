@@ -54,7 +54,7 @@ const RegisterPartner = () => {
       {/* Brand Text - Desktop Left (Fixed Position) */}
       <div className="fixed top-12 left-12 lg:top-24 lg:left-24 z-10 hidden lg:block max-w-2xl pointer-events-none">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-8 animate-fade-in pointer-events-auto">
-          <span className="w-2 h-2 rounded-full bg-[#10B981]"></span>
+          <img src="/logo.png" alt="Vindu" className="w-6 h-6 object-contain border border-orange-400 rounded-full" />
           <span className="text-white text-sm font-bold tracking-wide">For Business</span>
         </div>
         <h1 className="text-7xl font-black text-white leading-tight mb-6 animate-slide-up">

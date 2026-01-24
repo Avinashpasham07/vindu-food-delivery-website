@@ -21,7 +21,7 @@ const BottomNav = () => {
                     <span className={`text-[10px] font-medium transition-opacity duration-300 ${location.pathname === '/partner/dashboard' ? 'opacity-100' : 'opacity-70'}`}>Dashboard</span>
                 </Link>
             ) : (
-                <Link to="/" className={`relative flex flex-col items-center gap-1 transition-all duration-300 ${location.pathname === '/' ? 'text-[#FF5E00] -translate-y-1' : 'text-gray-500 hover:text-gray-300'}`}>
+                <Link to="/home" className={`relative flex flex-col items-center gap-1 transition-all duration-300 ${location.pathname === '/home' ? 'text-[#FF5E00] -translate-y-1' : 'text-gray-500 hover:text-gray-300'}`}>
                     <div className={`p-2 rounded-full transition-all duration-300 ${location.pathname === '/' ? 'bg-[#FF5E00]/10' : ''}`}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill={location.pathname === '/' ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />

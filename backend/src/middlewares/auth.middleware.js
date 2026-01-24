@@ -33,6 +33,8 @@ async function authfoodpatner(req, res, next) {
     }
 }
 
+const logger = require('../utils/logger');
+
 async function authuser(req, res, next) {
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
@@ -42,14 +44,12 @@ async function authuser(req, res, next) {
         });
     }
 
-    const fs = require('fs');
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        // fs.appendFileSync('auth_debug.log', `[${new Date().toISOString()}] Success: ${JSON.stringify(decoded)}\n`);
         const user = await usermodel.findById(decoded.userId);
 
         if (!user) {
-            fs.appendFileSync('auth_debug.log', `[${new Date().toISOString()}] User Not Found: ${decoded.userId}\n`);
+            logger.warn(`User Not Found in Auth Middleware: ${decoded.userId}`);
             return res.status(401).json({
                 message: "Not authorized: invalid user token"
             });
@@ -59,7 +59,7 @@ async function authuser(req, res, next) {
         next();
 
     } catch (err) {
-        fs.appendFileSync('auth_debug.log', `[${new Date().toISOString()}] Error: ${err.message} | Token: ${token ? token.substring(0, 20) + '...' : 'NONE'}\n`);
+        logger.error(`Auth Error: ${err.message}`, { token: token ? token.substring(0, 20) + '...' : 'NONE' });
         return res.status(401).json({
             message: "invalid token, authorization denied"
         });

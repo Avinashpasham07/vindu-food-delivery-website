@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocation }) => {
     const location = useLocation();
-    const isHome = location.pathname === '/';
+    const isHome = location.pathname === '/home';
     const user = JSON.parse(localStorage.getItem('user'));
 
     // Location State (Internal to Header if mostly UI, but passed from parent for persistence)
@@ -27,8 +27,8 @@ const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocati
         <div className="sticky top-0 z-50 bg-[#0d0d0d]/95 backdrop-blur-xl border-b border-white/5 pb-0 transition-all duration-300">
             <div className="max-w-7xl mx-auto px-5 pt-4 pb-4 flex items-center gap-8 justify-between">
                 {/* Logo */}
-                <Link to="/" className="text-3xl font-black tracking-tighter text-white">
-                    Vindu<span className="text-[#FF5E00]">.</span>
+                <Link to="/home" className="flex items-center gap-2">
+                    <img src="/logo.png" alt="Vindu" className="h-10 w-auto object-contain" />
                 </Link>
 
                 {/* Search & Location Capsule - ONLY ON HOME */}
