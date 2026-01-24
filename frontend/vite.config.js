@@ -35,7 +35,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom', 'framer-motion'],
+          vendor: ['react', 'react-dom', 'react-router-dom'],
           ui: ['@headlessui/react', 'lucide-react', 'react-hot-toast'],
           utils: ['axios', 'socket.io-client', 'i18next']
         }
