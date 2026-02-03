@@ -11,3 +11,4 @@
 {"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-01-24 21:10:43"}
 {"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-01-24 21:10:43"}
 {"level":"info","message":"User Logged In: 6971105ea72e7dde2eb8adf4","service":"vindu-backend","timestamp":"2026-01-24 21:45:22"}
+{"level":"info","message":"User Logged In: 6971105ea72e7dde2eb8adf4","service":"vindu-backend","timestamp":"2026-02-03 21:14:25"}

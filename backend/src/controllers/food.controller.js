@@ -11,7 +11,12 @@ async function createfood(req, res) {
     let videoUrl = '';
     let fileType = 'video';
 
-    if (req.files && req.files.video) {
+    if (req.body.videoUrl) {
+        videoUrl = req.body.videoUrl;
+        // Simple check to see if it's an image or video URL
+        const isImage = /\.(jpg|jpeg|png|webp|gif)$/i.test(videoUrl);
+        fileType = isImage ? 'image' : 'video';
+    } else if (req.files && req.files.video) {
         const videoFile = req.files.video[0];
         const base64File = videoFile.buffer.toString("base64");
         const uploadResult = await storageService.uploadImage(base64File, uuid());
@@ -21,6 +26,11 @@ async function createfood(req, res) {
 
     // Process Gallery Images (Parallel Upload)
     const galleryImages = [];
+    if (req.body.galleryUrls) {
+        const urls = req.body.galleryUrls.split(',').map(url => url.trim()).filter(url => url !== '');
+        galleryImages.push(...urls);
+    }
+
     if (req.files && req.files.images) {
         const uploadPromises = req.files.images.map(async (file) => {
             const base64 = file.buffer.toString("base64");
@@ -191,7 +201,11 @@ async function updateFood(req, res) {
 
         // If a new video/image is uploaded
         // If a new video/image is uploaded
-        if (req.files && req.files.video) {
+        if (req.body.videoUrl) {
+            updates.video = req.body.videoUrl;
+            const isImage = /\.(jpg|jpeg|png|webp|gif)$/i.test(req.body.videoUrl);
+            updates.fileType = isImage ? 'image' : 'video';
+        } else if (req.files && req.files.video) {
             const videoFile = req.files.video[0];
             const base64File = videoFile.buffer.toString("base64");
             const uploadResult = await storageService.uploadImage(base64File, uuid());
@@ -199,7 +213,24 @@ async function updateFood(req, res) {
             updates.fileType = uploadResult.fileType;
         }
 
-        // If extra gallery images are uploaded (Append to existing or replace? - For now append)
+        // Handle Gallery Images
+        let currentGallery = [];
+        if (req.body.existingImages) {
+            // Use the list provided by the frontend as the base
+            currentGallery = req.body.existingImages.split(',').map(url => url.trim()).filter(url => url !== '');
+        } else {
+            // Fallback to current DB state if not provided (safety)
+            const currentFood = await foodmodel.findById(id);
+            if (currentFood) {
+                currentGallery = [...currentFood.images];
+            }
+        }
+
+        if (req.body.galleryUrls) {
+            const urls = req.body.galleryUrls.split(',').map(url => url.trim()).filter(url => url !== '');
+            currentGallery = [...currentGallery, ...urls];
+        }
+
         if (req.files && req.files.images) {
             const uploadPromises = req.files.images.map(async (file) => {
                 const base64 = file.buffer.toString("base64");
@@ -207,29 +238,12 @@ async function updateFood(req, res) {
                 return result.url;
             });
             const uploadedUrls = await Promise.all(uploadPromises);
+            currentGallery = [...currentGallery, ...uploadedUrls];
+        }
 
-            // To append, we need `$push`. To replace we just set. 
-            // Here `updates.images` would replace. Let's do a simple replace logic for now OR fetch current and append.
-            // For simplicity in this `updates` object based flow, let's assume replacement or user sends old images back?
-            // Actually `findOneAndUpdate` with simple object does $set. 
-            // A better UX is probably "Add these images". Let's use $push if desired, but `updates` object overwrites entire fields usually.
-            // Let's stick to: New upload = Add to array. But `updates` map is static values. 
-            // We'll separate the $push operation if needed, or query first.
-            // EASIEST ROBUST WAY: Fetch doc first, merge arrays, save. But we want atomic.
-            // Let's use $push for images if present.
-
-            // Wait, `req.body` only has text fields. 
-            // Let's modify the query below.
-
-            // NOTE: `req.body.name` etc overwrites. 
-            // Creating a robust update requires thinking about deleting old images too.
-            // For MVP: New images get ADDED to the array.
-            const currentFood = await foodmodel.findById(id);
-            if (currentFood) {
-                updates.images = [...currentFood.images, ...uploadedUrls];
-            } else {
-                updates.images = uploadedUrls;
-            }
+        // Always update images if we've processed gallery related fields or if it's explicitly about removal
+        if (req.body.galleryUrls || (req.files && req.files.images) || req.body.existingImages) {
+            updates.images = currentGallery;
         }
 
         const food = await foodmodel.findOneAndUpdate(

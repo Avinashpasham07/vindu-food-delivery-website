@@ -176,26 +176,26 @@ const HomePage = () => {
                     {/* Top Row: Logo, Location (Mobile), Actions */}
                     <div className="flex items-center justify-between gap-4">
                         {/* Logo */}
-                        <div className="flex-shrink-0 flex items-center gap-2">
-                            <Link to="/landing" className="flex items-center gap-2">
-                                <img src="/logo.png" alt="Vindu" className="h-10 w-auto object-contain border border-orange-400 rounded-full" />
+                        <div className="flex-shrink-0 flex items-center gap-1 sm:gap-2">
+                            <Link to="/landing" className="flex items-center gap-1.5">
+                                <img src="/logo.png" alt="Vindu" className="h-7 w-7 sm:h-9 w-auto object-contain border border-orange-400 rounded-full" />
                             </Link>
-                            <Link to="/landing" className="text-3xl font-black tracking-tighter text-white">
-                                Vindu<span className="text-[#FF5E00]">.</span>
+                            <Link to="/landing" className="text-xl sm:text-2xl md:text-3xl font-black tracking-tighter text-white">
+                                <span className="hidden min-[400px]:inline">Vindu</span><span className="text-[#FF5E00]"></span>
                             </Link>
                         </div>
 
                         {/* Mobile Location Picker (Visible only on mobile) */}
-                        <div className="md:hidden flex-1 flex justify-center">
+                        <div className="md:hidden flex-1 flex justify-center max-w-[140px]">
                             <div
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1a1a1a] rounded-full border border-white/10"
+                                className="flex items-center gap-1.5 px-2.5 py-1 bg-[#1a1a1a] rounded-full border border-white/5 active:bg-[#222] transition-colors"
                                 onClick={() => setIsLocationOpen(!isLocationOpen)}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-[#FF5E00]">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-[#FF5E00]">
                                     <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                                 </svg>
-                                <span className="text-xs font-bold text-gray-200 max-w-[100px] truncate">{selectedLocation}</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className={`w-3 h-3 text-gray-400 transition-transform duration-300 ${isLocationOpen ? 'rotate-180 text-[#FF5E00]' : ''}`}>
+                                <span className="text-[10px] font-black text-gray-200 truncate max-w-[60px]">{selectedLocation}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className={`w-2.5 h-2.5 text-gray-500 transition-transform duration-300 ${isLocationOpen ? 'rotate-180 text-[#FF5E00]' : ''}`}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                                 </svg>
                             </div>
@@ -289,7 +289,7 @@ const HomePage = () => {
                         </div>
 
                         {/* Right Side Actions */}
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2 sm:gap-6">
                             {/* Squad Mode Button */}
                             <div className="flex">
                                 {roomId ? (
@@ -307,26 +307,24 @@ const HomePage = () => {
                                 ) : (
                                     <button
                                         onClick={() => setShowJoinModal(true)}
-                                        className="flex items-center gap-1.5 md:gap-2 text-sm md:text-[18px] font-semibold text-white bg-orange-500 px-3 py-1.5 md:px-6 md:py-2 rounded-full md:rounded-3xl cursor-pointer hover:bg-orange-600 transition-colors"
+                                        className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm md:text-base font-bold text-white bg-[#FF5E00] px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-full cursor-pointer hover:bg-orange-600 transition-all active:scale-95 shadow-md shadow-orange-900/20"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 md:w-5 md:h-5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5">
                                             <path d="M4.5 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM14.25 8.625a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0zM1.5 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM17.25 19.128l-.001.144a2.25 2.25 0 01-.233.96 10.088 10.088 0 005.06-4.42 6.753 6.753 0 01-1.454-3.321 .75.75 0 00-.539-.641 9.776 9.776 0 00-2.833-.422z" />
                                         </svg>
-                                        <span>{t('squad_mode')}</span>
+                                        <span className="hidden min-[380px]:inline whitespace-nowrap">{t('squad_mode')}</span>
                                     </button>
                                 )}
                             </div>
 
                             {user ? (
-                                <div className="flex items-center gap-4">
+                                <div className="hidden sm:flex items-center gap-4">
                                     <Link to="/user/profile" className="flex items-center gap-2 hover:bg-orange-500/5 p-2 rounded-lg transition-colors">
                                         <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FF5E00] to-[#FF9050] flex items-center justify-center text-white font-bold text-sm">
                                             {user.fullname ? user.fullname[0].toUpperCase() : 'U'}
                                         </div>
                                         <span className="text-gray-300 font-medium hidden sm:block">{user.fullname}</span>
                                     </Link>
-
-
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-6 text-gray-300 text-lg font-light">
@@ -410,8 +408,8 @@ const HomePage = () => {
 
             {/* Squad Join Modal */}
             {showJoinModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#1a1a1a] p-6 rounded-2xl w-full max-w-sm border border-white/10 shadow-2xl">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+                    <div className="bg-[#1a1a1a] p-6 rounded-2xl w-full max-w-sm border border-white/10 shadow-2xl relative">
                         <h3 className="text-xl font-bold mb-4">Join or Start Squad</h3>
                         <div className="space-y-4">
                             <button
@@ -486,32 +484,32 @@ const HomePage = () => {
 
             {/* Recommended Feed - Immersive Cards */}
             <div className="px-5 mt-8">
-                <h3 className="font-black text-2xl md:text-4xl mb-6 text-white tracking-tight flex items-center gap-2">
+                <h3 className="font-black text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-4 sm:mb-6 text-white tracking-tight flex items-center gap-2">
                     {t('trending')}
                 </h3>
 
                 {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {[1, 2, 3, 4, 5, 6].map(i => (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
                             <SkeletonCard key={i} />
                         ))}
                     </div>
                 ) : (
                     <>
                         {/* First Batch of Items (Top 6) */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
                             {filteredItems.slice(0, 3).map((item) => (
                                 <FoodCard key={item._id} item={item} />
                             ))}
                         </div>
 
                         {/* Mood Selector (Embedded) */}
-                        <div className="py-12">
+                        <div className="py-8">
                             <MoodSelector onMoodSelect={(tags) => setSelectedMoodTags(tags)} />
                         </div>
 
                         {/* Remaining Items */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
                             {filteredItems.slice(3).map((item) => (
                                 <FoodCard key={item._id} item={item} />
                             ))}

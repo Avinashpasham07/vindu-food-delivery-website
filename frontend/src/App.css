@@ -63,3 +63,12 @@ body {
 .like-animation {
   animation: likeHeartAnimation 0.8s ease-in-out forwards;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -17,24 +17,78 @@ const CreateFood = () => {
         discount: '',
         protein: '',
         carbs: '',
-        fats: ''
+        fats: '',
+        videoUrl: '',
+        galleryUrls: ''
     });
     const [videoFile, setVideoFile] = React.useState(null);
     const [galleryFiles, setGalleryFiles] = React.useState([]);
+    const [mediaMode, setMediaMode] = React.useState('upload'); // 'upload' or 'url'
+    const [galleryMode, setGalleryMode] = React.useState('upload'); // 'upload' or 'url'
+
+    const [videoPreview, setVideoPreview] = React.useState(null);
+    const [galleryPreviews, setGalleryPreviews] = React.useState([]);
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.id]: e.target.value });
+        const { id, value } = e.target;
+        setFormData({ ...formData, [id]: value });
+
+        // Instant preview for URLs
+        if (id === 'videoUrl') {
+            setVideoPreview(value);
+        }
+        if (id === 'galleryUrls') {
+            const urls = value.split(',').map(url => url.trim()).filter(url => url !== '');
+            setGalleryPreviews(urls);
+        }
     };
 
     const handleFileChange = (e) => {
-        setVideoFile(e.target.files[0]);
+        const file = e.target.files[0];
+        setVideoFile(file);
+        if (file) {
+            setVideoPreview(URL.createObjectURL(file));
+        } else {
+            setVideoPreview(null);
+        }
+    };
+
+    const handleGalleryFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        setGalleryFiles(files);
+        const previews = files.map(file => URL.createObjectURL(file));
+        setGalleryPreviews(previews);
+    };
+
+    const [galleryUrlInput, setGalleryUrlInput] = React.useState(''); // State for the single URL input
+
+    const handleAddGalleryUrl = () => {
+        if (galleryUrlInput.trim()) {
+            const newUrls = [...galleryPreviews, galleryUrlInput.trim()];
+            setGalleryPreviews(newUrls);
+            setGalleryUrlInput(''); // Clear input after adding
+
+            // Update formData so handleSubmit has access to the full list stringified
+            setFormData(prev => ({ ...prev, galleryUrls: newUrls.join(',') }));
+        }
+    };
+
+    const handleRemoveGalleryUrl = (indexToRemove) => {
+        const newUrls = galleryPreviews.filter((_, index) => index !== indexToRemove);
+        setGalleryPreviews(newUrls);
+        setFormData(prev => ({ ...prev, galleryUrls: newUrls.join(',') }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!videoFile) {
+        if (mediaMode === 'upload' && !videoFile) {
             alert("Please upload a video/image.");
+            return;
+        }
+
+        if (mediaMode === 'url' && !formData.videoUrl) {
+            alert("Please provide a video/image URL.");
             return;
         }
 
@@ -51,10 +105,17 @@ const CreateFood = () => {
         data.append('protein', formData.protein);
         data.append('carbs', formData.carbs);
         data.append('fats', formData.fats);
-        data.append('video', videoFile);
 
-        // Append all selected gallery images
-        if (galleryFiles.length > 0) {
+        if (mediaMode === 'url') {
+            data.append('videoUrl', formData.videoUrl);
+        } else {
+            data.append('video', videoFile);
+        }
+
+        if (galleryMode === 'url') {
+            // Use the list we've built
+            data.append('galleryUrls', galleryPreviews.join(','));
+        } else if (galleryFiles.length > 0) {
             Array.from(galleryFiles).forEach((file) => {
                 data.append('images', file); // 'images' matches backend field name
             });
@@ -76,6 +137,10 @@ const CreateFood = () => {
             const errorMessage = error.response?.data?.message || 'Failed to create food item';
             alert(errorMessage);
         }
+    };
+
+    const isImageUrl = (url) => {
+        return /\.(jpg|jpeg|png|webp|gif|avif)$/i.test(url) || url.startsWith('blob:');
     };
 
     return (
@@ -293,37 +358,145 @@ const CreateFood = () => {
                     </div>
 
                     <div className="mb-5">
-                        <label htmlFor="video" className="block text-[13px] font-semibold text-[#a1a1aa] mb-2">Upload Video/Image</label>
-                        <div className="relative">
-                            <input
-                                type="file"
-                                id="video"
-                                accept="video/*,image/*"
-                                required
-                                onChange={handleFileChange}
-                                className="w-full p-[10px] bg-[#1a1a1a] border border-[#333] rounded-xl text-white text-[15px] outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#10B981]/10 file:text-[#10B981] hover:file:bg-[#10B981]/20"
-                            />
+                        <div className="flex justify-between items-center mb-2">
+                            <label htmlFor="video" className="block text-[13px] font-semibold text-[#a1a1aa]">Main Video/Image</label>
+                            <div className="flex bg-[#1a1a1a] rounded-lg p-1 border border-[#333]">
+                                <button
+                                    type="button"
+                                    onClick={() => { setMediaMode('upload'); setVideoPreview(videoFile ? URL.createObjectURL(videoFile) : null); }}
+                                    className={`px-3 py-1 text-xs rounded-md transition-all ${mediaMode === 'upload' ? 'bg-[#10B981] text-white' : 'text-[#a1a1aa] hover:text-white'}`}
+                                >
+                                    Upload
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => { setMediaMode('url'); setVideoPreview(formData.videoUrl); }}
+                                    className={`px-3 py-1 text-xs rounded-md transition-all ${mediaMode === 'url' ? 'bg-[#10B981] text-white' : 'text-[#a1a1aa] hover:text-white'}`}
+                                >
+                                    URL
+                                </button>
+                            </div>
                         </div>
+                        <div className="relative">
+                            {mediaMode === 'upload' ? (
+                                <input
+                                    type="file"
+                                    id="video"
+                                    accept="video/*,image/*"
+                                    required={mediaMode === 'upload'}
+                                    onChange={handleFileChange}
+                                    className="w-full p-[10px] bg-[#1a1a1a] border border-[#333] rounded-xl text-white text-[15px] outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#10B981]/10 file:text-[#10B981] hover:file:bg-[#10B981]/20"
+                                />
+                            ) : (
+                                <input
+                                    type="url"
+                                    id="videoUrl"
+                                    placeholder="Paste video or image URL here"
+                                    required={mediaMode === 'url'}
+                                    value={formData.videoUrl}
+                                    onChange={handleChange}
+                                    className="w-full p-[14px_16px] bg-[#1a1a1a] border border-[#333] rounded-xl text-white text-[15px] outline-none transition-all placeholder:text-gray-600 focus:border-[#10B981] focus:ring-4 focus:ring-[#10B981]/10"
+                                />
+                            )}
+                        </div>
+                        {videoPreview && (
+                            <div className="mt-3">
+                                <p className="text-xs text-gray-500 mb-2">Preview:</p>
+                                {isImageUrl(videoPreview) ? (
+                                    <img src={videoPreview} alt="Preview" className="w-full h-40 object-cover rounded-xl border border-[#333]" />
+                                ) : (
+                                    <video src={videoPreview} className="w-full h-40 object-cover rounded-xl border border-[#333]" controls />
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="mb-5">
-                        <label htmlFor="gallery" className="block text-[13px] font-semibold text-[#a1a1aa] mb-2">Gallery Images (Max 4)</label>
-                        <div className="relative">
-                            <input
-                                type="file"
-                                id="gallery"
-                                accept="image/*"
-                                multiple
-                                onChange={(e) => setGalleryFiles(e.target.files)}
-                                className="w-full p-[10px] bg-[#1a1a1a] border border-[#333] rounded-xl text-white text-[15px] outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#10B981]/10 file:text-[#10B981] hover:file:bg-[#10B981]/20"
-                            />
-                            <div className="flex justify-between mt-2">
-                                <p className="text-xs text-gray-500">Select up to 4 images.</p>
-                                {galleryFiles.length > 0 && (
-                                    <p className="text-xs text-[#10B981] font-bold">{galleryFiles.length} file(s) selected</p>
-                                )}
+                        <div className="flex justify-between items-center mb-2">
+                            <label htmlFor="gallery" className="block text-[13px] font-semibold text-[#a1a1aa]">Gallery Images</label>
+                            <div className="flex bg-[#1a1a1a] rounded-lg p-1 border border-[#333]">
+                                <button
+                                    type="button"
+                                    onClick={() => { setGalleryMode('upload'); const previews = Array.from(galleryFiles).map(file => URL.createObjectURL(file)); setGalleryPreviews(previews); }}
+                                    className={`px-3 py-1 text-xs rounded-md transition-all ${galleryMode === 'upload' ? 'bg-[#10B981] text-white' : 'text-[#a1a1aa] hover:text-white'}`}
+                                >
+                                    Upload
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => { setGalleryMode('url'); setGalleryPreviews([]); }}
+                                    className={`px-3 py-1 text-xs rounded-md transition-all ${galleryMode === 'url' ? 'bg-[#10B981] text-white' : 'text-[#a1a1aa] hover:text-white'}`}
+                                >
+                                    URLs
+                                </button>
                             </div>
                         </div>
+                        <div className="relative">
+                            {galleryMode === 'upload' ? (
+                                <>
+                                    <input
+                                        type="file"
+                                        id="gallery"
+                                        accept="image/*"
+                                        multiple
+                                        onChange={handleGalleryFileChange}
+                                        className="w-full p-[10px] bg-[#1a1a1a] border border-[#333] rounded-xl text-white text-[15px] outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#10B981]/10 file:text-[#10B981] hover:file:bg-[#10B981]/20"
+                                    />
+                                    <div className="flex justify-between mt-2">
+                                        <p className="text-xs text-gray-500">Select multiple images.</p>
+                                        {galleryFiles.length > 0 && (
+                                            <p className="text-xs text-[#10B981] font-bold">{galleryFiles.length} file(s) selected</p>
+                                        )}
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Paste image URL here"
+                                            value={galleryUrlInput}
+                                            onChange={(e) => setGalleryUrlInput(e.target.value)}
+                                            className="w-full p-[14px_16px] bg-[#1a1a1a] border border-[#333] rounded-xl text-white text-[15px] outline-none transition-all placeholder:text-gray-600 focus:border-[#10B981] focus:ring-4 focus:ring-[#10B981]/10"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleAddGalleryUrl}
+                                            className="px-6 bg-[#10B981] rounded-xl font-bold hover:brightness-110 active:scale-95 transition-all whitespace-nowrap"
+                                        >
+                                            Add
+                                        </button>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-2">Add images one by one.</p>
+                                </>
+                            )}
+                        </div>
+                        {galleryPreviews.length > 0 && (
+                            <div className="mt-3">
+                                <p className="text-xs text-gray-500 mb-2">Gallery Preview (Click to remove):</p>
+                                <div className="flex gap-2 overflow-x-auto pb-2">
+                                    {galleryPreviews.map((preview, index) => (
+                                        <div key={index} className="relative group min-w-[64px]">
+                                            <img
+                                                src={preview}
+                                                alt={`Gallery ${index}`}
+                                                className="h-16 w-16 rounded-md object-cover border border-[#333] transition-all group-hover:brightness-50"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveGalleryUrl(index)}
+                                                className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 rounded-md"
+                                                title="Remove image"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <button className="w-full p-4 rounded-xl border-none text-white text-base font-bold cursor-pointer bg-gradient-to-br from-[#10B981] to-[#34D399] transition-all hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg mt-2.5" type="submit">

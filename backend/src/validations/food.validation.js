@@ -13,7 +13,9 @@ const createFood = {
         discount: Joi.string().allow(''),
         protein: Joi.number().allow(''),
         carbs: Joi.number().allow(''),
-        fats: Joi.number().allow('')
+        fats: Joi.number().allow(''),
+        videoUrl: Joi.string().uri().allow(''),
+        galleryUrls: Joi.string().allow('')
     })
 };
 
@@ -33,7 +35,10 @@ const updateFood = {
         discount: Joi.string().allow(''),
         protein: Joi.number().allow(''),
         carbs: Joi.number().allow(''),
-        fats: Joi.number().allow('')
+        fats: Joi.number().allow(''),
+        videoUrl: Joi.string().uri().allow(''),
+        galleryUrls: Joi.string().allow(''),
+        existingImages: Joi.string().allow('')
     })
 };
 
