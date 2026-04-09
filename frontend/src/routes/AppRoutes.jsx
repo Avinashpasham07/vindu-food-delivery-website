@@ -52,9 +52,9 @@ const PageLoader = () => (
 const DevBypass = () => {
   useEffect(() => {
     localStorage.setItem('dev_access', 'true');
-    window.location.href = '/home';
   }, []);
-  return <PageLoader />;
+  
+  return <Navigate to="/home" replace />;
 };
 
 // Gated Route Component
