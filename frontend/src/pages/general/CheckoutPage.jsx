@@ -15,6 +15,8 @@ const CheckoutPage = () => {
     const [isLocating, setIsLocating] = useState(false);
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
     const [placedOrderId, setPlacedOrderId] = useState(null);
+    const [couponCode, setCouponCode] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
     const isOrderPlaced = React.useRef(false);
 
     // Form State
@@ -140,7 +142,8 @@ const CheckoutPage = () => {
                 })),
                 totalAmount: grandTotal,
                 address: formData,
-                paymentMethod: paymentMethod
+                paymentMethod: paymentMethod,
+                couponCode: couponCode
             };
 
             // Use apiClient which sends cookies automatically. Also send header if we have token.
@@ -151,6 +154,18 @@ const CheckoutPage = () => {
             if (response.status === 201) {
                 isOrderPlaced.current = true;
                 setPlacedOrderId(response.data.order._id);
+
+                // Update Local Storage Streak
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user && response.data.streak) {
+                    user.streakCount = response.data.streak;
+                    localStorage.setItem('user', JSON.stringify(user));
+                }
+
+                if (response.data.reward) {
+                    alert(`WOW! 🎊 ${response.data.reward.message}\nYour Reward Coupon: ${response.data.reward.coupon}`);
+                }
+
                 setStep(3);
                 clearCart();
                 // Navigate to tracking directly
@@ -435,6 +450,23 @@ const CheckoutPage = () => {
                                         <span className="text-white font-bold ml-2">₹{item.price * item.quantity}</span>
                                     </div>
                                 ))}
+                            </div>
+
+                            <div className="h-px bg-white/10 my-6"></div>
+
+                            {/* Coupon Section */}
+                            <div className="mb-6">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-[#FF5E00] mb-3 block">Promo Code</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="STREAK7..."
+                                        value={couponCode}
+                                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                        className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:border-[#FF5E00] outline-none transition-all placeholder:text-gray-700 uppercase"
+                                    />
+                                </div>
+                                <p className="text-[10px] text-gray-500 mt-2">Earn discounts by maintaining your order streak! 🔥</p>
                             </div>
 
                             <div className="h-px bg-white/10 my-6"></div>

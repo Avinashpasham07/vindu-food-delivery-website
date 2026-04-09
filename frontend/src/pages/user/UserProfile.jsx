@@ -190,7 +190,7 @@ const UserProfile = () => {
 
                     <div className="lg:col-span-8 space-y-8">
                         <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar border-b border-white/5">
-                            {['overview', 'orders', 'favorites'].map((tab) => (
+                            {['overview', 'orders', 'favorites', 'plans'].map((tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
@@ -369,6 +369,64 @@ const UserProfile = () => {
                                         ))}
                                     </div>
                                 )}
+                            </div>
+                        )}
+
+                        {activeTab === 'plans' && (
+                            <div className="space-y-6 animate-fade-in-up">
+                                <div className="bg-[#111] border border-white/5 rounded-[32px] p-8 relative overflow-hidden group">
+                                    <div className={`absolute top-0 right-0 p-8 ${user.isGoldMember ? 'text-[#FFD700]' : 'text-gray-700'}`}>
+                                        <span className="text-6xl opacity-10 font-black uppercase tracking-tighter">
+                                            {user.isGoldMember ? 'Gold' : 'Free'}
+                                        </span>
+                                    </div>
+                                    <div className="relative z-10">
+                                        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Current Subscription</h3>
+                                        <h2 className="text-3xl font-black text-white mb-2">
+                                            {user.isGoldMember ? 'Vindu Gold Membership' : 'Standard Plan'}
+                                        </h2>
+                                        <p className="text-gray-400 font-medium mb-8">
+                                            {user.isGoldMember 
+                                                ? `Premium billing active. Next renewal on ${formatDate(user.goldExpiry)}.` 
+                                                : 'You are currently on the free tier. Upgrade for unlimited benefits.'}
+                                        </p>
+
+                                        <div className="flex flex-wrap gap-4">
+                                            {user.isGoldMember ? (
+                                                <button onClick={() => navigate('/user/gold')} className="px-6 py-3 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl font-bold transition-all">View Plan Details</button>
+                                            ) : (
+                                                <Link to="/user/gold" className="px-6 py-3 bg-[#FF5E00] text-white rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20">Upgrade Now</Link>
+                                            )}
+                                            <button className="px-6 py-3 bg-white/5 border border-white/10 text-gray-400 rounded-xl font-bold opacity-50 cursor-not-allowed">Billing History (Soon)</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-[#111] border border-white/5 rounded-3xl p-6">
+                                        <h4 className="text-sm font-bold text-gray-300 mb-4">Active Perks</h4>
+                                        <ul className="space-y-3">
+                                            {user.isGoldMember ? (
+                                                <>
+                                                    <li className="flex items-center gap-3 text-sm text-gray-400">
+                                                        <span className="text-green-500">✓</span> Free Delivery on all orders
+                                                    </li>
+                                                    <li className="flex items-center gap-3 text-sm text-gray-400">
+                                                        <span className="text-green-500">✓</span> Priority Support Access
+                                                    </li>
+                                                </>
+                                            ) : (
+                                                <li className="flex items-center gap-3 text-sm text-gray-500 italic">No active perks currently</li>
+                                            )}
+                                        </ul>
+                                    </div>
+                                    <div className="bg-[#111] border border-white/5 rounded-3xl p-6">
+                                        <h4 className="text-sm font-bold text-gray-300 mb-4">Upcoming Renewals</h4>
+                                        <p className="text-xs text-gray-500 font-medium leading-relaxed">
+                                            Subscriptions are billed via our secure payment partners. You can manage auto-renewal settings here once your first payment is processed.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>

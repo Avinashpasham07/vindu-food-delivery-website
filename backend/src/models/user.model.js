@@ -25,8 +25,18 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    goldExpiry: {
-        type: Date
+    streakCount: {
+        type: Number,
+        default: 0
+    },
+    lastOrderDate: {
+        type: Date,
+        default: null
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
     }
 },
     {

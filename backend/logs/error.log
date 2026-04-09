@@ -1,2 +1,9 @@
 [2026-02-03 09:45:41.954 PM] error: 	"existingImages" is not allowed
 [2026-02-03 09:46:02.714 PM] error: 	"existingImages" is not allowed
+[2026-04-08 11:50:17.943 PM] error: 	"couponCode" is not allowed
+[2026-04-08 11:50:27.686 PM] error: 	"couponCode" is not allowed
+[2026-04-08 11:50:37.332 PM] error: 	"couponCode" is not allowed
+[2026-04-08 11:52:05.193 PM] error: 	"status" must be one of [Placed, Preparing, Out for Delivery, Delivered, Cancelled]
+[2026-04-08 11:52:08.368 PM] error: 	"status" must be one of [Placed, Preparing, Out for Delivery, Delivered, Cancelled]
+[2026-04-08 11:52:11.489 PM] error: 	"status" must be one of [Placed, Preparing, Out for Delivery, Delivered, Cancelled]
+[2026-04-08 11:53:28.466 PM] error: 	"status" must be one of [Placed, Preparing, Out for Delivery, Delivered, Cancelled]

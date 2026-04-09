@@ -55,6 +55,21 @@ async function authuser(req, res, next) {
             });
         }
 
+        // --- Streak Automatic Reset Logic (Snapchat style) ---
+        if (user.streakCount > 0 && user.lastOrderDate) {
+            const now = new Date();
+            const lastOrder = new Date(user.lastOrderDate);
+            const diffInTime = now.getTime() - lastOrder.getTime();
+            const diffInDays = diffInTime / (1000 * 3600 * 24);
+
+            // If more than 48 hours passed (2 full days), streak breaks
+            if (diffInDays > 2) {
+                user.streakCount = 0;
+                await user.save();
+                logger.info(`Streak Reset to 0 for User: ${user._id} (Last order was ${Math.floor(diffInDays)} days ago)`);
+            }
+        }
+
         req.user = user;
         next();
 
@@ -64,6 +79,18 @@ async function authuser(req, res, next) {
             message: "invalid token, authorization denied"
         });
     }
+}
+
+async function authAdmin(req, res, next) {
+    authuser(req, res, () => {
+        if (req.user && req.user.role === 'admin') {
+            next();
+        } else {
+            return res.status(403).json({
+                message: "Access Denied: Admin privileges required"
+            });
+        }
+    });
 }
 
 async function authAny(req, res, next) {
@@ -120,4 +147,4 @@ async function authDeliveryPartner(req, res, next) {
     }
 }
 
-module.exports = { authfoodpatner, authuser, authUser: authuser, authAny, authDeliveryPartner };
+module.exports = { authfoodpatner, authuser, authUser: authuser, authAny, authDeliveryPartner, authAdmin };

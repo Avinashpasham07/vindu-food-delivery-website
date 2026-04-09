@@ -58,6 +58,7 @@ app.use('/api/food', foodRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/delivery', require('./routes/delivery.routes'));
 app.use('/api/ai', require('./routes/ai.routes'));
+app.use('/api/admin', require('./routes/admin.routes'));
 
 // Send 404 error for any unknown api request
 app.use((req, res, next) => {

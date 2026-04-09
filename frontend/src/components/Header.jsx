@@ -1,10 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import apiClient from '../api/client';
 
 const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocation }) => {
     const location = useLocation();
     const isHome = location.pathname === '/home';
-    const user = JSON.parse(localStorage.getItem('user'));
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+
+    // Sync user data with backend on mount
+    useEffect(() => {
+        const syncUser = async () => {
+            if (user) {
+                try {
+                    const response = await apiClient.get('/auth/user/me');
+                    if (response.data && response.data.user) {
+                        const updatedUser = response.data.user;
+                        localStorage.setItem('user', JSON.stringify(updatedUser));
+                        setUser(updatedUser);
+                    }
+                } catch (error) {
+                    console.error("Failed to sync user profile:", error);
+                }
+            }
+        };
+        syncUser();
+    }, []);
 
     // Location State (Internal to Header if mostly UI, but passed from parent for persistence)
     const [isLocationOpen, setIsLocationOpen] = useState(false);
@@ -132,7 +152,14 @@ const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocati
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm bg-gradient-to-tr ${user.isGoldMember ? 'from-[#FFD700] via-[#FDB931] to-[#9E7204] shadow-[0_0_10px_#FFD700]' : 'from-[#FF5E00] to-[#FF9050]'}`}>
                                     {user.fullname ? user.fullname[0].toUpperCase() : 'U'}
                                 </div>
-                                <span className="text-gray-300 font-medium hidden sm:block">{user.fullname}</span>
+                                <div className="flex flex-col items-start leading-tight">
+                                    <span className="text-gray-200 font-bold hidden sm:block text-sm">{user.fullname}</span>
+                                    {user.streakCount > 0 && (
+                                        <span className="flex items-center gap-1 text-[10px] font-black text-[#FF5E00] uppercase tracking-tighter bg-[#FF5E00]/10 px-1.5 rounded-full border border-[#FF5E00]/20">
+                                            <span className="animate-pulse">🔥</span> {user.streakCount} Day Streak
+                                        </span>
+                                    )}
+                                </div>
                             </Link>
                         </div>
                     ) : (

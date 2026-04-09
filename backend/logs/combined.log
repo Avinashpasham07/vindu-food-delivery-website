@@ -49,3 +49,38 @@
 [2026-02-03 09:44:17.372 PM] info: 	Connected to MongoDB
 [2026-02-03 09:45:41.954 PM] error: 	"existingImages" is not allowed
 [2026-02-03 09:46:02.714 PM] error: 	"existingImages" is not allowed
+[2026-02-03 09:46:16.239 PM] info: 	Server is running on http://localhost:3000
+[2026-02-03 09:46:17.081 PM] info: 	Connected to MongoDB
+[2026-04-08 11:41:12.817 PM] info: 	Server is running on http://localhost:3000
+[2026-04-08 11:41:13.802 PM] info: 	Connected to MongoDB
+[2026-04-08 11:43:22.890 PM] info: 	Server is running on http://localhost:3000
+[2026-04-08 11:43:23.745 PM] info: 	Connected to MongoDB
+[2026-04-08 11:50:17.943 PM] error: 	"couponCode" is not allowed
+[2026-04-08 11:50:27.686 PM] error: 	"couponCode" is not allowed
+[2026-04-08 11:50:37.332 PM] error: 	"couponCode" is not allowed
+[2026-04-08 11:51:37.556 PM] info: 	Server is running on http://localhost:3000
+[2026-04-08 11:51:39.023 PM] info: 	Connected to MongoDB
+[2026-04-08 11:52:05.193 PM] error: 	"status" must be one of [Placed, Preparing, Out for Delivery, Delivered, Cancelled]
+[2026-04-08 11:52:08.368 PM] error: 	"status" must be one of [Placed, Preparing, Out for Delivery, Delivered, Cancelled]
+[2026-04-08 11:52:11.489 PM] error: 	"status" must be one of [Placed, Preparing, Out for Delivery, Delivered, Cancelled]
+[2026-04-08 11:53:28.466 PM] error: 	"status" must be one of [Placed, Preparing, Out for Delivery, Delivered, Cancelled]
+[2026-04-09 12:02:05.894 AM] info: 	Server is running on http://localhost:3000
+[2026-04-09 12:02:07.844 AM] info: 	Connected to MongoDB
+[2026-04-09 12:02:15.194 AM] info: 	Server is running on http://localhost:3000
+[2026-04-09 12:02:16.133 AM] info: 	Connected to MongoDB
+[2026-04-09 12:02:19.920 AM] info: 	Server is running on http://localhost:3000
+[2026-04-09 12:02:20.748 AM] info: 	Connected to MongoDB
+[2026-04-09 12:02:27.119 AM] info: 	Server is running on http://localhost:3000
+[2026-04-09 12:02:27.890 AM] info: 	Connected to MongoDB
+[2026-04-09 12:03:51.044 AM] info: 	Server is running on http://localhost:3000
+[2026-04-09 12:03:52.220 AM] info: 	Connected to MongoDB
+[2026-04-09 12:08:48.798 AM] info: 	Server is running on http://localhost:3000
+[2026-04-09 12:08:49.764 AM] info: 	Connected to MongoDB
+[2026-04-09 07:51:09.469 PM] info: 	Server is running on http://localhost:3000
+[2026-04-09 07:51:11.304 PM] info: 	Connected to MongoDB
+[2026-04-09 07:58:33.629 PM] info: 	Server is running on http://localhost:3000
+[2026-04-09 07:58:34.959 PM] info: 	Connected to MongoDB
+[2026-04-09 08:02:32.243 PM] info: 	Server is running on http://localhost:3000
+[2026-04-09 08:02:33.009 PM] info: 	Connected to MongoDB
+[2026-04-09 08:02:37.599 PM] info: 	Server is running on http://localhost:3000
+[2026-04-09 08:02:38.594 PM] info: 	Connected to MongoDB

@@ -15,7 +15,8 @@ const placeOrder = {
         ).required().min(1),
         totalAmount: Joi.number().required(),
         address: Joi.object().required(),
-        paymentMethod: Joi.string().required().valid('card', 'upi', 'cod')
+        paymentMethod: Joi.string().required().valid('card', 'upi', 'cod'),
+        couponCode: Joi.string().optional().allow('', null)
     })
 };
 

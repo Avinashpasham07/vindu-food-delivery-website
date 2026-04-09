@@ -42,7 +42,9 @@ async function registerUser(req, res) {
             user: {
                 id: newUser._id,
                 fullname: newUser.fullname,
-                email: newUser.email
+                email: newUser.email,
+                role: newUser.role,
+                streakCount: newUser.streakCount
             },
             token
         });
@@ -103,7 +105,9 @@ async function loginUser(req, res) {
                 email: user.email,
                 phone: user.phone,
                 isGoldMember: user.isGoldMember,
-                goldExpiry: user.goldExpiry
+                goldExpiry: user.goldExpiry,
+                role: user.role,
+                streakCount: user.streakCount
             },
             token
         });
@@ -274,7 +278,9 @@ async function buyGoldMembership(req, res) {
                 fullname: user.fullname,
                 email: user.email,
                 isGoldMember: user.isGoldMember,
-                goldExpiry: user.goldExpiry
+                goldExpiry: user.goldExpiry,
+                role: user.role,
+                streakCount: user.streakCount
             }
         });
 
@@ -284,4 +290,24 @@ async function buyGoldMembership(req, res) {
     }
 }
 
-module.exports = { registerUser, loginUser, logoutUser, registerfoodpartner, loginfoodpartner, logoutfoodpartner, getPartnerById, getUserFavorites, buyGoldMembership };
+async function getMe(req, res) {
+    try {
+        res.status(200).json({
+            user: {
+                id: req.user._id,
+                fullname: req.user.fullname,
+                email: req.user.email,
+                phone: req.user.phone,
+                isGoldMember: req.user.isGoldMember,
+                goldExpiry: req.user.goldExpiry,
+                role: req.user.role,
+                streakCount: req.user.streakCount
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}
+
+module.exports = { registerUser, loginUser, logoutUser, registerfoodpartner, loginfoodpartner, logoutfoodpartner, getPartnerById, getUserFavorites, buyGoldMembership, getMe };

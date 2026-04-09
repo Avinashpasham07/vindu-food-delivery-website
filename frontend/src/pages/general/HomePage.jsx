@@ -30,6 +30,8 @@ const HomePage = () => {
     const [showJoinModal, setShowJoinModal] = useState(false);
     const [joinCode, setJoinCode] = useState('');
     const [isListening, setIsListening] = useState(false);
+    const [recentOrders, setRecentOrders] = useState([]);
+    const [loadingRecent, setLoadingRecent] = useState(false);
 
     const categories = [
         { id: 1, name: 'Starters', image: 'https://media.istockphoto.com/id/812470140/photo/chicken-malai-tikka-boneless-piece.webp?a=1&b=1&s=612x612&w=0&k=20&c=Chxp4CXlgMaLiWKWkhCUfkqbjOn6ujB0hpC7LWCSvLQ=' },
@@ -124,6 +126,29 @@ const HomePage = () => {
         fetchPartners();
     }, []);
 
+    useEffect(() => {
+        const fetchRecentOrders = async () => {
+            const storedUser = localStorage.getItem('user');
+            if (!storedUser) return;
+
+            setLoadingRecent(true);
+            try {
+                const token = localStorage.getItem('token');
+                const response = await apiClient.get('/orders/user-orders', {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {}
+                });
+                // Get last 3 unique items or just last 3 orders
+                setRecentOrders(response.data.slice(0, 3));
+            } catch (error) {
+                console.error("Error fetching recent orders:", error);
+            } finally {
+                setLoadingRecent(false);
+            }
+        };
+
+        fetchRecentOrders();
+    }, []);
+
     const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
     const placeholders = ["Biryani", "Pizza", "Burger", "Desserts", "Thali", "Healthy"];
 
@@ -200,7 +225,6 @@ const HomePage = () => {
                                 </svg>
                             </div>
                         </div>
-
 
                         {/* Search & Location Capsule (Desktop) */}
                         <div className="flex-1 max-w-2xl hidden md:flex items-center gap-2">
@@ -318,12 +342,19 @@ const HomePage = () => {
                             </div>
 
                             {user ? (
-                                <div className="hidden sm:flex items-center gap-4">
-                                    <Link to="/user/profile" className="flex items-center gap-2 hover:bg-orange-500/5 p-2 rounded-lg transition-colors">
+                                <div className="hidden sm:flex">
+                                    <Link to="/user/profile" className="flex items-center gap-2 hover:bg-orange-500/5 p-2 rounded-lg transition-colors group">
                                         <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FF5E00] to-[#FF9050] flex items-center justify-center text-white font-bold text-sm">
                                             {user.fullname ? user.fullname[0].toUpperCase() : 'U'}
                                         </div>
-                                        <span className="text-gray-300 font-medium hidden sm:block">{user.fullname}</span>
+                                        <div className="flex flex-col items-start leading-tight">
+                                            <span className="text-gray-300 font-bold hidden sm:block text-sm">{user.fullname}</span>
+                                            {user.streakCount > 0 && (
+                                                <span className="flex items-center gap-1 text-[10px] font-black text-[#FF5E00] uppercase tracking-tighter bg-[#FF5E00]/10 px-1.5 rounded-full border border-[#FF5E00]/20">
+                                                    <span className="animate-pulse">🔥</span> {user.streakCount} Day Streak
+                                                </span>
+                                            )}
+                                        </div>
                                     </Link>
                                 </div>
                             ) : (
@@ -448,6 +479,56 @@ const HomePage = () => {
                     </div>
                 </div>
             )}
+
+            {/* Quick Reorder Section (New) */}
+            {user && recentOrders.length > 0 && (
+                <div className="mt-10 px-6 animate-fade-in">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="font-black text-xl text-white flex items-center gap-2">
+                            Order Again <span className="text-sm font-medium text-gray-400">| Quick Reorder</span>
+                        </h3>
+                    </div>
+                    <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar snap-x">
+                        {recentOrders.map((order) => (
+                            <div key={order._id} className="snap-start min-w-[280px] bg-[#111] border border-white/5 rounded-[24px] p-4 group hover:border-[#FF5E00]/30 transition-all">
+                                <div className="flex justify-between items-start mb-3">
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase">{new Date(order.createdAt).toLocaleDateString()}</span>
+                                    <span className="text-xs font-black text-[#FF5E00]">₹{order.totalAmount}</span>
+                                </div>
+                                <div className="flex -space-x-3 mb-4">
+                                    {order.items.slice(0, 3).map((item, i) => (
+                                        <div key={i} className="w-10 h-10 rounded-full border-2 border-black overflow-hidden bg-zinc-800">
+                                            {item.video ? <video src={item.video} className="w-full h-full object-cover" muted /> : <img src={item.image} className="w-full h-full object-cover" />}
+                                        </div>
+                                    ))}
+                                    {order.items.length > 3 && (
+                                        <div className="w-10 h-10 rounded-full border-2 border-black bg-[#222] flex items-center justify-center text-[10px] font-bold text-gray-400">
+                                            +{order.items.length - 3}
+                                        </div>
+                                    )}
+                                </div>
+                                <button 
+                                    onClick={() => {
+                                        clearCart();
+                                        order.items.forEach(item => addToCart({
+                                            _id: item.foodId,
+                                            name: item.name,
+                                            price: item.price,
+                                            image: item.image,
+                                            video: item.video
+                                        }, item.quantity));
+                                        navigate('/cart');
+                                    }}
+                                    className="w-full py-2 bg-white/5 hover:bg-[#FF5E00] text-white rounded-xl text-xs font-bold transition-all border border-white/5 hover:border-[#FF5E00]"
+                                >
+                                    Reorder Now
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Categories - Sleek Horizontal Scroll */}
             <div className="mt-12 pl-6">
                 <div className="flex items-center justify-between pr-6 mb-6">
@@ -498,7 +579,7 @@ const HomePage = () => {
                     <>
                         {/* First Batch of Items (Top 6) */}
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
-                            {filteredItems.slice(0, 3).map((item) => (
+                            {filteredItems.slice(0, 5).map((item) => (
                                 <FoodCard key={item._id} item={item} />
                             ))}
                         </div>
@@ -510,7 +591,7 @@ const HomePage = () => {
 
                         {/* Remaining Items */}
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
-                            {filteredItems.slice(3).map((item) => (
+                            {filteredItems.slice(5).map((item) => (
                                 <FoodCard key={item._id} item={item} />
                             ))}
                         </div>

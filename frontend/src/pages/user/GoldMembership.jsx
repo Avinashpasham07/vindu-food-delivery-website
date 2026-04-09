@@ -88,7 +88,44 @@ const GoldMembership = () => {
                     </div>
                 </div>
 
-                <p className="text-gray-500 mt-12 text-sm">Prices inclusive of taxes. Cancel anytime.</p>
+                <p className="text-gray-500 mt-12 text-sm italic">Prices inclusive of taxes. Cancel anytime.</p>
+
+                {/* Comparison Table */}
+                <div className="mt-24 max-w-4xl mx-auto animate-fade-in-up">
+                    <h2 className="text-3xl font-black mb-10 tracking-tight text-white">Compare the <span className="text-[#FFD700]">Gold</span> Difference</h2>
+                    <div className="bg-[#111] rounded-[32px] overflow-hidden border border-white/5">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-white/10">
+                                    <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-gray-400">Features</th>
+                                    <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-gray-400 text-center">Free</th>
+                                    <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-[#FFD700] text-center bg-[#FFD700]/5">Vindu Gold</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {[
+                                    { title: "Delivery Fee", free: "Standard", gold: "Free Always" },
+                                    { title: "Surge Charges", free: "Applicable", gold: "Never" },
+                                    { title: "Support Priority", free: "Standard", gold: "VIP Priority" },
+                                    { title: "Reward Streak", free: "Standard", gold: "Double Rewards" },
+                                    { title: "Restaurant Deals", free: "Public", gold: "Exclusive Only" },
+                                    { title: "Squad Mode Access", free: "Limited", gold: "Unlimited" }
+                                ].map((row, i) => (
+                                    <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                        <td className="px-8 py-5 text-sm font-bold text-gray-300">{row.title}</td>
+                                        <td className="px-8 py-5 text-sm text-center text-gray-500">{row.free}</td>
+                                        <td className="px-8 py-5 text-sm text-center text-white font-black bg-[#FFD700]/5">{row.gold}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div className="mt-20 flex flex-col items-center gap-6">
+                    <p className="text-gray-300 font-medium">Still have questions?</p>
+                    <button onClick={() => navigate('/help')} className="px-8 py-3 rounded-xl border border-white/10 hover:bg-white text-black hover:text-black transition-all font-bold text-sm bg-white/5">Visit Help Center</button>
+                </div>
 
             </div>
         </div>

@@ -1,28 +1,107 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/order.model');
+const User = require('../models/user.model');
+const Coupon = require('../models/coupon.model');
 const { authuser } = require('../middlewares/auth.middleware');
 const validate = require('../middlewares/validate');
 const orderValidation = require('../validations/order.validation');
+const crypto = require('crypto');
 
 // Place a new Order
 router.post('/place', authuser, validate(orderValidation.placeOrder), async (req, res) => {
     try {
-        const { items, totalAmount, address, paymentMethod } = req.body;
+        const { items, totalAmount, address, paymentMethod, couponCode } = req.body;
 
         if (!items || items.length === 0) {
             return res.status(400).json({ message: 'No items in order' });
         }
 
+        let finalAmount = totalAmount;
+        let couponApplied = null;
+
+        // Apply Coupon if provided
+        if (couponCode) {
+            const coupon = await Coupon.findOne({
+                code: couponCode.toUpperCase(),
+                userId: req.user._id,
+                isActive: true,
+                isUsed: false,
+                expiryDate: { $gt: new Date() }
+            });
+
+            if (coupon) {
+                if (coupon.discountType === 'percentage') {
+                    finalAmount = totalAmount * (1 - coupon.discountValue / 100);
+                } else if (coupon.discountType === 'fixed') {
+                    finalAmount = Math.max(0, totalAmount - coupon.discountValue);
+                } else if (coupon.discountType === 'free_delivery') {
+                    // Logic for free delivery if delivery fee was included
+                    // For now, let's assume it's a fixed reduction or just a flag
+                }
+                couponApplied = coupon;
+            } else {
+                return res.status(400).json({ message: 'Invalid or expired coupon' });
+            }
+        }
+
         const newOrder = new Order({
             userId: req.user._id,
             items,
-            totalAmount,
+            totalAmount: finalAmount,
             address,
             paymentMethod
         });
 
         const savedOrder = await newOrder.save();
+
+        if (couponApplied) {
+            couponApplied.isUsed = true;
+            await couponApplied.save();
+        }
+
+        // --- Streak Logic ---
+        const user = await User.findById(req.user._id);
+        const now = new Date();
+        const lastOrder = user.lastOrderDate;
+        let streakReward = null;
+
+        if (!lastOrder) {
+            user.streakCount = 1;
+        } else {
+            const diffInTime = now.getTime() - lastOrder.getTime();
+            const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
+
+            if (diffInDays === 1) {
+                user.streakCount += 1;
+            } else if (diffInDays > 1) {
+                user.streakCount = 1;
+            }
+            // If diffInDays is 0, they already ordered today, streak stays the same
+        }
+
+        user.lastOrderDate = now;
+
+        // Reward Milestone (7 days)
+        if (user.streakCount > 0 && user.streakCount % 7 === 0) {
+            const streakNum = user.streakCount;
+            const code = `STREAK${streakNum}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+            
+            const newCoupon = new Coupon({
+                code,
+                discountType: 'percentage',
+                discountValue: 10,
+                userId: user._id,
+                expiryDate: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 days expiry
+            });
+            await newCoupon.save();
+            streakReward = {
+                message: `Congratulations! You've hit a ${streakNum}-day streak!`,
+                coupon: code
+            };
+        }
+
+        await user.save();
 
         // Notify Delivery Partners
         const io = req.app.get('io');
@@ -30,7 +109,12 @@ router.post('/place', authuser, validate(orderValidation.placeOrder), async (req
             io.to('delivery-room').emit('new-order', savedOrder);
         }
 
-        res.status(201).json({ message: 'Order placed successfully', order: savedOrder });
+        res.status(201).json({ 
+            message: 'Order placed successfully', 
+            order: savedOrder,
+            streak: user.streakCount,
+            reward: streakReward
+        });
 
     } catch (error) {
         console.error("Error placing order:", error);
@@ -139,6 +223,22 @@ router.put('/:orderId/status', validate(orderValidation.updateStatus), async (re
         res.json({ message: 'Status updated', order });
     } catch (error) {
         console.error("Error updating status:", error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// Get User's Coupons
+router.get('/my-coupons', authuser, async (req, res) => {
+    try {
+        const coupons = await Coupon.find({ 
+            userId: req.user._id,
+            isActive: true,
+            isUsed: false,
+            expiryDate: { $gt: new Date() }
+        }).sort({ createdAt: -1 });
+        res.json(coupons);
+    } catch (error) {
+        console.error("Error fetching coupons:", error);
         res.status(500).json({ message: 'Server Error' });
     }
 });

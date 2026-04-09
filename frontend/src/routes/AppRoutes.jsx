@@ -1,11 +1,12 @@
 // src/routes/AppRoutes.jsx
-import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { Suspense, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 // Layouts and Guards (Keep static for faster shell load)
 import MainLayout from '../layouts/MainLayout';
 import AuthPartner from '../components/AuthPartner';
 import AuthUser from '../components/AuthUser';
+import AuthAdmin from '../components/AuthAdmin';
 
 // Lazy Load Pages
 const RegisterUser = React.lazy(() => import('../pages/RegisterUser'));
@@ -34,6 +35,8 @@ const HelpPage = React.lazy(() => import('../pages/general/HelpPage'));
 const TermsPage = React.lazy(() => import('../pages/general/TermsPage'));
 const PrivacyPage = React.lazy(() => import('../pages/general/PrivacyPage'));
 const CookiesPage = React.lazy(() => import('../pages/general/CookiesPage'));
+const AdminDashboard = React.lazy(() => import('../pages/admin/AdminDashboard'));
+const MaintenancePage = React.lazy(() => import('../pages/general/MaintenancePage'));
 
 // Loading Fallback
 const PageLoader = () => (
@@ -44,6 +47,30 @@ const PageLoader = () => (
     </div>
   </div>
 );
+
+// Developer Bypass Component
+const DevBypass = () => {
+  useEffect(() => {
+    localStorage.setItem('dev_access', 'true');
+    window.location.href = '/home';
+  }, []);
+  return <PageLoader />;
+};
+
+// Gated Route Component
+const GatedRoute = ({ children }) => {
+  const isDev = localStorage.getItem('dev_access') === 'true';
+  const location = useLocation();
+
+  // Define public paths that DON'T need dev access
+  const publicPaths = ['/', '/landing', '/partner', '/rider', '/dev', '/user/login', '/user/register'];
+  
+  if (!isDev && !publicPaths.includes(location.pathname)) {
+    return <MaintenancePage />;
+  }
+
+  return children;
+};
 
 // Delivery Pages
 const DeliveryLogin = React.lazy(() => import('../pages/delivery/DeliveryLogin'));
@@ -61,6 +88,9 @@ const AppRoutes = () => {
       <ScrollToTop />
       <Suspense fallback={<PageLoader />}>
         <Routes>
+          {/* Developer Bypass */}
+          <Route path="/dev" element={<DevBypass />} />
+
           {/* User Routes */}
           <Route path="/user/register" element={<RegisterUser />} />
           <Route path="/user/login" element={<LoginUser />} />
@@ -73,8 +103,13 @@ const AppRoutes = () => {
           {/* Delivery Partner Routes */}
           <Route path="/delivery/login" element={<DeliveryLogin />} />
           <Route path="/delivery/register" element={<DeliveryRegister />} />
-          <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
-          <Route path="/delivery/profile" element={<DeliveryProfile />} />
+          <Route path="/delivery/dashboard" element={<GatedRoute><DeliveryDashboard /></GatedRoute>} />
+          <Route path="/delivery/profile" element={<GatedRoute><DeliveryProfile /></GatedRoute>} />
+          <Route path="/admin" element={
+            <AuthAdmin>
+              <AdminDashboard />
+            </AuthAdmin>
+          } />
 
           {/* Entry & Landing Pages */}
           <Route path="/" element={<EntryPage />} />
@@ -82,8 +117,8 @@ const AppRoutes = () => {
           <Route path="/partner" element={<RestaurantLanding />} />
           <Route path="/rider" element={<DeliveryLanding />} />
 
-          {/* Main Layout for App Pages */}
-          <Route element={<MainLayout />}>
+          {/* Main Layout for App Pages - ALL GATED */}
+          <Route element={<GatedRoute><MainLayout /></GatedRoute>}>
             <Route path="/home" element={<Home />} />
             <Route path="/reels" element={<ReelsPage />} />
             <Route path="/cart" element={
@@ -137,4 +172,4 @@ const AppRoutes = () => {
   );
 };
 
-export default AppRoutes;
+export default AppRoutes;

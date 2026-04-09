@@ -13,7 +13,7 @@ const PartnerDashboard = () => {
     const [myItems, setMyItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [orders, setOrders] = useState([]);
-    const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'menu'
+    const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'menu', or 'customers'
 
     // Calculate Dashboard Stats
     const calculateStats = () => {
@@ -238,6 +238,12 @@ const PartnerDashboard = () => {
                 >
                     Menu Management
                 </button>
+                <button
+                    onClick={() => setActiveTab('customers')}
+                    className={`pb-4 text-lg font-bold transition-all ${activeTab === 'customers' ? 'text-[#10B981] border-b-2 border-[#10B981]' : 'text-gray-400 hover:text-white'}`}
+                >
+                    Loyal Customers
+                </button>
             </div>
 
             {/* Live Orders Section */}
@@ -378,6 +384,70 @@ const PartnerDashboard = () => {
                 </>
             )}
 
+            {/* Customers Section */}
+            {activeTab === 'customers' && (
+                <div className="animate-fade-in-up">
+                    <h2 className="text-xl font-bold mb-6 text-white border-b border-white/10 pb-4">Your Most Loyal Fans</h2>
+                    <div className="bg-[#1a1a1a] rounded-[32px] overflow-hidden border border-white/5">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-white/10">
+                                    <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-gray-500">Customer</th>
+                                    <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-gray-500 text-center">Orders</th>
+                                    <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-gray-500 text-center">Total Spent</th>
+                                    <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-gray-500 text-center">Last Order</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {Object.values(orders.reduce((acc, order) => {
+                                    const userId = order.userId?._id;
+                                    if (!userId) return acc;
+                                    if (!acc[userId]) {
+                                        acc[userId] = {
+                                            id: userId,
+                                            name: order.userId.fullname,
+                                            orderCount: 0,
+                                            totalSpent: 0,
+                                            lastOrder: order.createdAt
+                                        };
+                                    }
+                                    acc[userId].orderCount += 1;
+                                    acc[userId].totalSpent += order.totalAmount;
+                                    if (new Date(order.createdAt) > new Date(acc[userId].lastOrder)) {
+                                        acc[userId].lastOrder = order.createdAt;
+                                    }
+                                    return acc;
+                                }, {})).sort((a, b) => b.orderCount - a.orderCount).map((customer, i) => (
+                                    <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#10B981] to-emerald-400 flex items-center justify-center font-black text-sm">
+                                                    {customer.name[0]}
+                                                </div>
+                                                <span className="font-bold text-gray-300 group-hover:text-white transition-colors">{customer.name}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5 text-center">
+                                            <span className="bg-[#10B981]/10 text-[#10B981] px-3 py-1 rounded-full font-black text-xs border border-[#10B981]/20">
+                                                {customer.orderCount} Orders
+                                            </span>
+                                        </td>
+                                        <td className="px-8 py-5 text-center text-white font-black">₹{customer.totalSpent}</td>
+                                        <td className="px-8 py-5 text-center text-gray-500 text-xs font-bold">
+                                            {new Date(customer.lastOrder).toLocaleDateString()}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {orders.length === 0 && (
+                            <div className="p-20 text-center text-gray-500">
+                                No customer data available yet.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

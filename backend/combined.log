@@ -12,3 +12,13 @@
 {"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-01-24 21:10:43"}
 {"level":"info","message":"User Logged In: 6971105ea72e7dde2eb8adf4","service":"vindu-backend","timestamp":"2026-01-24 21:45:22"}
 {"level":"info","message":"User Logged In: 6971105ea72e7dde2eb8adf4","service":"vindu-backend","timestamp":"2026-02-03 21:14:25"}
+{"level":"info","message":"User Logged In: 6971105ea72e7dde2eb8adf4","service":"vindu-backend","timestamp":"2026-02-03 22:13:46"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-02-03 22:14:26"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-02-03 22:14:26"}
+{"level":"info","message":"User Logged In: 6971105ea72e7dde2eb8adf4","service":"vindu-backend","timestamp":"2026-02-03 22:14:32"}
+{"level":"info","message":"User Logged In: 6971105ea72e7dde2eb8adf4","service":"vindu-backend","timestamp":"2026-02-03 22:27:09"}
+{"level":"info","message":"User Logged In: 6971105ea72e7dde2eb8adf4","service":"vindu-backend","timestamp":"2026-02-03 22:27:31"}
+{"level":"warn","message":"Login Failed: User not found - admin@shivscope.com","service":"vindu-backend","timestamp":"2026-04-08 23:41:35"}
+{"level":"warn","message":"Login Failed: Password mismatch - admin@audionix.com","service":"vindu-backend","timestamp":"2026-04-08 23:41:42"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-08 23:41:49"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-09 00:02:32"}
