@@ -12,6 +12,9 @@ const orderRoutes = require('./routes/order.routes');
 
 const app = express();
 
+// Trust the first proxy (required for Render/Heroku)
+app.set('trust proxy', 1);
+
 // Security Middlewares
 app.use(helmet()); // Secure HTTP Headers
 app.use(compression()); // Compress all responses

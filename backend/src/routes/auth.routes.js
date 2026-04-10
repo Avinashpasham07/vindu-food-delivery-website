@@ -48,4 +48,27 @@ router.post('/update-fcm-token', async (req, res) => {
     }
 });
 
+// TEST ROUTE: Send a ping to any user/partner
+router.post('/test-ping', async (req, res) => {
+    try {
+        const { userId, role, title, body } = req.body;
+        const NotificationService = require('../services/notification.service');
+        
+        let targetModel;
+        if (role === 'user') targetModel = 'User';
+        else if (role === 'deliveryPartner') targetModel = 'DeliveryPartner';
+        else if (role === 'foodPartner') targetModel = 'FoodPartner';
+
+        const result = await NotificationService.sendToUser(userId, targetModel, {
+            title: title || "Test Ping! 🔔",
+            body: body || "This is a test notification from Vindu.",
+            data: { type: 'TEST' }
+        });
+
+        res.json({ message: 'Notification sent', result });
+    } catch (err) {
+        res.status(500).json({ message: 'Test failed', error: err.message });
+    }
+});
+
 module.exports = router;
