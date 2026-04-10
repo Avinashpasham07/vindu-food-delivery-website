@@ -7,7 +7,7 @@ import OrderMap from '../../components/OrderMap';
 import toast from 'react-hot-toast';
 import ChatWindow from '../../components/ChatWindow';
 
-const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
 const socket = io(socketUrl);
 
 const OrderTracking = () => {

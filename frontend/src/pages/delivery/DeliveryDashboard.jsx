@@ -8,7 +8,7 @@ import "leaflet-routing-machine";
 import L from 'leaflet';
 import ChatWindow from '../../components/ChatWindow';
 
-const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
 const socket = io(socketUrl);
 
 // Accurate Distance Calculator (Haversine Formula)
