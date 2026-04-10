@@ -4,7 +4,7 @@ const User = require('../models/user.model');
 const FoodPartner = require('../models/foodpartner.model');
 const Order = require('../models/order.model');
 const FoodItem = require('../models/food.model');
-const DeliveryPartner = require('../models/deliverypartner.model');
+const DeliveryPartner = require('../models/deliveryPartner.model');
 const { authAdmin } = require('../middlewares/auth.middleware');
 
 // GET Admin Dashboard Stats

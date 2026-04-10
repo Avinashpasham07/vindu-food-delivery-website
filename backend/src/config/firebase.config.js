@@ -1,12 +1,20 @@
 const admin = require('firebase-admin');
 const path = require('path');
 
-// Path to the service account key provided by the user
-const serviceAccountPath = path.join(__dirname, '../../vindu-7eb49-firebase-adminsdk-fbsvc-90f94d90e0.json');
-
 try {
+    let serviceAccount;
+
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+        // Production: Pass the JSON string via environment variable
+        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    } else {
+        // Local: Load from file
+        const serviceAccountPath = path.join(__dirname, '../../vindu-7eb49-firebase-adminsdk-fbsvc-90f94d90e0.json');
+        serviceAccount = require(serviceAccountPath);
+    }
+
     admin.initializeApp({
-        credential: admin.credential.cert(serviceAccountPath)
+        credential: admin.credential.cert(serviceAccount)
     });
     console.log('✅ Firebase Admin Initialized Successfully');
 } catch (error) {
