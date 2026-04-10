@@ -91,6 +91,6 @@ foodItemSchema.index({ foodType: 1 }); // Filter by Veg/Non-Veg
 foodItemSchema.index({ price: 1 }); // Sort by price
 foodItemSchema.index({ averageRating: -1 }); // Sort by rating
 
-const foodmodel = mongoose.model('fooditem', foodItemSchema);
+const foodmodel = mongoose.models.fooditem || mongoose.model('fooditem', foodItemSchema);
 
 module.exports = foodmodel;

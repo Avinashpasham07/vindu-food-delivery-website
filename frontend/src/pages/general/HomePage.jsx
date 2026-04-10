@@ -206,7 +206,7 @@ const HomePage = () => {
                                 <img src="/logo.png" alt="Vindu" className="h-7 w-7 sm:h-9 w-auto object-contain border border-orange-400 rounded-full" />
                             </Link>
                             <Link to="/landing" className="text-xl sm:text-2xl md:text-3xl font-black tracking-tighter text-white">
-                                <span className="hidden min-[400px]:inline">Vindu</span><span className="text-[#FF5E00]"></span>
+                                <span className="hidden min-[400px]:inline">Vindu</span><span className="text-[var(--accent)]"></span>
                             </Link>
                         </div>
 
@@ -350,7 +350,7 @@ const HomePage = () => {
                                         <div className="flex flex-col items-start leading-tight">
                                             <span className="text-gray-300 font-bold hidden sm:block text-sm">{user.fullname}</span>
                                             {user.streakCount > 0 && (
-                                                <span className="flex items-center gap-1 text-[10px] font-black text-[#FF5E00] uppercase tracking-tighter bg-[#FF5E00]/10 px-1.5 rounded-full border border-[#FF5E00]/20">
+                                                <span className="flex items-center gap-1 text-[10px] font-black text-[var(--accent)] uppercase tracking-tighter bg-[var(--accent)]/10 px-1.5 rounded-full border border-[var(--accent)]/20">
                                                     <span className="animate-pulse">🔥</span> {user.streakCount} Day Streak
                                                 </span>
                                             )}
@@ -519,7 +519,7 @@ const HomePage = () => {
                                         }, item.quantity));
                                         navigate('/cart');
                                     }}
-                                    className="w-full py-2 bg-white/5 hover:bg-[#FF5E00] text-white rounded-xl text-xs font-bold transition-all border border-white/5 hover:border-[#FF5E00]"
+                                    className="w-full py-2 bg-white/5 hover:bg-[var(--accent)] text-white rounded-xl text-xs font-bold transition-all border border-white/5 hover:border-[var(--accent)]"
                                 >
                                     Reorder Now
                                 </button>

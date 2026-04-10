@@ -2,6 +2,315 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../../api/client';
 import Skeleton from '../../components/Skeleton';
+import { useToast } from '../../context/ToastContext';
+
+// Sub-components for Admin Dashboard
+
+const PartnersView = () => {
+    const [partners, setPartners] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const { showToast } = useToast();
+
+    const fetchPartners = async () => {
+        try {
+            const response = await apiClient.get('/admin/partners');
+            setPartners(response.data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => { fetchPartners(); }, []);
+
+    const toggleStatus = async (id) => {
+        try {
+            await apiClient.put(`/admin/partner/${id}/toggle-status`);
+            showToast('Partner status updated successfully', 'success');
+            fetchPartners();
+        } catch (error) {
+            showToast('Failed to update status', 'error');
+        }
+    };
+
+    if (loading) return <div className="p-12 text-center text-gray-500 font-bold uppercase tracking-widest text-xs">Accessing Encrypted Records...</div>;
+
+    return (
+        <div className="bg-[#111] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
+            <table className="w-full text-left">
+                <thead>
+                    <tr className="text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-white/5">
+                        <th className="py-6 px-8">Restaurant</th>
+                        <th className="py-6 px-8">Email</th>
+                        <th className="py-6 px-8">Status</th>
+                        <th className="py-6 px-8 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.02]">
+                    {partners.map(p => (
+                        <tr key={p._id} className="hover:bg-white/[0.01] transition-colors group">
+                            <td className="py-6 px-8">
+                                <span className="font-bold text-gray-300 block">{p.name}</span>
+                                <span className="text-[10px] text-gray-600 block">{p.address || 'India'}</span>
+                            </td>
+                            <td className="py-6 px-8 text-sm text-gray-500">{p.email}</td>
+                            <td className="py-6 px-8">
+                                <span className={`px-3 py-1 rounded-full text-[10px] font-bold border ${p.isVerified ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
+                                    {p.isVerified ? 'VERIFIED' : 'PENDING'}
+                                </span>
+                            </td>
+                            <td className="py-6 px-8 text-right">
+                                <button
+                                    onClick={() => toggleStatus(p._id)}
+                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${p.isVerified ? 'bg-white/5 hover:bg-red-500/10 hover:text-red-500' : 'bg-[#FF5E00] hover:bg-[#FF5E00]/80'}`}
+                                >
+                                    {p.isVerified ? 'Deactivate' : 'Activate Partner'}
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+const DeliveryView = () => {
+    const [riders, setRiders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const { showToast } = useToast();
+
+    const fetchRiders = async () => {
+        try {
+            const response = await apiClient.get('/admin/delivery-partners');
+            setRiders(response.data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => { fetchRiders(); }, []);
+
+    const toggleStatus = async (id) => {
+        try {
+            await apiClient.put(`/admin/delivery-partner/${id}/toggle-status`);
+            showToast('Rider verification status updated', 'success');
+            fetchRiders();
+        } catch (error) {
+            showToast('Failed to update rider status', 'error');
+        }
+    };
+
+    if (loading) return <div className="p-12 text-center text-gray-500 font-bold uppercase tracking-widest text-xs">Connecting to Fleet Tracking...</div>;
+
+    return (
+        <div className="bg-[#111] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
+            <table className="w-full text-left">
+                <thead>
+                    <tr className="text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-white/5">
+                        <th className="py-6 px-8">Rider</th>
+                        <th className="py-6 px-8">Contact</th>
+                        <th className="py-6 px-8">Live Status</th>
+                        <th className="py-6 px-8">Earnings</th>
+                        <th className="py-6 px-8 text-right">Verification</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.02]">
+                    {riders.map(r => (
+                        <tr key={r._id} className="hover:bg-white/[0.01] transition-colors group">
+                            <td className="py-6 px-8">
+                                <span className="font-bold text-gray-300 block">{r.fullname}</span>
+                                <span className="text-[10px] text-gray-600 font-bold tracking-widest uppercase block">ID: {r._id.slice(-6).toUpperCase()}</span>
+                            </td>
+                            <td className="py-6 px-8">
+                                <p className="text-sm text-gray-500">{r.email}</p>
+                                <p className="text-xs text-gray-600">{r.phone}</p>
+                            </td>
+                            <td className="py-6 px-8">
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-2 h-2 rounded-full ${r.status === 'online' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-gray-700'}`}></div>
+                                    <span className={`text-[10px] font-black uppercase tracking-widest ${r.status === 'online' ? 'text-emerald-500' : 'text-gray-600'}`}>
+                                        {r.status}
+                                    </span>
+                                </div>
+                            </td>
+                            <td className="py-6 px-8">
+                                <span className="font-black text-white">₹{r.earnings || 0}</span>
+                            </td>
+                            <td className="py-6 px-8 text-right">
+                                <button
+                                    onClick={() => toggleStatus(r._id)}
+                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${r.isVerified ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}
+                                >
+                                    {r.isVerified ? 'VERIFIED' : 'APPROVE RIDER'}
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+const UsersView = () => {
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await apiClient.get('/admin/users');
+                setUsers(response.data);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUsers();
+    }, []);
+
+    if (loading) return <div className="p-12 text-center text-gray-500 font-bold">Retrieving Citizen Data...</div>;
+
+    return (
+        <div className="bg-[#111] border border-white/5 rounded-[40px] overflow-hidden">
+            <table className="w-full text-left">
+                <thead>
+                    <tr className="text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-white/5">
+                        <th className="py-6 px-8">User</th>
+                        <th className="py-6 px-8">Streak</th>
+                        <th className="py-6 px-8">Status</th>
+                        <th className="py-6 px-8">Joined</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.02]">
+                    {users.map(u => (
+                        <tr key={u._id} className="hover:bg-white/[0.01] transition-colors">
+                            <td className="py-6 px-8">
+                                <span className="font-bold block">{u.fullname}</span>
+                                <span className="text-xs text-gray-600 block truncate max-w-[200px]">{u.email}</span>
+                            </td>
+                            <td className="py-6 px-8">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg">🔥</span>
+                                    <span className="font-black text-white">{u.streakCount}</span>
+                                </div>
+                            </td>
+                            <td className="py-6 px-8">
+                                <span className={`px-3 py-1 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20`}>
+                                    {u.isGoldMember ? 'GOLD MEMBER' : 'STANDARD'}
+                                </span>
+                            </td>
+                            <td className="py-6 px-8 text-xs text-gray-600 font-bold uppercase tracking-widest">
+                                {new Date(u.createdAt).toLocaleDateString()}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+const OrdersView = () => {
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await apiClient.get('/admin/orders');
+                setOrders(response.data);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchOrders();
+    }, []);
+
+    if (loading) return <div className="p-12 text-center text-gray-500 font-bold">Syncing Global Logs...</div>;
+
+    return (
+        <div className="bg-[#111] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
+            <table className="w-full text-left">
+                <thead>
+                    <tr className="text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-white/5">
+                        <th className="py-6 px-8">ID</th>
+                        <th className="py-6 px-8">Customer</th>
+                        <th className="py-6 px-8">Amount</th>
+                        <th className="py-6 px-8">Status</th>
+                        <th className="py-6 px-8">Ref</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.02]">
+                    {orders.map(o => (
+                        <tr key={o._id} className="hover:bg-white/[0.01] transition-colors">
+                            <td className="py-6 px-8 font-mono text-[10px] text-gray-600">#{o._id.slice(-6).toUpperCase()}</td>
+                            <td className="py-6 px-8 font-bold text-gray-300">{o.userId?.fullname || 'Anonymous'}</td>
+                            <td className="py-6 px-8 font-black text-white text-lg">₹{o.totalAmount}</td>
+                            <td className="py-6 px-8">
+                                <span className={`px-3 py-1 rounded-full text-[10px] font-bold border ${o.status === 'Delivered' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-[#FF5E00]/10 text-[#FF5E00] border-[#FF5E00]/20'}`}>
+                                    {o.status}
+                                </span>
+                            </td>
+                            <td className="py-6 px-8 text-[10px] text-gray-700 font-black uppercase tracking-widest">{o.paymentMethod}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+const SettingsView = () => {
+    const { showToast } = useToast();
+    const [isMaintenance, setIsMaintenance] = useState(false);
+
+    const toggleMaintenance = () => {
+        setIsMaintenance(!isMaintenance);
+        showToast(isMaintenance ? 'Platform Live Mode Restored' : 'Platform Maintenance Mode Active', 'info');
+    };
+
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-[#111] border border-white/5 rounded-[32px] p-8 space-y-6">
+                <h4 className="text-lg font-bold">Platform Status Control</h4>
+                <div className="flex items-center justify-between p-6 bg-black/40 rounded-2xl border border-white/5">
+                    <div>
+                        <p className="font-bold">System Maintenance</p>
+                        <p className="text-xs text-gray-600 mt-1">Locks all non-admin routes for system updates.</p>
+                    </div>
+                    <button
+                        onClick={toggleMaintenance}
+                        className={`w-14 h-8 rounded-full transition-all relative ${isMaintenance ? 'bg-red-500' : 'bg-gray-800'}`}
+                    >
+                        <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${isMaintenance ? 'left-7' : 'left-1'}`}></div>
+                    </button>
+                </div>
+            </div>
+
+            <div className="bg-[#111] border border-white/5 rounded-[32px] p-8 space-y-6">
+                <h4 className="text-lg font-bold">Broadcast Center</h4>
+                <div className="space-y-4">
+                    <p className="text-xs text-gray-600 font-bold uppercase tracking-widest">Global Dashboard Notice</p>
+                    <textarea
+                        className="w-full h-32 bg-black/40 border border-white/5 rounded-2xl p-4 text-sm outline-none focus:border-[#FF5E00]/50 transition-all"
+                        placeholder="Enter announcement text for all users..."
+                    ></textarea>
+                    <button className="w-full py-4 bg-white/5 hover:bg-[#FF5E00] text-gray-500 hover:text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all">
+                        Deploy Broadcast
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -53,7 +362,8 @@ const AdminDashboard = () => {
                 <nav className="space-y-1">
                     {[
                         { id: 'overview', name: 'Overview', icon: '📊' },
-                        { id: 'partners', name: 'Restaurants', icon: '🍽️' },
+                        { id: 'partners', name: 'Restaurants', icon: '🍽️', badge: stats?.pendingPartners },
+                        { id: 'delivery', name: 'Delivery Partners', icon: '🛵', badge: stats?.pendingRiders },
                         { id: 'users', name: 'Customers', icon: '👥' },
                         { id: 'orders', name: 'Global Orders', icon: '🛒' },
                         { id: 'settings', name: 'Platform Settings', icon: '⚙️' }
@@ -61,10 +371,17 @@ const AdminDashboard = () => {
                         <button
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
-                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === item.id ? 'bg-[#FF5E00] text-white shadow-lg shadow-[#FF5E00]/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+                            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === item.id ? 'bg-[#FF5E00] text-white shadow-lg shadow-[#FF5E00]/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
                         >
-                            <span>{item.icon}</span>
-                            {item.name}
+                            <div className="flex items-center gap-4">
+                                <span>{item.icon}</span>
+                                {item.name}
+                            </div>
+                            {item.badge > 0 && (
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] bg-red-500 text-white animate-pulse`}>
+                                    {item.badge}
+                                </span>
+                            )}
                         </button>
                     ))}
                 </nav>
@@ -99,15 +416,29 @@ const AdminDashboard = () => {
                             {[
                                 { label: 'Total Revenue', value: `₹${stats?.totalRevenue?.toLocaleString()}`, trend: '+12.5%', color: 'from-emerald-500/20' },
                                 { label: 'Active Users', value: stats?.totalUsers, trend: '+43', color: 'from-blue-500/20' },
-                                { label: 'Total Partners', value: stats?.totalPartners, trend: '+2', color: 'from-[#FF5E00]/20' },
-                                { label: 'Global Orders', value: stats?.totalOrders, trend: '+156', color: 'from-purple-500/20' }
+                                { 
+                                    label: 'Total Partners', 
+                                    value: stats?.totalPartners, 
+                                    trend: stats?.pendingPartners > 0 ? `${stats.pendingPartners} PENDING` : '+2', 
+                                    trendColor: stats?.pendingPartners > 0 ? 'text-red-500 bg-red-500/10 border-red-500/20' : 'text-emerald-500 bg-emerald-500/10',
+                                    color: 'from-[#FF5E00]/20' 
+                                },
+                                { 
+                                    label: 'Global Orders', 
+                                    value: stats?.totalOrders, 
+                                    trend: stats?.pendingRiders > 0 ? `${stats.pendingRiders} RIDERS UNVERIFIED` : '+156', 
+                                    trendColor: stats?.pendingRiders > 0 ? 'text-red-500 bg-red-500/10 border-red-500/20' : 'text-purple-500 bg-purple-500/10',
+                                    color: 'from-purple-500/20' 
+                                }
                             ].map((stat, i) => (
                                 <div key={i} className={`bg-[#111] border border-white/5 p-6 rounded-[32px] relative overflow-hidden group hover:border-white/10 transition-all`}>
                                     <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
                                     <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 relative z-10">{stat.label}</p>
                                     <div className="flex items-end justify-between relative z-10">
                                         <h2 className="text-3xl font-black tracking-tight">{stat.value}</h2>
-                                        <span className="text-[10px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full">{stat.trend}</span>
+                                        <span className={`text-[10px] font-black px-2 py-1 rounded-full border transition-all ${stat.trendColor || 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20'}`}>
+                                            {stat.trend}
+                                        </span>
                                     </div>
                                 </div>
                             ))}
@@ -153,11 +484,45 @@ const AdminDashboard = () => {
                     </div>
                 )}
 
-                {activeTab !== 'overview' && (
-                    <div className="h-[400px] flex flex-col items-center justify-center bg-[#111] border border-dashed border-white/10 rounded-[40px] animate-fade-in">
-                        <span className="text-4xl mb-4">🚧</span>
-                        <h3 className="text-xl font-bold">Module Under Construction</h3>
-                        <p className="text-gray-500">We are adding advanced management features to the {activeTab} section.</p>
+                {activeTab === 'partners' && (
+                    <div className="space-y-8 animate-fade-in-up">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-3xl font-black tracking-tighter">Restaurant Partners</h2>
+                            <div className="px-4 py-2 bg-[#111] border border-white/5 rounded-xl flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">System Live</span>
+                            </div>
+                        </div>
+
+                        <PartnersView />
+                    </div>
+                )}
+
+                {activeTab === 'delivery' && (
+                    <div className="space-y-8 animate-fade-in-up">
+                        <h2 className="text-3xl font-black tracking-tighter">Delivery Fleet</h2>
+                        <DeliveryView />
+                    </div>
+                )}
+
+                {activeTab === 'users' && (
+                    <div className="space-y-8 animate-fade-in-up">
+                        <h2 className="text-3xl font-black tracking-tighter">Customer Directory</h2>
+                        <UsersView />
+                    </div>
+                )}
+
+                {activeTab === 'orders' && (
+                    <div className="space-y-8 animate-fade-in-up">
+                        <h2 className="text-3xl font-black tracking-tighter">Global Order History</h2>
+                        <OrdersView />
+                    </div>
+                )}
+
+                {activeTab === 'settings' && (
+                    <div className="space-y-8 animate-fade-in-up">
+                        <h2 className="text-3xl font-black tracking-tighter">Platform Control</h2>
+                        <SettingsView />
                     </div>
                 )}
             </main>

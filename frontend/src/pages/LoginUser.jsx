@@ -33,7 +33,11 @@ const LoginUser = () => {
 
         // Small delay for animation
         setTimeout(() => {
-          navigate('/home');
+          if (data.user.role === 'admin') {
+            navigate('/admin');
+          } else {
+            navigate('/home');
+          }
         }, 500);
       }
     } catch (error) {

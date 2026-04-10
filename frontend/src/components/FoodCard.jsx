@@ -82,15 +82,15 @@ const FoodCard = ({ item }) => {
         quantity === 0 ? (
             <button
                 onClick={handleAdd}
-                className="w-24 md:w-auto bg-[#FF5E00] text-white font-bold text-xs uppercase tracking-wider px-6 py-2 rounded-xl transition-all shadow-lg hover:shadow-orange-500/30 active:scale-95 border border-transparent"
+                className="w-24 md:w-auto bg-[var(--accent)] text-white font-bold text-xs uppercase tracking-wider px-6 py-2 rounded-xl transition-all shadow-lg shadow-[var(--accent-glow)] active:scale-95 border border-transparent"
             >
                 {t('add')}
             </button>
         ) : (
-            <div className="flex items-center justify-between bg-[#1a1a1a] rounded-xl border border-[#FF5E00] h-9 md:h-10 overflow-hidden relative shadow-lg min-w-[90px]">
+            <div className="flex items-center justify-between bg-[#1a1a1a] rounded-xl border border-[var(--accent)] h-9 md:h-10 overflow-hidden relative shadow-lg min-w-[90px]">
                 <button
                     onClick={handleDecrement}
-                    className="px-3 h-full flex items-center justify-center text-[#FF5E00] hover:bg-[#FF5E00]/10 font-bold text-lg active:scale-90 transition-transform"
+                    className="px-3 h-full flex items-center justify-center text-[var(--accent)] hover:bg-[var(--accent)]/10 font-bold text-lg active:scale-90 transition-transform"
                 >
                     -
                 </button>
@@ -102,7 +102,7 @@ const FoodCard = ({ item }) => {
                 </span>
                 <button
                     onClick={handleAdd}
-                    className="px-3 h-full flex items-center justify-center text-[#FF5E00] hover:bg-[#FF5E00]/10 font-bold text-lg active:scale-90 transition-transform"
+                    className="px-3 h-full flex items-center justify-center text-[var(--accent)] hover:bg-[var(--accent)]/10 font-bold text-lg active:scale-90 transition-transform"
                 >
                     +
                 </button>
@@ -110,9 +110,8 @@ const FoodCard = ({ item }) => {
         )
     );
 
-    const isImageUrl = (url) => {
-        return /\.(jpg|jpeg|png|webp|gif|avif)$/i.test(url) || url.startsWith('blob:');
-    };
+    // Get gold status
+    const isGold = JSON.parse(localStorage.getItem('user') || '{}').isGoldMember;
 
     return (
         <Link
@@ -120,7 +119,10 @@ const FoodCard = ({ item }) => {
             className="block w-full cursor-pointer group"
         >
             {/* Main Container: Mobile = Vertical Card, Desktop = Vertical Card (Consistent Feed Style) */}
-            <div className="flex flex-col gap-0 bg-[#1e1e1e] rounded-xl md:bg-[#1a1a1a] md:rounded-2xl w-full overflow-hidden border border-white/5 hover:border-[#FF5E00]/30 transition-all duration-300 shadow-sm hover:shadow-lg">
+            <div className={`flex flex-col gap-0 bg-[var(--card-bg)] rounded-xl md:bg-[var(--card-bg)] md:rounded-2xl w-full overflow-hidden border ${isGold ? 'border-[#D4AF37]/30 shadow-[0_5px_15px_rgba(212,175,55,0.1)]' : 'border-white/5'} hover:border-[var(--accent)] transition-all duration-300 shadow-sm hover:shadow-lg relative`}>
+                
+                {/* Gold Shimmer Overlay */}
+                {isGold && <div className="absolute inset-0 animate-shimmer pointer-events-none z-10 opacity-30"></div>}
 
                 {/* MEDIA SECTION */}
                 <div className="relative w-full aspect-video overflow-hidden">

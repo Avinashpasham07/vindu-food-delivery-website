@@ -115,7 +115,10 @@ const UserProfile = () => {
     }
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'N/A';
+        return date.toLocaleDateString('en-US', {
             month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
         });
     };
@@ -140,7 +143,7 @@ const UserProfile = () => {
                             <span className="text-sm font-medium">Back to Home</span>
                         </Link>
                         <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white leading-none">
-                            Hello, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5E00] to-amber-500">{user.fullname?.split(' ')[0] || 'User'}</span>.
+                            Hello, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] to-amber-500">{user.fullname?.split(' ')[0] || 'User'}</span>.
                         </h1>
                         <p className="text-gray-400 mt-2 text-lg font-medium">Welcome to your personal command center.</p>
                     </div>
@@ -166,7 +169,7 @@ const UserProfile = () => {
 
                             <div className="relative flex flex-col items-center text-center">
                                 <div className="relative mb-6">
-                                    <div className={`w-32 h-32 rounded-full p-[3px] bg-gradient-to-tr ${user.isGoldMember ? 'from-[#FFD700] via-[#FDB931] to-[#9E7204]' : 'from-[#FF5E00] via-amber-500 to-yellow-500'} animate-spin-slow`}>
+                                    <div className={`w-32 h-32 rounded-full p-[3px] bg-gradient-to-tr ${user.isGoldMember ? 'from-[#FFD700] via-[#FDB931] to-[#9E7204]' : 'from-[var(--accent)] via-amber-500 to-yellow-500'} animate-spin-slow`}>
                                         <div className="w-full h-full rounded-full bg-[#111] border-4 border-[#111] flex items-center justify-center overflow-hidden relative z-10 transition-transform hover:scale-105">
                                             {user.profileImage ? (
                                                 <img src={user.profileImage} alt="Profile" className="w-full h-full object-cover" />
@@ -194,7 +197,7 @@ const UserProfile = () => {
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`px-6 py-3 rounded-t-2xl text-sm font-bold transition-all relative ${activeTab === tab ? 'text-[#FF5E00] bg-gradient-to-b from-[#1a1a1a] to-transparent border-b-2 border-[#FF5E00]' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+                                    className={`px-6 py-3 rounded-t-2xl text-sm font-bold transition-all relative ${activeTab === tab ? 'text-[var(--accent)] bg-gradient-to-b from-[#1a1a1a] to-transparent border-b-2 border-[var(--accent)]' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
                                 >
                                     {tab.charAt(0).toUpperCase() + tab.slice(1)}
                                 </button>
@@ -223,7 +226,7 @@ const UserProfile = () => {
                                     <div className="relative z-10 max-w-lg">
                                         <h3 className="text-3xl font-black text-white mb-2">Invite friends, get ₹100</h3>
                                         <p className="text-white/80 font-medium mb-6">Share your referral code and earn bonus credits for every friend who joins Vindu.</p>
-                                        <button className="px-6 py-3 bg-white text-[#FF5E00] rounded-xl font-bold shadow-lg hover:bg-gray-100 transition-colors">Share Code</button>
+                                        <button className="px-6 py-3 bg-white text-[var(--accent)] rounded-xl font-bold shadow-lg hover:bg-gray-100 transition-colors">Share Code</button>
                                     </div>
                                 </div>
                             </div>
@@ -395,7 +398,7 @@ const UserProfile = () => {
                                             {user.isGoldMember ? (
                                                 <button onClick={() => navigate('/user/gold')} className="px-6 py-3 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl font-bold transition-all">View Plan Details</button>
                                             ) : (
-                                                <Link to="/user/gold" className="px-6 py-3 bg-[#FF5E00] text-white rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20">Upgrade Now</Link>
+                                                <Link to="/user/gold" className="px-6 py-3 bg-[var(--accent)] text-white rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg shadow-[var(--accent-glow)]">Upgrade Now</Link>
                                             )}
                                             <button className="px-6 py-3 bg-white/5 border border-white/10 text-gray-400 rounded-xl font-bold opacity-50 cursor-not-allowed">Billing History (Soon)</button>
                                         </div>

@@ -310,4 +310,40 @@ async function getMe(req, res) {
     }
 }
 
-module.exports = { registerUser, loginUser, logoutUser, registerfoodpartner, loginfoodpartner, logoutfoodpartner, getPartnerById, getUserFavorites, buyGoldMembership, getMe };
+async function updatePartnerProfile(req, res) {
+    try {
+        const { id } = req.params;
+        const { name, contactName, phone, address, location } = req.body;
+
+        logger.info(`Updating Partner Profile for ID: ${id}`);
+        logger.debug("Update Data:", { name, contactName, phone, address, location });
+
+        // Build update object only with provided fields
+        const updateObj = {};
+        if (name) updateObj.name = name;
+        if (contactName) updateObj.contactName = contactName;
+        if (phone) updateObj.phone = phone;
+        if (address) updateObj.address = address;
+        if (location) updateObj.location = location;
+
+        const updatedPartner = await foodpartnermodel.findByIdAndUpdate(
+            id,
+            { $set: updateObj },
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!updatedPartner) {
+            return res.status(404).json({ message: "Partner not found" });
+        }
+
+        res.status(200).json({
+            message: "Profile updated successfully",
+            partner: updatedPartner
+        });
+    } catch (error) {
+        console.error("Error updating partner profile:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}
+
+module.exports = { registerUser, loginUser, logoutUser, registerfoodpartner, loginfoodpartner, logoutfoodpartner, getPartnerById, getUserFavorites, buyGoldMembership, getMe, updatePartnerProfile };

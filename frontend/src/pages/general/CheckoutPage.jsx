@@ -3,6 +3,7 @@ import { useCart } from '../../context/CartContext';
 import { useSquad } from '../../context/SquadContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../../api/client';
+import toast from 'react-hot-toast';
 
 const CheckoutPage = () => {
     const { cart, cartTotal, clearCart } = useCart();
@@ -25,7 +26,9 @@ const CheckoutPage = () => {
         phone: '',
         address: '',
         city: '',
-        zip: ''
+        zip: '',
+        lat: null,
+        lng: null
     });
 
     const [paymentMethod, setPaymentMethod] = useState('card');
@@ -56,7 +59,7 @@ const CheckoutPage = () => {
 
     const handleUseLocation = () => {
         if (!navigator.geolocation) {
-            alert('Geolocation is not supported by your browser');
+            toast.error('Geolocation is not supported by your browser');
             return;
         }
 
@@ -66,51 +69,37 @@ const CheckoutPage = () => {
             async (position) => {
                 try {
                     const { latitude, longitude } = position.coords;
-                    // Using OpenStreetMap Nominatim API for reverse geocoding (Free, no key needed)
                     const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
                     const data = await response.json();
 
                     if (data && data.address) {
                         const addr = data.address;
-                        // Prioritize village/hamlet over neighbourhood (colonies)
                         const localArea = addr.village || addr.hamlet || addr.neighbourhood || addr.suburb || addr.city_district || '';
-
                         setFormData(prev => ({
                             ...prev,
                             address: `${addr.road || ''} ${addr.house_number || ''}, ${localArea}`.trim(),
                             city: addr.city || addr.town || addr.municipality || '',
-                            zip: addr.postcode || ''
+                            zip: addr.postcode || '',
+                            lat: latitude,
+                            lng: longitude
                         }));
+                        toast.success("Location captured! 📍");
                     }
                 } catch (error) {
                     console.error('Error fetching address:', error);
-                    alert('Could not fetch address details. Please enter manually.');
+                    toast.error('Could not fetch address details.');
                 } finally {
                     setIsLocating(false);
                 }
             },
             (error) => {
                 console.error('Geolocation error:', error);
-                let msg = 'Unable to retrieve your location';
-                switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                        msg = 'Location permission denied. Please enable it in browser settings.';
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        msg = 'Location information is unavailable.';
-                        break;
-                    case error.TIMEOUT:
-                        msg = 'Location request timed out. Please try again.';
-                        break;
-                    default:
-                        msg = 'An unknown error occurred.';
-                }
-                alert(msg);
+                toast.error('Unable to retrieve your location');
                 setIsLocating(false);
             },
             {
                 enableHighAccuracy: true,
-                timeout: 10000,
+                timeout: 15000,
                 maximumAge: 0
             }
         );
@@ -119,7 +108,12 @@ const CheckoutPage = () => {
     const handlePlaceOrder = async () => {
         // Validation
         if (!formData.name || !formData.phone || !formData.address || !formData.city || !formData.zip) {
-            alert('Please fill in all delivery details');
+            toast.error('Please fill in all delivery details');
+            return;
+        }
+
+        if (!formData.lat || !formData.lng) {
+            toast.error('Please click "Use Current Location" to enable real-time tracking! 🗺️');
             return;
         }
 
@@ -142,6 +136,7 @@ const CheckoutPage = () => {
                 })),
                 totalAmount: grandTotal,
                 address: formData,
+                customerLocation: { lat: formData.lat, lng: formData.lng },
                 paymentMethod: paymentMethod,
                 couponCode: couponCode
             };

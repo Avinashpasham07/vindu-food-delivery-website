@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
+const Message = require('./models/message.model');
 
 const squadSessions = {}; // In-memory store: { roomId: { members: [], cart: [] } }
 
@@ -73,6 +74,20 @@ module.exports = (io) => {
             // Broadcast to the specific order room so User and Restaurant can see it
             // Payload: { lat: number, lng: number, heading: number }
             socket.to(`order-${orderId}`).emit('driver-location-updated', location);
+        });
+
+        // 10. Chat System [NEW]
+        socket.on('send_message', async ({ orderId, senderId, senderModel, senderName, text }) => {
+            try {
+                // Persist to DB for history
+                const message = new Message({ orderId, senderId, senderModel, senderName, text });
+                await message.save();
+
+                // Broadcast to the order room
+                io.to(`order-${orderId}`).emit('new_message', message);
+            } catch (err) {
+                console.error("Socket Chat Error:", err);
+            }
         });
         // Disconnect
         socket.on('disconnect', () => {

@@ -6,7 +6,7 @@ const AuthAdmin = ({ children }) => {
     const token = localStorage.getItem('token');
 
     if (!token || !user || user.role !== 'admin') {
-        return <Navigate to="/home" replace />;
+        return <Navigate to="/admin/login" replace />;
     }
 
     return children;

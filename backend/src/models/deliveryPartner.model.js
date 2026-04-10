@@ -31,10 +31,18 @@ const deliveryPartnerSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Order',
         default: null
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    fcmTokens: {
+        type: [String],
+        default: []
     }
 }, {
     timestamps: true
 });
 
-const DeliveryPartner = mongoose.model('DeliveryPartner', deliveryPartnerSchema);
+const DeliveryPartner = mongoose.models.DeliveryPartner || mongoose.model('DeliveryPartner', deliveryPartnerSchema);
 module.exports = DeliveryPartner;

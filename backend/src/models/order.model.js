@@ -48,6 +48,18 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['Searching', 'Assigned', 'PickedUp', 'Delivered', 'Cancelled'],
         default: 'Searching'
+    },
+    customerLocation: {
+        lat: Number,
+        lng: Number
+    },
+    restaurantLocation: {
+        lat: Number,
+        lng: Number
+    },
+    riderLocation: {
+        lat: Number,
+        lng: Number
     }
 });
 
@@ -58,5 +70,5 @@ orderSchema.index({ deliveryStatus: 1 }); // Fast dashboard filtering
 orderSchema.index({ status: 1 }); // Fast status filtering
 orderSchema.index({ createdAt: -1 }); // Fast sorting by newest
 
-const Order = mongoose.model('Order', orderSchema);
+const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 module.exports = Order;

@@ -23,3 +23,43 @@
 {"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-08 23:41:49"}
 {"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-09 00:02:32"}
 {"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-09 20:19:05"}
+{"level":"warn","message":"Login Failed: User not found - admin@vindu.com","service":"vindu-backend","timestamp":"2026-04-09 21:18:35"}
+{"level":"warn","message":"Login Failed: User not found - admin@vindu.com","service":"vindu-backend","timestamp":"2026-04-09 21:18:37"}
+{"level":"info","message":"User Registered: 69d7ca7a2bf83f6a2f16e3c5","service":"vindu-backend","timestamp":"2026-04-09 21:19:14"}
+{"level":"warn","message":"Login Failed: Password mismatch - avinash@gmail.com","service":"vindu-backend","timestamp":"2026-04-09 21:19:31"}
+{"level":"warn","message":"Login Failed: Password mismatch - avinash@gmail.com","service":"vindu-backend","timestamp":"2026-04-09 21:19:50"}
+{"level":"warn","message":"Login Failed: Password mismatch - avinash@gmail.com","service":"vindu-backend","timestamp":"2026-04-09 21:19:51"}
+{"level":"warn","message":"Login Failed: User not found - admin@vindu.com","service":"vindu-backend","timestamp":"2026-04-09 21:19:55"}
+{"level":"info","message":"User Logged In: 69d7ca7a2bf83f6a2f16e3c5","service":"vindu-backend","timestamp":"2026-04-09 21:20:16"}
+{"level":"info","message":"User Logged In: 69d7ca7a2bf83f6a2f16e3c5","service":"vindu-backend","timestamp":"2026-04-09 21:23:45"}
+{"level":"warn","message":"Login Failed: Password mismatch - admin@audionix.com","service":"vindu-backend","timestamp":"2026-04-09 23:24:39"}
+{"level":"info","message":"Gold Membership Expired for User: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-09 23:24:49"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-09 23:24:49"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 13:43:25"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 15:58:00"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:03:55"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:04:04"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:04:04"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:04:07"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:04:52"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:04:52"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:04:54"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:04:55"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:05:06"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:05:06"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:05:10"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-10 16:05:51"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:24:08"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:25:36"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:25:45"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:25:47"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:25:47"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-10 16:26:02"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:40:55"}
+{"level":"warn","message":"User Not Found in Auth Middleware: undefined","service":"vindu-backend","timestamp":"2026-04-10 16:40:55"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-10 16:41:00"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-10 16:41:44"}
+{"level":"info","message":"Updating Partner Profile for ID: 69d69bcd56715ae14f37a1fc","service":"vindu-backend","timestamp":"2026-04-10 16:47:10"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-10 16:50:06"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-10 17:33:24"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-10 18:55:57"}

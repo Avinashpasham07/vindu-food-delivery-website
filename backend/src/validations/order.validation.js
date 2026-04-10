@@ -16,7 +16,11 @@ const placeOrder = {
         totalAmount: Joi.number().required(),
         address: Joi.object().required(),
         paymentMethod: Joi.string().required().valid('card', 'upi', 'cod'),
-        couponCode: Joi.string().optional().allow('', null)
+        couponCode: Joi.string().optional().allow('', null),
+        customerLocation: Joi.object().keys({
+            lat: Joi.number().allow(null),
+            lng: Joi.number().allow(null)
+        }).optional()
     })
 };
 
@@ -25,7 +29,7 @@ const updateStatus = {
         orderId: Joi.string().required()
     }),
     body: Joi.object().keys({
-        status: Joi.string().required().valid('Placed', 'Preparing', 'Out for Delivery', 'Delivered', 'Cancelled')
+        status: Joi.string().required().valid('Placed', 'Preparing', 'Ready', 'Out for Delivery', 'Delivered', 'Cancelled')
     })
 };
 

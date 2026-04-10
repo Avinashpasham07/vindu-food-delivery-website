@@ -1,8 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+:root {
+  --accent: #FF5E00;
+  --accent-glow: rgba(255, 94, 0, 0.2);
+  --bg-main: #0d0d0d;
+  --card-bg: #111111;
+  --text-main: #ffffff;
+}
+
+[data-theme="gold"] {
+  --accent: #D4AF37;
+  --accent-glow: rgba(212, 175, 55, 0.3);
+  --bg-main: #050505;
+  --card-bg: #0a0a0a;
+  --text-main: #f8f8f8;
+}
+
 @theme {
-  --color-user-primary: #FF5E00;
+  --color-user-primary: var(--accent);
   --color-partner-primary: #10B981;
 }
 
@@ -71,4 +87,19 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #D4AF37 0%, #F9E2AF 50%, #D4AF37 100%);
 }

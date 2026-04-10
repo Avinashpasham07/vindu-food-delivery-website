@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import OrderService from '../../services/order.service';
-import mapBackground from '../../assets/map_background.png';
 import { useTranslation } from 'react-i18next';
+import OrderMap from '../../components/OrderMap';
+import toast from 'react-hot-toast';
+import ChatWindow from '../../components/ChatWindow';
 
 const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
 const socket = io(socketUrl);
@@ -14,7 +16,10 @@ const OrderTracking = () => {
     const { t } = useTranslation();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [progress, setProgress] = useState(0); // 0 to 100 for rider position
+    const [progress, setProgress] = useState(0); 
+    const [riderLocation, setRiderLocation] = useState(null);
+    const [roadStats, setRoadStats] = useState({ distance: 0, eta: 0, isRoadAware: false });
+    const [isSimulating, setIsSimulating] = useState(false);
 
     useEffect(() => {
         fetchOrderDetails();
@@ -33,6 +38,11 @@ const OrderTracking = () => {
                 setOrder(prev => ({ ...prev, deliveryStatus: status }));
                 updateProgress(status);
             }
+        });
+
+        socket.on('driver-location-updated', (location) => {
+            console.log("Live Location Received:", location);
+            setRiderLocation(location);
         });
 
         return () => {
@@ -88,10 +98,66 @@ const OrderTracking = () => {
     }, [order?.deliveryStatus]);
 
 
+    const calculateHaversine = (lat1, lon1, lat2, lon2) => {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    };
+
+    // New: Fetch actual road distance from OSRM
+    const fetchRoadDistance = async (start, end) => {
+        try {
+            const url = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?overview=false`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            if (data.routes && data.routes.length > 0) {
+                const distanceKm = data.routes[0].distance / 1000;
+                // OSRM duration is in seconds
+                const durationMins = Math.ceil(data.routes[0].duration / 60);
+                return { distance: distanceKm, eta: durationMins };
+            }
+        } catch (err) {
+            console.error("OSRM Route Error:", err);
+        }
+        // Fallback to Haversine
+        const havDist = calculateHaversine(start.lat, start.lng, end.lat, end.lng);
+        return { distance: havDist, eta: Math.ceil(havDist * 4 + 10), isFallback: true };
+    };
+
+    // Update Road Stats whenever mission state changes
+    useEffect(() => {
+        const updateStats = async () => {
+            if (!order?.restaurantLocation?.lat || !order?.customerLocation?.lat) return;
+
+            let start = order.restaurantLocation;
+            let end = order.customerLocation;
+
+            // If rider is out for delivery, track from rider to customer
+            if (order.deliveryStatus === 'Out_for_Delivery' && riderLocation?.lat) {
+                start = riderLocation;
+            }
+
+            const stats = await fetchRoadDistance(start, end);
+            setRoadStats({
+                distance: stats.distance,
+                eta: stats.eta,
+                isRoadAware: !stats.isFallback
+            });
+        };
+
+        updateStats();
+    }, [order?.restaurantLocation, order?.customerLocation, order?.deliveryStatus, riderLocation]);
+
     const fetchOrderDetails = async () => {
         try {
             const data = await OrderService.getOrderDetails(orderId);
             setOrder(data);
+            setRiderLocation(data.riderLocation || data.restaurantLocation);
             setLoading(false);
             // Initial progress set
             if (data.deliveryStatus === 'Out_for_Delivery') setProgress(20);
@@ -101,6 +167,34 @@ const OrderTracking = () => {
             console.error("Error fetching order:", err);
             setLoading(false);
         }
+    };
+
+    // --- Simulation Logic ---
+    const startSimulation = () => {
+        if (!order?.restaurantLocation?.lat || !order?.customerLocation?.lat) {
+            toast.error("Real coordinates missing for tracking!");
+            return;
+        }
+
+        setIsSimulating(true);
+        let step = 0;
+        const totalSteps = 20;
+        
+        const interval = setInterval(() => {
+            step++;
+            const lat = order.restaurantLocation.lat + (order.customerLocation.lat - order.restaurantLocation.lat) * (step / totalSteps);
+            const lng = order.restaurantLocation.lng + (order.customerLocation.lng - order.restaurantLocation.lng) * (step / totalSteps);
+            
+            socket.emit('update-location', {
+                orderId,
+                location: { lat, lng }
+            });
+
+            if (step >= totalSteps) {
+                clearInterval(interval);
+                setIsSimulating(false);
+            }
+        }, 1500);
     };
 
     const getStepStatus = (step) => {
@@ -131,8 +225,10 @@ const OrderTracking = () => {
     const startX = 20; const endX = 80;
     const startY = 60; const endY = 30;
 
-    const riderLeft = startX + (endX - startX) * (progress / 100);
-    const riderTop = startY + (endY - startY) * (progress / 100);
+    // Use Road Stats
+    const totalDistance = roadStats.distance;
+    const remainingDistance = roadStats.distance;
+    const eta = roadStats.eta;
 
     return (
         <div className="min-h-screen bg-[#050505] text-white font-['Plus_Jakarta_Sans'] relative pb-20 selection:bg-[#FF5E00]/30 flex flex-col overflow-hidden">
@@ -144,75 +240,84 @@ const OrderTracking = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                     </svg>
                 </button>
-                <div className="flex items-center gap-3">
-                    <div id="live-signal" className="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e] opacity-50 transition-opacity duration-300" title="Live Signal"></div>
-                    <div className="px-4 py-1.5 bg-[#FF5E00] rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-orange-500/20">
+                <div className="flex items-center gap-2">
+                    {/* Gold Priority Badge */}
+                    {JSON.parse(localStorage.getItem('user') || '{}').isGoldMember && (
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gold-gradient rounded-full shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-white/20 animate-pulse">
+                            <span className="text-black text-[9px] font-black uppercase tracking-tighter">Priority Dispatch</span>
+                            <span className="text-black text-[10px]">✨</span>
+                        </div>
+                    )}
+                    <div className="px-4 py-1.5 bg-[var(--accent)] rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-[var(--accent-glow)]">
                         {t(order.deliveryStatus?.toLowerCase() || 'order_placed')}
                     </div>
                 </div>
             </div>
 
-            {/* Simulated Map Area */}
+            {/* Real Map Area */}
             <div className="flex-1 relative w-full h-[50vh] min-h-[400px] overflow-hidden bg-[#1a1a1a]">
-                {/* Background Image */}
-                <img loading="lazy" src={mapBackground} alt="Map Background" className="absolute inset-0 w-full h-full object-cover opacity-80" />
-
-                {/* Path Line (SVG) */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-                    <line
-                        x1="20%" y1="60%"
-                        x2="80%" y2="30%"
-                        stroke="#FF5E00"
-                        strokeWidth="4"
-                        strokeDasharray="10,10"
-                        opacity="0.6"
-                    />
-                </svg>
-
-                {/* Restaurant Marker */}
-                <div className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10" style={{ left: '20%', top: '60%' }}>
-                    <div className="w-10 h-10 bg-[#111] border-2 border-gray-500 rounded-full flex items-center justify-center text-xl shadow-[0_0_20px_rgba(0,0,0,0.6)]">
-                        👨‍🍳
+                {(!order?.restaurantLocation?.lat && !order?.customerLocation?.lat) && (
+                    <div className="absolute inset-0 z-[2000] bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
+                        <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10">
+                            <span className="text-3xl">📍</span>
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">Tracking Unavailable</h3>
+                        <p className="text-gray-400 text-sm max-w-xs">
+                            GPS coordinates for this order were not captured. Please contact support.
+                        </p>
                     </div>
-                    <span className="mt-1 text-[10px] font-bold bg-black/50 px-2 rounded text-gray-300 backdrop-blur-sm">{t('restaurant')}</span>
-                </div>
-
-                {/* Home Marker */}
-                <div className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10" style={{ left: '80%', top: '30%' }}>
-                    <div className="w-10 h-10 bg-[#FF5E00] border-2 border-white rounded-full flex items-center justify-center text-xl shadow-[0_0_20px_rgba(255,94,0,0.6)] animate-pulse">
-                        🏠
+                )}
+                
+                {/* Warning for partial data */}
+                {((!order?.restaurantLocation?.lat && order?.customerLocation?.lat) || (order?.restaurantLocation?.lat && !order?.customerLocation?.lat)) && (
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[2000] bg-yellow-500/20 backdrop-blur border border-yellow-500/30 px-4 py-2 rounded-full flex items-center gap-2">
+                        <span className="text-sm text-yellow-500 font-bold">⚠️ Partial Tracking Data</span>
                     </div>
-                    <span className="mt-1 text-[10px] font-bold bg-black/50 px-2 rounded text-white backdrop-blur-sm">{t('home')}</span>
-                </div>
+                )}
 
-                {/* Animated Rider */}
-                <div
-                    className="absolute transform -translate-x-1/2 -translate-y-1/2 z-20 transition-all duration-300 ease-linear will-change-transform"
-                    style={{ left: `${riderLeft}%`, top: `${riderTop}%` }}
-                >
-                    <div className="w-12 h-12 bg-white rounded-full border-4 border-[#FF5E00] flex items-center justify-center text-2xl shadow-[0_0_30px_rgba(255,94,0,0.5)]">
-                        🛵
-                    </div>
-                    {/* Label below rider */}
-                    <div className="absolute top-14 left-1/2 -translate-x-1/2 bg-black/80 text-white text-[10px] font-bold px-2 py-0.5 rounded whitespace-nowrap">
-                        {order.deliveryStatus === 'Out_for_Delivery' ? t('out_for_delivery_desc') : t('preparing_desc')}
-                    </div>
-                </div>
+                <OrderMap 
+                    restaurant={order.restaurantLocation}
+                    customer={order.customerLocation}
+                    rider={riderLocation}
+                />
 
+                {/* Simulation Button Overlay */}
+                {order?.restaurantLocation?.lat && (
+                    <div className="absolute bottom-10 right-6 z-[1000]">
+                        <button 
+                            onClick={startSimulation}
+                            disabled={isSimulating}
+                            className={`px-4 py-2 rounded-xl border border-white/10 font-bold text-xs shadow-2xl backdrop-blur-md transition-all active:scale-95 ${isSimulating ? 'bg-orange-500/20 text-orange-400' : 'bg-[#111]/80 text-white hover:bg-[#FF5E00]'}`}
+                        >
+                            {isSimulating ? '🛰️ Tracking Active...' : '📍 Simulate Rider'}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Bottom Sheet (Details) */}
             <div className="bg-[#111] border-t border-white/10 rounded-t-[32px] p-6 pb-10 shadow-[0_-10px_40px_rgba(0,0,0,0.8)] animate-slide-up z-10 relative -mt-6">
 
                 {/* ETA Header */}
-                <div className="flex justify-between items-end mb-8">
-                    <div>
-                        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">{t('estimated_arrival')}</p>
-                        <h2 className="text-4xl font-black text-white">35 <span className="text-xl text-gray-500 font-bold">{t('min')}</span></h2>
+                <div className="flex justify-between items-end mb-8 bg-[#1a1a1a] p-5 rounded-2xl border border-white/5 relative overflow-hidden">
+                    {/* Progress Background */}
+                    <div className="absolute top-0 left-0 bottom-0 bg-[#FF5E00]/5 transition-all duration-1000" style={{ width: `${progress}%` }}></div>
+                    
+                    <div className="relative z-10">
+                        <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">{t('estimated_arrival')}</p>
+                        <h2 className="text-4xl font-black text-white leading-none">
+                            {order.deliveryStatus === 'Delivered' ? '0' : eta} 
+                            <span className="text-lg text-gray-500 font-bold ml-1">{t('min')}</span>
+                        </h2>
                     </div>
-                    <div className="text-right">
-                        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">{t('order_id')}</p>
-                        <p className="text-white font-mono font-bold">#{order._id.slice(-6).toUpperCase()}</p>
+                    <div className="text-right relative z-10">
+                        <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">
+                            {order.deliveryStatus === 'Out_for_Delivery' ? 'Remaining Distance' : 'Total Distance'}
+                        </p>
+                        <p className="text-white text-xl font-black">
+                            {(order.deliveryStatus === 'Out_for_Delivery' ? remainingDistance : totalDistance).toFixed(1)} 
+                            <span className="text-xs text-gray-500 uppercase ml-1">km</span>
+                        </p>
                     </div>
                 </div>
 
@@ -247,6 +352,24 @@ const OrderTracking = () => {
                             </div>
                         </div>
 
+                    </div>
+                </div>
+
+                {/* Restaurant Info */}
+                <div className="mb-8 p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-[#FF5E00]/30 transition-all">
+                    <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-xl flex-shrink-0">
+                            🍳
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-[#FF5E00] text-[10px] font-black uppercase tracking-[0.2em] mb-1">Coming From</p>
+                            <h3 className="text-white font-bold truncate">
+                                {order.items?.[0]?.foodId?.foodpartner?.businessName || 'Vindu Restaurant'}
+                            </h3>
+                            <p className="text-gray-500 text-xs mt-0.5 line-clamp-2 leading-relaxed">
+                                {order.items?.[0]?.foodId?.foodpartner?.address || 'Address updating...'}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -285,6 +408,13 @@ const OrderTracking = () => {
                     </button>
                 )}
             </div>
+ 
+            {/* Chat Overlay */}
+            <ChatWindow 
+                orderId={orderId} 
+                currentUser={JSON.parse(localStorage.getItem('user') || '{}')} 
+                senderModel="User"
+            />
         </div>
     );
 };

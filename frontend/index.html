@@ -5,7 +5,14 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/logo.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vindu - Food Delivery</title>
+  <title>Vindu | Premium Delivery</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+  <style>
+    .leaflet-container { width: 100%; height: 100%; background: #050505 !important; border-radius: 40px; }
+    .leaflet-tile { filter: grayscale(1) invert(1) opacity(0.5); }
+    .leaflet-routing-container { display: none !important; } /* Hide the bulky text panel */
+  </style>
 </head>
 
 <body>

@@ -17,7 +17,7 @@ const AnalyticsChart = ({ data }) => {
         <div className="w-full h-[300px] bg-[#1a1a1a] rounded-2xl border border-white/5 p-4 md:p-6 relative overflow-hidden">
             <h3 className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-6">Revenue Trend (Today)</h3>
 
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={300}>
                 <AreaChart
                     data={chartData}
                     margin={{

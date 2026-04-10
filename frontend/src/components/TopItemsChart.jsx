@@ -16,7 +16,7 @@ const TopItemsChart = ({ data }) => {
         <div className="w-full h-[350px] bg-[#1a1a1a] rounded-2xl border border-white/5 p-6 flex flex-col">
             <h3 className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Best Sellers</h3>
             <div className="flex-1 min-h-0">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
                         <Pie
                             data={chartData}

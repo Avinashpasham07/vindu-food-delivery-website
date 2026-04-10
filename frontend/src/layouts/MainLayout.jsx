@@ -7,8 +7,13 @@ const MainLayout = () => {
     const isFoodDetails = location.pathname.startsWith('/food/');
     const [isExpanded, setIsExpanded] = useState(false);
 
+    // Get user from localStorage to check gold status
+    const storedUser = localStorage.getItem('user');
+    const user = storedUser ? JSON.parse(storedUser) : null;
+    const isGold = user?.isGoldMember || false;
+
     return (
-        <div className="min-h-screen bg-[#0d0d0d]">
+        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]" data-theme={isGold ? 'gold' : 'default'}>
             <div>
                 <Navigation isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
             </div>

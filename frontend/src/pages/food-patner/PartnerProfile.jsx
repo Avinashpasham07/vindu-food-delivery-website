@@ -1,22 +1,114 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import apiClient from '../../api/client';
+import toast from 'react-hot-toast';
+
+// Custom Marker Icon for Leaflet
+import L from 'leaflet';
+const restaurantIcon = new L.DivIcon({
+    html: `<div style="background-color: #10B981; border: 2px solid white; border-radius: 50%; width: 32px; height: 32px; display: flex; items-center; justify-content: center; font-size: 16px; box-shadow: 0 0 10px rgba(16,185,129,0.5);">🍴</div>`,
+    className: 'custom-div-icon',
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+});
 
 const PartnerProfile = () => {
     const navigate = useNavigate();
     const [partner, setPartner] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState({});
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        const storedPartner = localStorage.getItem('partner');
-        if (storedPartner) {
-            setPartner(JSON.parse(storedPartner));
-        } else {
-            // navigate('/food-partner/login');
-        }
+        const fetchPartnerData = async () => {
+            const storedPartner = localStorage.getItem('partner');
+            if (storedPartner) {
+                const p = JSON.parse(storedPartner);
+                setPartner(p);
+                setFormData(p);
+
+                // Fetch fresh data from server to ensure sync
+                try {
+                    const partnerId = p.id || p._id;
+                    const res = await apiClient.get(`/auth/partner/${partnerId}`);
+                    setPartner(res.data.partner);
+                    setFormData(res.data.partner);
+                } catch (err) {
+                    console.error("Failed to fetch fresh partner data:", err);
+                }
+            } else {
+                navigate('/food-partner/login');
+            }
+        };
+
+        fetchPartnerData();
     }, [navigate]);
+
+    const isValidLocation = (loc) => loc && typeof loc.lat === 'number' && typeof loc.lng === 'number';
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        const { _id, id, __v, email, role, ...updateData } = formData;
+        
+        try {
+            const partnerId = partner.id || partner._id;
+            console.log("Saving Partner Profile:", { partnerId, updateData });
+            
+            const res = await apiClient.put(`/auth/partner/update/${partnerId}`, updateData);
+            
+            setPartner(res.data.partner);
+            setFormData(res.data.partner);
+            localStorage.setItem('partner', JSON.stringify(res.data.partner));
+            setIsEditing(false);
+            toast.success("Profile updated successfully!");
+        } catch (error) {
+            console.error("Update failed:", error);
+            const errorMsg = error.response?.data?.message || "Failed to update profile";
+            toast.error(errorMsg);
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     if (!partner) {
         return <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center text-white">Loading Profile...</div>;
     }
+
+    // Logic to re-center map ONLY when initial data is loaded or saved
+    // We use a stable key based on the partner's unique ID to prevent flickering on every click
+    const mapKey = `map-${partner?.id || partner?._id || 'initial'}`;
+
+    const mapCenter = isValidLocation(formData.location) 
+        ? [formData.location.lat, formData.location.lng] 
+        : [28.6139, 77.2090];
+
+    // Component to automatically fly the map to the selected location
+    const MapAutoCenter = ({ center }) => {
+        const map = useMap();
+        useEffect(() => {
+            if (center) {
+                map.flyTo(center, 15, { duration: 1.5 });
+            }
+        }, [center, map]);
+        return null;
+    };
+
+    const LocationMarker = () => {
+        useMapEvents({
+            click(e) {
+                setFormData(prev => ({
+                    ...prev,
+                    location: { lat: e.latlng.lat, lng: e.latlng.lng }
+                }));
+            },
+        });
+
+        return isValidLocation(formData.location) ? (
+            <Marker position={[formData.location.lat, formData.location.lng]} icon={restaurantIcon} />
+        ) : null;
+    };
 
     return (
         <div className="min-h-screen bg-[#0d0d0d] text-white font-['Plus_Jakarta_Sans'] p-6 md:p-12">
@@ -48,22 +140,143 @@ const PartnerProfile = () => {
 
                 <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="bg-[#0d0d0d] p-6 rounded-2xl border border-white/5">
-                        <label className="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-2">Contact Name</label>
-                        <div className="text-white text-lg font-medium">{partner.contactName || "N/A"}</div>
+                        <label className="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-2">Business Name</label>
+                        {isEditing ? (
+                            <input
+                                type="text"
+                                className="w-full bg-[#111] border border-white/10 rounded-lg p-2 text-white outline-none focus:border-[#10B981]"
+                                value={formData.name || ''}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            />
+                        ) : (
+                            <div className="text-white text-lg font-medium">{partner.name}</div>
+                        )}
                     </div>
                     <div className="bg-[#0d0d0d] p-6 rounded-2xl border border-white/5">
                         <label className="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-2">Phone Number</label>
-                        <div className="text-white text-lg font-medium">{partner.phone || "N/A"}</div>
+                        {isEditing ? (
+                            <input
+                                type="text"
+                                className="w-full bg-[#111] border border-white/10 rounded-lg p-2 text-white outline-none focus:border-[#10B981]"
+                                value={formData.phone || ''}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            />
+                        ) : (
+                            <div className="text-white text-lg font-medium">{partner.phone || "N/A"}</div>
+                        )}
                     </div>
                     <div className="bg-[#0d0d0d] p-6 rounded-2xl border border-white/5 md:col-span-2">
-                        <label className="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-2">Email Address</label>
-                        <div className="text-white text-lg font-medium">{partner.email}</div>
+                        <label className="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-2">Physical Address</label>
+                        {isEditing ? (
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    className="flex-1 bg-[#111] border border-white/10 rounded-lg p-2 text-white outline-none focus:border-[#10B981]"
+                                    value={formData.address || ''}
+                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                    placeholder="Enter full address (e.g., Ghatkesar, Medchal)"
+                                />
+                                <button
+                                    onClick={async () => {
+                                        if (!formData.address) {
+                                            toast.error("Please enter an address first");
+                                            return;
+                                        }
+                                        const loadingToast = toast.loading("Finding address...");
+                                        try {
+                                            // Search with address + restaurant name for better accuracy
+                                            const query = `${formData.address}, ${formData.name || ''}`;
+                                            const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+                                            const data = await res.json();
+                                            
+                                            if (data && data.length > 0) {
+                                                const { lat, lon } = data[0];
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    location: { lat: parseFloat(lat), lng: parseFloat(lon) }
+                                                }));
+                                                toast.success("Location found!", { id: loadingToast });
+                                            } else {
+                                                // Try again with just the address if combined search fails
+                                                const res2 = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(formData.address)}&format=json&limit=1`);
+                                                const data2 = await res2.json();
+                                                if (data2 && data2.length > 0) {
+                                                    const { lat, lon } = data2[0];
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        location: { lat: parseFloat(lat), lng: parseFloat(lon) }
+                                                    }));
+                                                    toast.success("Address found!", { id: loadingToast });
+                                                } else {
+                                                    toast.error("Could not find that location. Please pin it manually.", { id: loadingToast });
+                                                }
+                                            }
+                                        } catch (err) {
+                                            toast.error("Geocoding failed", { id: loadingToast });
+                                        }
+                                    }}
+                                    className="bg-[#10B981]/20 text-[#10B981] px-4 rounded-lg font-bold hover:bg-[#10B981]/30 transition"
+                                    title="Find on Map"
+                                >
+                                    🔍
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="text-white text-lg font-medium">{partner.address || "No address set"}</div>
+                        )}
                     </div>
                 </div>
 
-                <button className="mt-8 px-8 py-3 rounded-xl bg-[#10B981] text-white font-bold hover:bg-[#059669] transition w-full shadow-lg shadow-[#10B981]/20">
-                    Edit Business Details
-                </button>
+                {/* Location Picker Map */}
+                <div className="mt-8">
+                    <label className="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-4">Restaurant GPS Location</label>
+                    <div className="h-64 rounded-2xl overflow-hidden border border-white/10 bg-[#111]">
+                        <MapContainer
+                            key={mapKey}
+                            center={mapCenter}
+                            zoom={13}
+                            style={{ height: '100%', width: '100%' }}
+                            scrollWheelZoom={false}
+                        >
+                            <TileLayer
+                                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
+                            />
+                            {isEditing && <MapAutoCenter center={mapCenter} />}
+                            {isEditing && <LocationMarker />}
+                            {!isEditing && isValidLocation(formData.location) && (
+                                <Marker position={[formData.location.lat, formData.location.lng]} icon={restaurantIcon} />
+                            )}
+                        </MapContainer>
+                    </div>
+                    {isEditing && <p className="text-[10px] text-gray-500 mt-2 italic">Click on the map to set your restaurant's exact pin location.</p>}
+                </div>
+
+                <div className="mt-10 flex gap-4">
+                    {isEditing ? (
+                        <>
+                            <button
+                                onClick={handleSave}
+                                disabled={isSaving}
+                                className="flex-1 px-8 py-3 rounded-xl bg-[#10B981] text-white font-bold hover:bg-[#059669] transition shadow-lg shadow-[#10B981]/20 disabled:opacity-50"
+                            >
+                                {isSaving ? "Saving..." : "Save Changes"}
+                            </button>
+                            <button
+                                onClick={() => { setIsEditing(false); setFormData(partner); }}
+                                className="flex-1 px-8 py-3 rounded-xl bg-[#222] text-white font-bold hover:bg-[#333] transition"
+                            >
+                                Cancel
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            onClick={() => setIsEditing(true)}
+                            className="w-full px-8 py-3 rounded-xl bg-[#222] text-[#10B981] border border-[#10B981]/30 hover:bg-[#10B981] hover:text-white font-bold transition shadow-lg"
+                        >
+                            Update Business Profile & Location
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );

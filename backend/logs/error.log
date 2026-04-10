@@ -7,3 +7,6 @@
 [2026-04-08 11:52:08.368 PM] error: 	"status" must be one of [Placed, Preparing, Out for Delivery, Delivered, Cancelled]
 [2026-04-08 11:52:11.489 PM] error: 	"status" must be one of [Placed, Preparing, Out for Delivery, Delivered, Cancelled]
 [2026-04-08 11:53:28.466 PM] error: 	"status" must be one of [Placed, Preparing, Out for Delivery, Delivered, Cancelled]
+[2026-04-09 09:24:07.793 PM] error: 	Not found
+[2026-04-09 09:24:21.397 PM] error: 	Not found
+[2026-04-10 04:18:54.205 PM] error: 	"customerLocation" is not allowed

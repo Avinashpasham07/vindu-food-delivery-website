@@ -36,6 +36,7 @@ const TermsPage = React.lazy(() => import('../pages/general/TermsPage'));
 const PrivacyPage = React.lazy(() => import('../pages/general/PrivacyPage'));
 const CookiesPage = React.lazy(() => import('../pages/general/CookiesPage'));
 const AdminDashboard = React.lazy(() => import('../pages/admin/AdminDashboard'));
+const AdminLogin = React.lazy(() => import('../pages/admin/AdminLogin'));
 const MaintenancePage = React.lazy(() => import('../pages/general/MaintenancePage'));
 
 // Loading Fallback
@@ -90,6 +91,9 @@ const AppRoutes = () => {
         <Routes>
           {/* Developer Bypass */}
           <Route path="/dev" element={<DevBypass />} />
+
+          {/* Admin Login */}
+          <Route path="/admin/login" element={<AdminLogin />} />
 
           {/* User Routes */}
           <Route path="/user/register" element={<RegisterUser />} />

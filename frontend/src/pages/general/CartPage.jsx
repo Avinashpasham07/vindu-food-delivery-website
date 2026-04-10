@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useSquad } from '../../context/SquadContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts';
 
 const CartPage = () => {
     const { cart, addToCart, decrementItem, removeFromCart, cartTotal, cartCount } = useCart();
@@ -11,6 +12,23 @@ const CartPage = () => {
     const activeCart = roomId ? sharedCart : cart;
     const activeTotal = roomId ? activeCart.reduce((total, item) => total + (item.price * item.quantity), 0) : cartTotal;
     const activeCount = roomId ? activeCart.reduce((count, item) => count + item.quantity, 0) : cartCount;
+
+    // Nutrition Stat Center Calculation
+    const nutritionData = useMemo(() => {
+        const totals = activeCart.reduce((acc, item) => {
+            const nutry = item.nutrition || { protein: 0, carbs: 0, fats: 0 };
+            acc.protein += (nutry.protein || 0) * item.quantity;
+            acc.carbs += (nutry.carbs || 0) * item.quantity;
+            acc.fats += (nutry.fats || 0) * item.quantity;
+            return acc;
+        }, { protein: 0, carbs: 0, fats: 0 });
+
+        return [
+            { name: 'Protein', value: totals.protein, color: '#10B981', unit: 'g' },
+            { name: 'Carbs', value: totals.carbs, color: '#3B82F6', unit: 'g' },
+            { name: 'Fats', value: totals.fats, color: '#F59E0B', unit: 'g' }
+        ];
+    }, [activeCart]);
 
     // Helper for squad updates
     const handleSquadUpdate = (item, qtyDelta) => {
@@ -74,7 +92,7 @@ const CartPage = () => {
 
                 <div className="relative z-10 flex flex-col items-center">
                     <div className="w-32 h-32 bg-[#1a1a1a]/50 backdrop-blur-xl border border-white/5 rounded-full flex items-center justify-center mb-8 shadow-2xl animate-fade-in-up">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-12 h-12 text-[#FF5E00]/80">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-12 h-12 text-[var(--accent)]/80">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                         </svg>
                     </div>
@@ -106,7 +124,7 @@ const CartPage = () => {
                     </button>
                     <div>
                         <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-1">{roomId ? 'Squad Cart' : 'Your Cart'}</h1>
-                        <p className="text-gray-400 text-sm md:text-base font-medium">You have <span className="text-[#FF5E00] font-bold">{activeCount} items</span> in your cart</p>
+                        <p className="text-gray-400 text-sm md:text-base font-medium">You have <span className="text-[var(--accent)] font-bold">{activeCount} items</span> in your cart</p>
                     </div>
                 </div>
 
@@ -155,7 +173,7 @@ const CartPage = () => {
                                             </span>
                                             <button
                                                 onClick={() => roomId ? handleSquadUpdate(item, 1) : addToCart(item)}
-                                                className="w-8 h-8 flex items-center justify-center text-white bg-[#FF5E00] hover:bg-[#ff7b29] rounded-full transition-all shadow-lg hover:shadow-[#FF5E00]/40 active:scale-90"
+                                                className="w-8 h-8 flex items-center justify-center text-white bg-[var(--accent)] hover:bg-[var(--accent)]/80 rounded-full transition-all shadow-lg shadow-[var(--accent-glow)] active:scale-90"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                                             </button>
@@ -182,7 +200,56 @@ const CartPage = () => {
                     </div>
 
                     {/* Bill Details */}
-                    <div className="lg:col-span-1">
+                    <div className="lg:col-span-1 space-y-6">
+                        {/* Nutrition Stat Center Dashboard */}
+                        <div className="animate-fade-in-up">
+                            <div className="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[32px] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="font-extrabold text-lg flex items-center gap-2">
+                                        <span className="text-xl">📊</span> Nutrition Center
+                                    </h3>
+                                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest bg-white/5 px-2 py-1 rounded-full">Fuel Analysis</span>
+                                </div>
+
+                                <div className="h-[180px] w-full mb-6">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={nutritionData} layout="vertical" margin={{ left: -20, right: 20 }}>
+                                            <XAxis type="number" hide />
+                                            <YAxis dataKey="name" type="category" width={80} hide />
+                                            <Tooltip 
+                                                cursor={{ fill: 'transparent' }}
+                                                content={({ active, payload }) => {
+                                                    if (active && payload && payload.length) {
+                                                        const data = payload[0].payload;
+                                                        return (
+                                                            <div className="bg-[#1a1a1a] border border-white/10 p-2 rounded-lg text-xs font-bold">
+                                                                {data.name}: {data.value}{data.unit}
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return null;
+                                                }}
+                                            />
+                                            <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24}>
+                                                {nutritionData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-2">
+                                    {nutritionData.map(macro => (
+                                        <div key={macro.name} className="bg-white/5 p-3 rounded-2xl border border-white/5 text-center">
+                                            <p className="text-[10px] font-bold text-gray-500 uppercase mb-1">{macro.name}</p>
+                                            <p className="text-lg font-black" style={{ color: macro.color }}>{macro.value}<span className="text-[10px] ml-0.5">{macro.unit}</span></p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="sticky top-24 animate-fade-in-up animation-delay-100">
                             <div className="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[32px] p-5 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.5)] relative overflow-hidden">
 
@@ -218,7 +285,7 @@ const CartPage = () => {
                                         <span className="text-lg font-bold text-white mb-1">Grand Total</span>
                                         <div className="text-right">
                                             <div className="text-xs text-gray-500 mb-1">Incl. all taxes</div>
-                                            <span className="text-4xl font-black text-[#FF5E00] tracking-tight">₹{grandTotal}</span>
+                                            <span className="text-4xl font-black text-[var(--accent)] tracking-tight">₹{grandTotal}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -235,7 +302,7 @@ const CartPage = () => {
                                             }
                                         });
                                     }}
-                                    className="w-full mt-8 bg-white text-black hover:bg-[#FF5E00] hover:text-white py-5 rounded-2xl font-bold text-xl shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group"
+                                    className="w-full mt-8 bg-white text-black hover:bg-[var(--accent)] hover:text-white py-5 rounded-2xl font-bold text-xl shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group"
                                 >
                                     {roomId ? 'Pay My Share' : 'Proceed to Checkout'}
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5 group-hover:translate-x-1 transition-transform">

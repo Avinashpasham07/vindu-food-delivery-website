@@ -2,6 +2,7 @@ const DeliveryPartner = require('../models/deliveryPartner.model');
 const Order = require('../models/order.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const NotificationService = require('../services/notification.service');
 
 // Auth Functions
 async function register(req, res) {
@@ -64,20 +65,7 @@ async function logout(req, res) {
 async function toggleStatus(req, res) {
     try {
         const { status } = req.body; // 'online' or 'offline'
-        // Assuming middleware attaches req.deliveryPartner
-        // If not using middleware yet, we might need to rely on passed ID or fix middleware later.
-        // For now, let's assume we pass ID in body or header if not fully implementing middleware right this second, 
-        // but robust way is middleware. I will create a simple middleware usage assumption or check `orders.routes` likely has one.
-        // Let's implement middleware-less first or rely on token decoding if needed, but standard is `req.user` equivalent.
-        // I will assume `req.deliveryPartner` is set by a middleware we will create or reuse logic.
 
-        // Actually, let's look at `authMiddleware`.
-        // I should probably add `authMiddleware.authDeliveryPartner` separately. 
-        // For now, I'll assume we can get ID from req.params for simplicity or standard auth.
-        // BUT, better to implement `authMiddleware` for delivery.
-
-        // I will proceed assuming I will update middleware or use logic here.
-        // Let's rely on `req.deliveryPartner` being populated by a middleware I'll add.
 
         const partner = req.deliveryPartner;
         partner.status = status;
@@ -91,9 +79,19 @@ async function toggleStatus(req, res) {
 
 async function getAvailableOrders(req, res) {
     try {
-        // Find orders that are placed/preparing and NOT assigned yet (Searching)
-        const orders = await Order.find({ deliveryStatus: 'Searching' })
-            .populate('items.foodId')
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Find orders that are 'Searching' and created TODAY
+        const orders = await Order.find({
+            deliveryStatus: 'Searching',
+            createdAt: { $gte: today }
+        })
+            .populate({
+                path: 'items.foodId',
+                populate: { path: 'foodpartner', select: 'name address phone' }
+            })
+            .populate('userId', 'fullname phone address isGoldMember')
             .sort({ createdAt: -1 });
 
         res.json({ orders });
@@ -162,8 +160,8 @@ async function acceptOrder(req, res) {
         // Populate before sending back
         console.log("Debug: Populating order details");
         const populatedOrder = await order.populate([
-            { path: 'items.foodId' },
-            { path: 'userId', select: 'fullname phone address' }
+            { path: 'items.foodId', populate: { path: 'foodpartner', select: 'name address phone' } },
+            { path: 'userId', select: 'fullname phone address isGoldMember' }
         ]);
 
         if (io) {
@@ -171,6 +169,13 @@ async function acceptOrder(req, res) {
             // Safety check: userId might be null if user was deleted
             if (populatedOrder.userId) {
                 io.to(`user-${populatedOrder.userId._id}`).emit('order-updated', populatedOrder);
+                
+                // [PUSH NOTIFICATION] Notify User
+                NotificationService.sendToUser(populatedOrder.userId._id, 'User', {
+                    title: 'Rider Assigned! 🛵',
+                    body: `${partner.fullname} has accepted your order and is heading to the restaurant.`,
+                    data: { orderId: order._id.toString(), type: 'ORDER_ASSIGNED' }
+                });
             }
             io.to('delivery-room').emit('order-taken', { orderId });
         }
@@ -211,6 +216,21 @@ async function updateOrderStatus(req, res) {
         const io = req.app.get('io');
         if (io) {
             io.to(`user-${order.userId}`).emit('order-updated', order);
+
+            // [PUSH NOTIFICATION] Notify User based on status
+            if (status === 'PickedUp') {
+                NotificationService.sendToUser(order.userId, 'User', {
+                    title: 'Out for Delivery! 🚀',
+                    body: 'Your order has been picked up and is on the way.',
+                    data: { orderId: order._id.toString(), type: 'ORDER_OUT_FOR_DELIVERY' }
+                });
+            } else if (status === 'Delivered') {
+                NotificationService.sendToUser(order.userId, 'User', {
+                    title: 'Order Delivered! 🎁',
+                    body: 'Enjoy your meal! Please rate your experience.',
+                    data: { orderId: order._id.toString(), type: 'ORDER_DELIVERED' }
+                });
+            }
         }
 
         res.json({ message: `Order status updated to ${status}`, order });
@@ -225,7 +245,12 @@ async function getCurrentOrder(req, res) {
         const partner = req.deliveryPartner;
         if (!partner.currentOrder) return res.json({ order: null });
 
-        const order = await Order.findById(partner.currentOrder).populate('items.foodId').populate('userId', 'fullname phone address');
+        const order = await Order.findById(partner.currentOrder)
+            .populate({
+                path: 'items.foodId',
+                populate: { path: 'foodpartner', select: 'name address phone' }
+            })
+            .populate('userId', 'fullname phone address isGoldMember');
 
         // Self-Healing: If order is not found (deleted?), clear the partner's status
         if (!order) {

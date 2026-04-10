@@ -7,11 +7,12 @@ const { authuser } = require('../middlewares/auth.middleware');
 const validate = require('../middlewares/validate');
 const orderValidation = require('../validations/order.validation');
 const crypto = require('crypto');
+const NotificationService = require('../services/notification.service');
 
 // Place a new Order
 router.post('/place', authuser, validate(orderValidation.placeOrder), async (req, res) => {
     try {
-        const { items, totalAmount, address, paymentMethod, couponCode } = req.body;
+        const { items, totalAmount, address, paymentMethod, couponCode, customerLocation } = req.body;
 
         if (!items || items.length === 0) {
             return res.status(400).json({ message: 'No items in order' });
@@ -45,11 +46,23 @@ router.post('/place', authuser, validate(orderValidation.placeOrder), async (req
             }
         }
 
+        // Fetch Restaurant Location from the first item's partner
+        let restaurantLocation = null;
+        if (items.length > 0) {
+            const Food = require('../models/food.model');
+            const foodItem = await Food.findById(items[0].foodId).populate('foodpartner');
+            if (foodItem?.foodpartner?.location?.lat) {
+                restaurantLocation = foodItem.foodpartner.location;
+            }
+        }
+
         const newOrder = new Order({
             userId: req.user._id,
             items,
             totalAmount: finalAmount,
             address,
+            customerLocation,
+            restaurantLocation,
             paymentMethod
         });
 
@@ -103,10 +116,23 @@ router.post('/place', authuser, validate(orderValidation.placeOrder), async (req
 
         await user.save();
 
-        // Notify Delivery Partners
+        // Notify Delivery Partners & Restaurant
         const io = req.app.get('io');
         if (io) {
             io.to('delivery-room').emit('new-order', savedOrder);
+        }
+
+        // [PUSH NOTIFICATION] Notify Restaurant
+        if (items.length > 0) {
+            const Food = require('../models/food.model');
+            const foodItem = await Food.findById(items[0].foodId).populate('foodpartner');
+            if (foodItem?.foodpartner) {
+                NotificationService.sendToUser(foodItem.foodpartner._id, 'FoodPartner', {
+                    title: 'New Order Received! 🍳',
+                    body: `You have a new order (#${savedOrder._id.toString().slice(-6).toUpperCase()}) for ₹${finalAmount}.`,
+                    data: { orderId: savedOrder._id.toString(), type: 'NEW_ORDER' }
+                });
+            }
         }
 
         res.status(201).json({ 
@@ -119,6 +145,18 @@ router.post('/place', authuser, validate(orderValidation.placeOrder), async (req
     } catch (error) {
         console.error("Error placing order:", error);
         res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// GET Chat History for Order
+router.get('/:id/messages', async (req, res) => {
+    try {
+        const Message = require('../models/message.model');
+        const messages = await Message.find({ orderId: req.params.id })
+            .sort({ createdAt: 1 });
+        res.json(messages);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching chat logs', error: error.message });
     }
 });
 
@@ -182,14 +220,34 @@ router.get('/partner/:partnerId', async (req, res) => {
 // Get Order by ID
 router.get('/:id', async (req, res) => {
     try {
-        const order = await Order.findById(req.params.id)
-            .populate('items.foodId')
+        let order = await Order.findById(req.params.id)
+            .populate({
+                path: 'items.foodId',
+                populate: { path: 'foodpartner' } // Deep populate partner for name/address
+            })
             .populate('userId', 'fullname phone address')
             .populate('deliveryPartner', 'fullname phone');
 
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
+
+        // --- Auto-Repair: Missing Restaurant Location ---
+        // If the order has no location, try to pull it from the current restaurant profile
+        if (!order.restaurantLocation?.lat && order.items.length > 0) {
+            const Food = require('../models/food.model');
+            // Safely get the ID even if foodId is already populated
+            const foodId = order.items[0].foodId._id || order.items[0].foodId;
+            const foodItem = await Food.findById(foodId).populate('foodpartner');
+            
+            if (foodItem?.foodpartner?.location?.lat) {
+                // Return the updated location even if it's not saved to the order yet
+                const orderObj = order.toObject();
+                orderObj.restaurantLocation = foodItem.foodpartner.location;
+                order = orderObj;
+            }
+        }
+
         res.json(order);
     } catch (error) {
         console.error("Error fetching order:", error);
@@ -214,11 +272,28 @@ router.put('/:orderId/status', validate(orderValidation.updateStatus), async (re
 
         await order.save();
 
-        const io = req.app.get('io');
         if (io) {
             io.to(`order-${orderId}`).emit('order-updated', order);
             io.emit('order-updated', order); // Broadcast to all for dashboard updates
         }
+
+        // [PUSH NOTIFICATION] Notify Customer
+        let title = 'Order Update! ✨';
+        let body = `Your order is now ${status.toLowerCase()}.`;
+
+        if (status === 'Preparing') {
+            title = 'Cooking Started! 👨‍🍳';
+            body = 'The restaurant is now preparing your delicious meal.';
+        } else if (status === 'Ready') {
+            title = 'Order Ready! 🍱';
+            body = 'Your food is ready and waiting for a delivery partner.';
+        }
+
+        NotificationService.sendToUser(order.userId, 'User', {
+            title,
+            body,
+            data: { orderId: order._id.toString(), type: 'ORDER_STATUS_UPDATE' }
+        });
 
         res.json({ message: 'Status updated', order });
     } catch (error) {

@@ -4,8 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import AnalyticsChart from '../../components/AnalyticsChart';
 import TopItemsChart from '../../components/TopItemsChart';
-
-// ... (inside component)
+import OrderMap from '../../components/OrderMap';
+import ChatWindow from '../../components/ChatWindow';
 
 const PartnerDashboard = () => {
     const navigate = useNavigate();
@@ -14,6 +14,9 @@ const PartnerDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [orders, setOrders] = useState([]);
     const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'menu', or 'customers'
+    const [trackingOrder, setTrackingOrder] = useState(null);
+    const [riderLocation, setRiderLocation] = useState(null);
+    const [chatOrderId, setChatOrderId] = useState(null);
 
     // Calculate Dashboard Stats
     const calculateStats = () => {
@@ -57,10 +60,6 @@ const PartnerDashboard = () => {
             });
         });
 
-        // Filter out hours with 0 revenue to keep chart clean (optional, keeping for timeline consistency)
-        // Let's just take the active hours range (e.g. 9 AM to 11 PM) for better config?
-        // For now, let's just pass the full day or slice it.
-        // Optimization: Filter to only show hours with activity or current time range.
         const currentHour = new Date().getHours();
         const relevantRevenueData = revenueData.filter(d => d.hour <= currentHour && d.hour >= 9); // Show 9 AM to Now
 
@@ -68,7 +67,7 @@ const PartnerDashboard = () => {
         const topItemsData = Object.keys(itemCounts)
             .map(key => ({ name: key, value: itemCounts[key] }))
             .sort((a, b) => b.value - a.value)
-            .slice(0, 5); // Top 5
+            .slice(0, 5);
 
         return { revenueData: relevantRevenueData, topItemsData };
     };
@@ -76,7 +75,6 @@ const PartnerDashboard = () => {
     const { revenueData, topItemsData } = calculateStats();
 
     useEffect(() => {
-        // Retrieve partner data from local storage
         const storedPartner = localStorage.getItem('partner');
         if (storedPartner) {
             const parsedPartner = JSON.parse(storedPartner);
@@ -90,16 +88,16 @@ const PartnerDashboard = () => {
             socket.emit('join_partner_room', parsedPartner.id || parsedPartner._id); // Assume room logic exists or broadcast globally
 
             socket.on('new-order', (newOrder) => {
-                // Check if this order belongs to us (client side filter for now if broadcast global)
-                // For simplicity, just re-fetch or append if we verify ownership
                 fetchOrders(parsedPartner.id || parsedPartner._id);
-                // Or simplified:
-                // setOrders(prev => [newOrder, ...prev]);
                 alert("New Order Received! ");
             });
 
             socket.on('order-updated', (updatedOrder) => {
                 setOrders(prev => prev.map(o => o._id === updatedOrder._id ? updatedOrder : o));
+            });
+
+            socket.on('driver-location-updated', (location) => {
+                setRiderLocation(location);
             });
 
             return () => socket.disconnect();
@@ -193,6 +191,25 @@ const PartnerDashboard = () => {
                 </div>
             </div>
 
+            {/* Critical Location Warning */}
+            {(!partner?.location || !partner?.location?.lat) && (
+                <div className="mb-10 p-6 bg-red-500/10 border border-red-500/20 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 animate-pulse">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-2xl">⚠️</div>
+                        <div>
+                            <h3 className="text-lg font-bold text-red-500">Business Location Not Set!</h3>
+                            <p className="text-gray-400 text-sm">Customers cannot track their orders accurately until you set your restaurant's GPS location.</p>
+                        </div>
+                    </div>
+                    <Link
+                        to="/partner/profile"
+                        className="px-8 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-red-500/20"
+                    >
+                        Set Location Now 📍
+                    </Link>
+                </div>
+            )}
+
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div className="bg-[#1a1a1a] p-6 rounded-2xl border border-white/5">
@@ -209,11 +226,6 @@ const PartnerDashboard = () => {
                     <div className="text-4xl font-black text-white">₹{orders.reduce((acc, curr) => acc + curr.totalAmount, 0)}</div>
                 </div>
             </div>
-
-
-
-    // ... (return JSX)
-
             {/* Analytics Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12 animate-fade-in-up">
                 <div className="lg:col-span-2">
@@ -291,6 +303,24 @@ const PartnerDashboard = () => {
 
                                 {/* Actions */}
                                 <div className="grid grid-cols-2 gap-3">
+                                    {/* Tracking Map Trigger */}
+                                    {['Preparing', 'Ready', 'Out for Delivery'].includes(order.status) && (
+                                        <button
+                                            onClick={() => setTrackingOrder(order)}
+                                            className="col-span-2 mt-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 py-3 rounded-xl font-bold transition-all border border-blue-500/20"
+                                        >
+                                            Track Deliverer 📍
+                                        </button>
+                                    )}
+
+                                    {/* Chat Button */}
+                                    <button
+                                        onClick={() => setChatOrderId(order._id)}
+                                        className="col-span-2 bg-white/5 hover:bg-white/10 text-gray-400 py-3 rounded-xl font-bold transition-all border border-white/5 flex items-center justify-center gap-2"
+                                    >
+                                        📡 Send Signal
+                                    </button>
+
                                     {/* Status Flow Buttons */}
                                     {order.status === 'Placed' && (
                                         <button
@@ -447,6 +477,57 @@ const PartnerDashboard = () => {
                         )}
                     </div>
                 </div>
+            )}
+
+            {/* Tracking Modal */}
+            {trackingOrder && (
+                <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-[#111] border border-white/10 w-full max-w-4xl h-[80vh] rounded-[40px] overflow-hidden flex flex-col shadow-2xl relative">
+                        <div className="p-6 border-b border-white/10 flex justify-between items-center bg-[#1a1a1a]">
+                            <div>
+                                <h3 className="text-xl font-black text-white">Tracking Order #{trackingOrder._id.slice(-6).toUpperCase()}</h3>
+                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">{trackingOrder.customerLocation ? 'Live GPS Active' : 'Waiting for GPS signal...'}</p>
+                            </div>
+                            <button
+                                onClick={() => setTrackingOrder(null)}
+                                className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center transition-all text-white"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="flex-1 relative">
+                            <OrderMap
+                                restaurant={trackingOrder.restaurantLocation}
+                                customer={trackingOrder.customerLocation}
+                                rider={riderLocation}
+                            />
+                        </div>
+
+                        <div className="p-6 bg-[#1a1a1a] flex justify-between items-center border-t border-white/10">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-[#FF5E00] rounded-full flex items-center justify-center text-xl font-bold">🛵</div>
+                                <div>
+                                    <p className="text-white font-bold">{trackingOrder.deliveryPartner?.fullname || 'Driver Searching...'}</p>
+                                    <p className="text-xs text-gray-500 uppercase font-black">{trackingOrder.deliveryStatus}</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-gray-500 text-xs font-black uppercase">Customer</p>
+                                <p className="text-white font-bold">{trackingOrder.userId?.fullname}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Chat Overlay */}
+            {chatOrderId && (
+                <ChatWindow
+                    orderId={chatOrderId}
+                    currentUser={partner}
+                    senderModel="FoodPartner"
+                />
             )}
         </div>
     );

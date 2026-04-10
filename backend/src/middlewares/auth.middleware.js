@@ -24,6 +24,14 @@ async function authfoodpatner(req, res, next) {
         }
 
         req.foodpartner = foodpartner;
+
+        // Check verification status
+        if (!foodpartner.isVerified) {
+            return res.status(403).json({
+                message: "Restaurant account not verified. Please contact Admin for approval."
+            });
+        }
+
         next();
 
     } catch (err) {
@@ -141,6 +149,14 @@ async function authDeliveryPartner(req, res, next) {
         if (!partner) return res.status(401).json({ message: "Not authorized: partner not found" });
 
         req.deliveryPartner = partner;
+
+        // Check verification status
+        if (!partner.isVerified) {
+            return res.status(403).json({
+                message: "Rider account not verified. Activation required by Admin."
+            });
+        }
+
         next();
     } catch (err) {
         return res.status(401).json({ message: "invalid token, authorization denied" });

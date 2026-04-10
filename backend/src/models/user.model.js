@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    goldExpiry: {
+        type: Date,
+        default: null
+    },
     streakCount: {
         type: Number,
         default: 0
@@ -33,10 +37,18 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    location: {
+        lat: { type: Number, default: null },
+        lng: { type: Number, default: null }
+    },
     role: {
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
+    },
+    fcmTokens: {
+        type: [String],
+        default: []
     }
 },
     {
