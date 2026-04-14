@@ -3,7 +3,8 @@ import { io } from 'socket.io-client';
 
 const SquadContext = createContext();
 
-const socket = io('http://localhost:3000', {
+const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
+const socket = io(socketUrl, {
     autoConnect: false,
     withCredentials: true
 });

@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import apiClient from '../api/client';
 import toast from 'react-hot-toast';
 
-const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
 const socket = io(socketUrl);
 
 const ChatWindow = ({ orderId, currentUser, senderModel }) => {

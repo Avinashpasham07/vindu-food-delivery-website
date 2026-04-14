@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../../api/client';
 
 const Profile = () => {
     const { id } = useParams();
@@ -12,11 +11,11 @@ const Profile = () => {
         const fetchData = async () => {
             try {
                 // Fetch Partner Details
-                const partnerRes = await axios.get(`http://localhost:3000/api/auth/partner/${id}`);
+                const partnerRes = await apiClient.get(`/auth/partner/${id}`);
                 setPartner(partnerRes.data.partner);
 
                 // Fetch Partner's Food Items
-                const foodRes = await axios.get(`http://localhost:3000/api/food/partner/${id}`);
+                const foodRes = await apiClient.get(`/food/partner/${id}`);
                 setFoodItems(foodRes.data.fooditems);
 
             } catch (error) {

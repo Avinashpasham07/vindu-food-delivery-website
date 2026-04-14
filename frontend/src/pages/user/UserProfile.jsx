@@ -23,7 +23,7 @@ const UserProfile = () => {
             const parsedUser = JSON.parse(storedUser);
             setUser(parsedUser);
 
-            const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
+            const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
             const socket = io(socketUrl);
             socket.emit('join_user_room', parsedUser.id || parsedUser._id);
 
