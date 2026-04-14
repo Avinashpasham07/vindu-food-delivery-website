@@ -44,7 +44,8 @@ async function registerUser(req, res) {
                 fullname: newUser.fullname,
                 email: newUser.email,
                 role: newUser.role,
-                streakCount: newUser.streakCount
+                streakCount: newUser.streakCount,
+                vinduCoins: newUser.vinduCoins
             },
             token
         });
@@ -107,7 +108,8 @@ async function loginUser(req, res) {
                 isGoldMember: user.isGoldMember,
                 goldExpiry: user.goldExpiry,
                 role: user.role,
-                streakCount: user.streakCount
+                streakCount: user.streakCount,
+                vinduCoins: user.vinduCoins
             },
             token
         });
@@ -280,7 +282,8 @@ async function buyGoldMembership(req, res) {
                 isGoldMember: user.isGoldMember,
                 goldExpiry: user.goldExpiry,
                 role: user.role,
-                streakCount: user.streakCount
+                streakCount: user.streakCount,
+                vinduCoins: user.vinduCoins
             }
         });
 
@@ -301,7 +304,8 @@ async function getMe(req, res) {
                 isGoldMember: req.user.isGoldMember,
                 goldExpiry: req.user.goldExpiry,
                 role: req.user.role,
-                streakCount: req.user.streakCount
+                streakCount: req.user.streakCount,
+                vinduCoins: req.user.vinduCoins
             }
         });
     } catch (error) {

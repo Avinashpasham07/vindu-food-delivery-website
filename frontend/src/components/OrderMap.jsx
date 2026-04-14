@@ -2,8 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-routing-machine';
-import { createControlComponent } from "@react-leaflet/core";
 
 // Fix for default marker icons in Leaflet + React
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -40,77 +38,41 @@ const riderIcon = new L.DivIcon({
 });
 
 // Component to auto-focus map on markers
-const BoundsHandler = ({ restaurant, customer, rider }) => {
+const BoundsHandler = ({ stops = [], customer }) => {
     const map = useMap();
+    const isValid = (loc) => loc && typeof loc.lat === 'number' && typeof loc.lng === 'number';
+
     useEffect(() => {
-        const points = [];
-        if (restaurant && typeof restaurant.lat === 'number') points.push([restaurant.lat, restaurant.lng]);
-        if (customer && typeof customer.lat === 'number') points.push([customer.lat, customer.lng]);
-        if (rider && typeof rider.lat === 'number') points.push([rider.lat, rider.lng]);
-
-        if (points.length === 0) return;
-
-        try {
-            if (points.length === 1) {
-                // If only one point, fly to it
-                map.flyTo(points[0], 16, { duration: 1.5 });
-            } else {
-                // If multiple points, fit to bounds
-                const bounds = L.latLngBounds(points);
-                map.fitBounds(bounds, { padding: [70, 70], maxZoom: 16 });
-            }
-        } catch (err) {
-            console.error("Leaflet bounds error:", err);
+        if (stops.length > 0 && isValid(customer)) {
+            const bounds = L.latLngBounds([
+                ...stops.map(s => [s.lat, s.lng]),
+                [customer.lat, customer.lng]
+            ]);
+            map.fitBounds(bounds, { padding: [50, 50] });
         }
-    }, [restaurant?.lat, restaurant?.lng, customer?.lat, customer?.lng, rider?.lat, rider?.lng, map]);
+    }, [stops, customer, map]);
     return null;
 };
 
-// Road-Based Routing Layer
-const RoutingLayer = createControlComponent(({ pickup, dropoff }) => {
-    return L.Routing.control({
-        waypoints: [L.latLng(pickup), L.latLng(dropoff)],
-        router: L.Routing.osrmv1({ 
-            serviceUrl: 'https://router.project-osrm.org/route/v1',
-            profile: 'driving'
-        }),
-        lineOptions: {
-            styles: [
-                { color: '#FF5E00', weight: 8, opacity: 0.2 }, // External Glow
-                { color: '#FF5E00', weight: 4, opacity: 1 }      // Main Path
-            ]
-        },
-        show: false, // Hide the text instructions panel
-        addWaypoints: false,
-        draggableWaypoints: false,
-        fitSelectedRoutes: false, // We use BoundsHandler for this
-        createMarker: () => null // Hide default routing markers (we use our own icons)
-    });
-});
-
-const OrderMap = ({ restaurant, customer, rider, className }) => {
+const OrderMap = ({ restaurant, restaurants = [], customer, rider, className }) => {
     // Default fallback (e.g., Delhi center) if no coordinates provided
     const defaultCenter = [28.6139, 77.2090];
 
-    // Defensive check for coordinate validity (handles strings and numbers)
-    const isValid = (loc) => {
-        if (!loc) return false;
-        const lat = parseFloat(loc.lat);
-        const lng = parseFloat(loc.lng);
-        return !isNaN(lat) && !isNaN(lng);
-    };
+    // Defensive check for coordinate validity
+    const isValid = (loc) => loc && typeof loc.lat === 'number' && typeof loc.lng === 'number';
 
-    const getCenter = () => {
-        if (isValid(rider)) return [parseFloat(rider.lat), parseFloat(rider.lng)];
-        if (isValid(restaurant)) return [parseFloat(restaurant.lat), parseFloat(restaurant.lng)];
-        if (isValid(customer)) return [parseFloat(customer.lat), parseFloat(customer.lng)];
-        return defaultCenter;
-    };
+    // Filter valid stops early to avoid TDZ errors
+    const stops = restaurants.filter(isValid);
+    if (!stops.length && isValid(restaurant)) stops.push(restaurant);
 
-    const center = getCenter();
+    const center = isValid(rider)
+        ? [rider.lat, rider.lng]
+        : (isValid(restaurant) 
+            ? [restaurant.lat, restaurant.lng] 
+            : (stops.length > 0 ? [stops[0].lat, stops[0].lng] : defaultCenter));
 
-    // Force re-render when coordinates change to ensure MapContainer re-initializes correctly
-    const mapKey = `map-${restaurant?.lat || 0}-${customer?.lat || 0}-${rider?.lat || 0}`;
+    // Force re-render when order IDs change to ensure MapContainer re-initializes
+    const mapKey = restaurant?.id || restaurant?._id || (stops.length > 0 ? stops[0]._id : 'initial-map');
 
     return (
         <div className={`w-full h-full min-h-[400px] ${className}`} style={{ minHeight: '400px' }}>
@@ -123,38 +85,58 @@ const OrderMap = ({ restaurant, customer, rider, className }) => {
                 style={{ height: '100%', width: '100%', minHeight: '400px' }}
             >
                 <TileLayer
-                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
-                    attribution='&copy; OpenStreetMap contributors'
+                    url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                    attribution='&copy; Google Maps'
                 />
 
-                {/* Road Path Logic */}
-                {isValid(restaurant) && isValid(customer) && (
-                    <RoutingLayer 
-                        pickup={[parseFloat(restaurant.lat), parseFloat(restaurant.lng)]} 
-                        dropoff={[parseFloat(customer.lat), parseFloat(customer.lng)]} 
+                {/* Connecting Lines: Rider -> Stop1 -> Stop2 -> Stop3 -> Customer */}
+                {stops.length > 0 && isValid(customer) && (
+                    <Polyline
+                        positions={[
+                            ...stops.map(s => [s.lat, s.lng]),
+                            [customer.lat, customer.lng]
+                        ]}
+                        color="#FF5E00"
+                        weight={4}
+                        opacity={0.6}
+                        dashArray="10, 10"
                     />
                 )}
 
-                {isValid(restaurant) && (
-                    <Marker position={[parseFloat(restaurant.lat), parseFloat(restaurant.lng)]} icon={restaurantIcon}>
-                        <Popup>Restaurant pickup</Popup>
-                    </Marker>
-                )}
+                {/* All Restaurant Stops */}
+                {stops.map((stop, index) => (
+                    isValid(stop) && (
+                        <Marker 
+                            key={`ord-stop-${index}`} 
+                            position={[parseFloat(stop.lat), parseFloat(stop.lng)]} 
+                            icon={new L.DivIcon({
+                                html: `<div style="background-color: ${index === 0 ? '#111' : '#222'}; border: 2px solid ${index === 0 ? '#FF5E00' : '#444'}; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
+                                         ${index === 0 ? '👨‍🍳' : '🏢'}
+                                       </div>`,
+                                className: 'custom-div-icon',
+                                iconSize: [40, 40],
+                                iconAnchor: [20, 20],
+                            })}
+                        >
+                            <Popup>{stop.name || `Restaurant ${index + 1}`}</Popup>
+                        </Marker>
+                    )
+                ))}
 
                 {isValid(customer) && (
-                    <Marker position={[parseFloat(customer.lat), parseFloat(customer.lng)]} icon={homeIcon}>
+                    <Marker position={[customer.lat, customer.lng]} icon={homeIcon}>
                         <Popup>Your Home</Popup>
                     </Marker>
                 )}
 
                 {isValid(rider) && (
-                    <Marker position={[parseFloat(rider.lat), parseFloat(rider.lng)]} icon={riderIcon}>
+                    <Marker position={[rider.lat, rider.lng]} icon={riderIcon}>
                         <Popup>Rider is here</Popup>
                     </Marker>
                 )}
 
-                {(isValid(restaurant) || isValid(customer) || isValid(rider)) && (
-                    <BoundsHandler restaurant={restaurant} customer={customer} rider={rider} />
+                {stops.length > 0 && isValid(customer) && (
+                    <BoundsHandler stops={stops} customer={customer} />
                 )}
             </MapContainer>
         </div>

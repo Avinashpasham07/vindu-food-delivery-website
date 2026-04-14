@@ -2,28 +2,16 @@ import React, { useState, useEffect, useMemo } from 'react';
 import apiClient from '../../api/client';
 import { io } from 'socket.io-client';
 import { useNavigate, Link } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import { createControlComponent } from "@react-leaflet/core";
 import "leaflet-routing-machine";
 import L from 'leaflet';
 import ChatWindow from '../../components/ChatWindow';
 
-const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
+const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
 const socket = io(socketUrl);
 
-// Accurate Distance Calculator (Haversine Formula)
-const calculateDistance = (loc1, loc2) => {
-    if (!loc1?.lat || !loc2?.lat) return 0;
-    const R = 6371; // Earth's radius in km
-    const dLat = (parseFloat(loc2.lat) - parseFloat(loc1.lat)) * Math.PI / 180;
-    const dLon = (parseFloat(loc2.lng) - parseFloat(loc1.lng)) * Math.PI / 180;
-    const a = 
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(parseFloat(loc1.lat) * Math.PI / 180) * Math.cos(parseFloat(loc2.lat) * Math.PI / 180) * 
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-};
+
 
 const SwipeToAccept = ({ onAccept, text = "Swipe to Accept Mission" }) => {
     const [isSwiping, setIsSwiping] = useState(false);
@@ -85,7 +73,6 @@ const SwipeToAccept = ({ onAccept, text = "Swipe to Accept Mission" }) => {
 const RoutingMachine = createControlComponent(({ pickup, dropoff }) => {
     return L.Routing.control({
         waypoints: [L.latLng(pickup), L.latLng(dropoff)],
-        router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
         lineOptions: {
             styles: [
                 { color: '#FF5E00', weight: 8, opacity: 0.3 }, // Glow
@@ -100,7 +87,7 @@ const RoutingMachine = createControlComponent(({ pickup, dropoff }) => {
     });
 });
 
-const MissionMap = ({ restaurantLoc, customerLoc }) => {
+const MissionMap = ({ stops = [], customerLoc }) => {
     // Defensive check for coordinate validity
     const isValid = (loc) => {
         if (!loc) return false;
@@ -109,26 +96,28 @@ const MissionMap = ({ restaurantLoc, customerLoc }) => {
         return !isNaN(lat) && !isNaN(lng);
     };
 
-    const pickupCoords = isValid(restaurantLoc) 
-        ? [parseFloat(restaurantLoc.lat), parseFloat(restaurantLoc.lng)] 
-        : [17.3850, 78.4867];
-
+    const stopCoords = stops.filter(isValid).map(s => [parseFloat(s.lat), parseFloat(s.lng)]);
     const dropoffCoords = isValid(customerLoc)
         ? [parseFloat(customerLoc.lat), parseFloat(customerLoc.lng)]
         : [17.3950, 78.4967];
+
+    // If no stops, use a fallback
+    const startCoords = stopCoords.length > 0 ? stopCoords[0] : [17.3850, 78.4867];
  
-    const center = [(pickupCoords[0] + dropoffCoords[0]) / 2, (pickupCoords[1] + dropoffCoords[1]) / 2];
+    const center = [(startCoords[0] + dropoffCoords[0]) / 2, (startCoords[1] + dropoffCoords[1]) / 2];
  
-    const pickupIcon = new L.Icon({
-        iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
-        iconSize: [40, 40],
-        iconAnchor: [20, 40],
+    const pickupIcon = new L.DivIcon({
+        html: `<div style="background-color: #FF5E00; border: 2px solid white; border-radius: 12px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 0 15px rgba(255,94,0,0.5); transform: rotate(45deg);"><div style="transform: rotate(-45deg);">🏬</div></div>`,
+        className: 'custom-div-icon',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
     });
  
-    const dropoffIcon = new L.Icon({
-        iconUrl: 'https://cdn-icons-png.flaticon.com/512/447/447031.png',
+    const dropoffIcon = new L.DivIcon({
+        html: `<div style="background-color: #111; border: 2px solid #FF5E00; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 0 20px rgba(255,94,0,0.3);">🏠</div>`,
+        className: 'custom-div-icon',
         iconSize: [40, 40],
-        iconAnchor: [20, 40],
+        iconAnchor: [20, 20],
     });
 
     return (
@@ -140,18 +129,42 @@ const MissionMap = ({ restaurantLoc, customerLoc }) => {
 
             <MapContainer center={center} zoom={13} scrollWheelZoom={false} className="h-full w-full">
                 <TileLayer
-                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                    url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                    attribution='&copy; Google Maps'
                 />
                 
-                <RoutingMachine pickup={pickupCoords} dropoff={dropoffCoords} />
+                {stopCoords.length > 0 && isValid(customerLoc) && (
+                    <Polyline
+                        positions={[...stopCoords, dropoffCoords]}
+                        color="#FF5E00"
+                        weight={4}
+                        opacity={0.5}
+                        dashArray="10, 10"
+                    />
+                )}
                 
-                <Marker position={pickupCoords} icon={pickupIcon}>
-                    <Popup>Restaurant Pickup</Popup>
-                </Marker>
-                <Marker position={dropoffCoords} icon={dropoffIcon}>
-                    <Popup>Customer Drop-off</Popup>
-                </Marker>
+                {stopCoords.length > 0 && (
+                    <RoutingMachine 
+                        pickup={stopCoords[0]} 
+                        dropoff={dropoffCoords} 
+                        // Note: Leaflet Routing Machine supports waypoints, 
+                        // we can pass all stopCoords as intermediates if needed
+                    />
+                )}
+                
+                {stops.map((stop, idx) => (
+                    isValid(stop) && (
+                        <Marker key={`stop-${idx}`} position={[parseFloat(stop.lat), parseFloat(stop.lng)]} icon={pickupIcon}>
+                            <Popup>{stop.name || `Pickup ${idx + 1}`}</Popup>
+                        </Marker>
+                    )
+                ))}
+
+                {isValid(customerLoc) && (
+                    <Marker position={[parseFloat(customerLoc.lat), parseFloat(customerLoc.lng)]} icon={dropoffIcon}>
+                        <Popup>Target Dropoff</Popup>
+                    </Marker>
+                )}
             </MapContainer>
         </div>
     );
@@ -262,9 +275,13 @@ const DeliveryDashboard = () => {
         }
     };
 
-    const updateStatus = async (status) => {
+    const updateStatus = async (status, stopPartnerId = null) => {
         try {
-            const res = await apiClient.put('/delivery/orders/status', { orderId: activeOrder._id, status });
+            const res = await apiClient.put('/delivery/orders/status', { 
+                orderId: activeOrder._id, 
+                status,
+                stopPartnerId 
+            });
             setActiveOrder(res.data.order);
             if (status === 'Delivered') {
                 setActiveOrder(null);
@@ -340,6 +357,10 @@ const DeliveryDashboard = () => {
                                     <p className="text-gray-400 font-bold">Base Fee</p>
                                     <p className="text-4xl font-black text-white">₹{activeOrder.totalAmount}</p>
                                 </div>
+                                <div className="mt-4 flex justify-between items-center">
+                                    <p className="text-gray-400 font-bold">Stops</p>
+                                    <p className="text-2xl font-black text-[#FF5E00]">{activeOrder.restaurantStops?.length || 1}</p>
+                                </div>
                             </div>
                             
                             <div className="bg-[#111] border border-white/5 rounded-[40px] p-8">
@@ -361,32 +382,44 @@ const DeliveryDashboard = () => {
 
                         {/* Control Center */}
                         <div className="lg:col-span-8 flex flex-col gap-6">
-                            <div className={`w-full bg-[#111] border rounded-[45px] p-10 transition-all duration-500 shadow-2xl ${activeOrder.deliveryStatus === 'Assigned' ? 'border-[#FF5E00] shadow-[0_20px_80px_rgba(255,94,0,0.15)]' : 'border-white/5 opacity-40'}`}>
-                                <div className="flex justify-between items-start mb-8">
-                                    <div className="flex items-center gap-5">
-                                        <div className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center text-4xl">🏬</div>
-                                        <div>
-                                            <h3 className="text-2xl font-black text-white italic uppercase">PICKUP: {activeOrder.items[0]?.foodId?.foodpartner?.name || "RESTAURANT"}</h3>
-                                            <p className="text-gray-500 font-bold text-sm mt-1">{activeOrder.items[0]?.foodId?.foodpartner?.address || "Restaurant Terminal"}</p>
+                            <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest px-4">Pickup Itinerary</h3>
+                            {activeOrder.restaurantStops?.map((stop, idx) => (
+                                <div 
+                                    key={idx}
+                                    className={`w-full bg-[#111] border rounded-[45px] p-8 transition-all duration-500 shadow-2xl ${stop.status === 'Pending' ? 'border-[#FF5E00] shadow-[0_20px_80px_rgba(255,94,0,0.15)]' : 'border-white/5 opacity-40'}`}
+                                >
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className="flex items-center gap-5">
+                                            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-3xl">
+                                                {stop.status === 'PickedUp' ? '✅' : '🏬'}
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-black text-white italic uppercase">{stop.name}</h3>
+                                                <p className="text-gray-500 font-bold text-xs mt-1">{stop.location?.address || "Pickup Location"}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <button 
+                                                onClick={() => setSelectedContact({ 
+                                                    name: stop.name, 
+                                                    phone: 'Contact Provider' 
+                                                })} 
+                                                className="w-12 h-12 bg-[#FF5E00]/10 text-[#FF5E00] border border-[#FF5E00]/20 rounded-2xl flex items-center justify-center text-xl shadow-lg active:scale-95 transition-all hover:bg-[#FF5E00] hover:text-white"
+                                            >
+                                                📞
+                                            </button>
                                         </div>
                                     </div>
-                                    <div className="flex gap-3">
+                                    {stop.status === 'Pending' && (
                                         <button 
-                                            onClick={() => setSelectedContact({ 
-                                                name: activeOrder.items[0]?.foodId?.foodpartner?.name, 
-                                                phone: activeOrder.items[0]?.foodId?.foodpartner?.phone || 'Contacting...' 
-                                            })} 
-                                            className="w-14 h-14 bg-[#FF5E00]/10 text-[#FF5E00] border border-[#FF5E00]/20 rounded-2xl flex items-center justify-center text-2xl shadow-lg active:scale-95 transition-all hover:bg-[#FF5E00] hover:text-white"
+                                            onClick={() => updateStatus('PickedUp', stop.partnerId)} 
+                                            className="w-full py-4 bg-white text-black font-black rounded-2xl text-lg hover:scale-[1.01] active:scale-95 transition-all shadow-xl uppercase"
                                         >
-                                            📞
+                                            Pick Up from {stop.name}
                                         </button>
-                                        <button className="px-6 py-2 bg-white/5 rounded-full text-[10px] font-black tracking-widest text-[#FF5E00] uppercase self-center hidden sm:block">NAV ON</button>
-                                    </div>
+                                    )}
                                 </div>
-                                {activeOrder.deliveryStatus === 'Assigned' && (
-                                    <button onClick={() => updateStatus('PickedUp')} className="w-full py-6 bg-white text-black font-black rounded-3xl text-2xl hover:scale-[1.01] active:scale-95 transition-all shadow-xl uppercase">Confirm Pickup</button>
-                                )}
-                            </div>
+                            ))}
 
                             <div className={`w-full bg-[#111] border rounded-[45px] p-10 transition-all duration-500 shadow-2xl ${activeOrder.deliveryStatus === 'PickedUp' ? 'border-[#FF5E00] shadow-[0_20px_80px_rgba(255,94,0,0.15)]' : 'border-white/5 opacity-40'}`}>
                                 <div className="flex justify-between items-center mb-8">
@@ -475,7 +508,7 @@ const DeliveryDashboard = () => {
                                                 <div>
                                                     <h3 className="text-5xl font-black text-white tracking-tighter leading-none mb-2">₹{order.totalAmount}</h3>
                                                     <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest">
-                                                        {order.items?.length || 1} Packages • {calculateDistance(order.restaurantLocation, order.customerLocation).toFixed(1)} KM
+                                                        {order.items?.length || 1} Packages • {order.restaurantStops?.length || 1} Stops
                                                     </p>
                                                 </div>
                                             </div>
@@ -484,7 +517,9 @@ const DeliveryDashboard = () => {
                                                 <div className="flex gap-5">
                                                     <div className="w-1.5 bg-gradient-to-b from-blue-500 to-[#FF5E00] rounded-full my-1"></div>
                                                     <div className="space-y-4 font-black tracking-tight overflow-hidden">
-                                                        <p className="text-xs text-white opacity-90 truncate italic uppercase">Pickup: {order.items[0]?.foodId?.foodpartner?.name || order.restaurantName || "Vindu Partner"}</p>
+                                                        <p className="text-xs text-white opacity-90 truncate italic uppercase">
+                                                            Pickups: {order.restaurantStops?.map(s => s.name).join(', ') || "Vindu Partners"}
+                                                        </p>
                                                         <p className="text-xs text-gray-500 truncate italic uppercase">Drop: {order.address?.address || order.address?.street || "Customer Residence"}</p>
                                                     </div>
                                                 </div>
@@ -539,7 +574,7 @@ const DeliveryDashboard = () => {
 
                         {/* Tactical Radar Display [NEW] */}
                         <MissionMap 
-                            restaurantLoc={selectedBriefing.restaurantLocation} 
+                            stops={selectedBriefing.restaurantStops?.map(s => ({ ...s.location, name: s.name }))} 
                             customerLoc={selectedBriefing.customerLocation} 
                         />
 
@@ -591,17 +626,13 @@ const DeliveryDashboard = () => {
                                      </div>
                                      <div className="space-y-4 mb-16 px-6">
                                          <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-gray-500">
-                                             <span>Distance Bonus</span>
-                                             <span className="text-white">+₹25.00</span>
-                                         </div>
-                                         <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-gray-500">
-                                             <span>Prime Incentive</span>
-                                             <span className="text-white">+₹15.00</span>
+                                             <span>Multi-Stop Bonus</span>
+                                             <span className="text-white">+₹{Math.max(0, (selectedBriefing.restaurantStops?.length - 1) * 15)}</span>
                                          </div>
                                          <div className="h-px bg-white/5 w-full my-4"></div>
                                          <div className="flex justify-between items-center text-sm font-black uppercase tracking-widest text-[#FF5E00]">
                                              <span>Net Payout</span>
-                                             <span>₹{selectedBriefing.totalAmount + 40}</span>
+                                             <span>₹{25 + Math.max(0, (selectedBriefing.restaurantStops?.length - 1) * 15)}</span>
                                          </div>
                                      </div>
 

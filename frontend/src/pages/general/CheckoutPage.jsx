@@ -64,42 +64,76 @@ const CheckoutPage = () => {
         }
 
         setIsLocating(true);
-
+        const geoToast = toast.loading('Waiting for GPS signal...');
+ 
         navigator.geolocation.getCurrentPosition(
             async (position) => {
                 try {
+                    toast.loading('Resolving address...', { id: geoToast });
                     const { latitude, longitude } = position.coords;
-                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-                    const data = await response.json();
+                    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+                    
+                    if (!apiKey) {
+                        throw new Error('Maps API Key missing');
+                    }
 
-                    if (data && data.address) {
-                        const addr = data.address;
-                        const localArea = addr.village || addr.hamlet || addr.neighbourhood || addr.suburb || addr.city_district || '';
+                    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`);
+                    const data = await response.json();
+ 
+                    if (data.status === 'OK' && data.results.length > 0) {
+                        const result = data.results[0];
+                        const components = result.address_components;
+                        
+                        const getComponent = (types) => {
+                            const comp = components.find(c => types.some(t => c.types.includes(t)));
+                            return comp ? comp.long_name : '';
+                        };
+
+                        const subLocality = getComponent(['sublocality_level_1', 'sublocality']);
+                        const locality = getComponent(['locality']);
+                        const neighborhood = getComponent(['neighborhood']);
+                        
+                        // Smart address: Try to clean up the formatted address if it starts with a plus code
+                        let bestAddress = result.formatted_address;
+                        if (bestAddress.includes('+') && data.results[1]) {
+                           bestAddress = data.results[1].formatted_address;
+                        }
+
                         setFormData(prev => ({
                             ...prev,
-                            address: `${addr.road || ''} ${addr.house_number || ''}, ${localArea}`.trim(),
-                            city: addr.city || addr.town || addr.municipality || '',
-                            zip: addr.postcode || '',
+                            address: bestAddress,
+                            city: locality || subLocality || neighborhood || getComponent(['administrative_area_level_2']),
+                            zip: getComponent(['postal_code']),
                             lat: latitude,
                             lng: longitude
                         }));
-                        toast.success("Location captured! 📍");
+                        toast.success("Location locked! 📍", { id: geoToast });
+                    } else {
+                        // Fallback: Use coordinates even if address resolution fails
+                        setFormData(prev => ({ ...prev, lat: latitude, lng: longitude }));
+                        toast.error(`Address not found (${data.status}). GPS coordinates captured!`, { id: geoToast });
+                        console.warn("Google Maps Geocoding failed:", data);
                     }
                 } catch (error) {
                     console.error('Error fetching address:', error);
-                    toast.error('Could not fetch address details.');
+                    toast.error(`Error: ${error.message || 'Could not resolve address'}`, { id: geoToast });
                 } finally {
                     setIsLocating(false);
                 }
             },
             (error) => {
                 console.error('Geolocation error:', error);
-                toast.error('Unable to retrieve your location');
+                let msg = 'Unable to retrieve location';
+                if (error.code === 1) msg = 'Location access denied. Please enable GPS.';
+                else if (error.code === 2) msg = 'Position unavailable.';
+                else if (error.code === 3) msg = 'Request timed out.';
+                
+                toast.error(msg, { id: geoToast });
                 setIsLocating(false);
             },
             {
                 enableHighAccuracy: true,
-                timeout: 15000,
+                timeout: 10000,
                 maximumAge: 0
             }
         );

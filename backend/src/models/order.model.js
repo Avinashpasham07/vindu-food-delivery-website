@@ -53,13 +53,38 @@ const orderSchema = new mongoose.Schema({
         lat: Number,
         lng: Number
     },
-    restaurantLocation: {
-        lat: Number,
-        lng: Number
-    },
+    restaurantStops: [{
+        partnerId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'foodpartner'
+        },
+        name: String,
+        location: {
+            lat: Number,
+            lng: Number
+        },
+        status: {
+            type: String,
+            enum: ['Pending', 'PickedUp'],
+            default: 'Pending'
+        }
+    }],
     riderLocation: {
         lat: Number,
         lng: Number
+    },
+    estimatedDeliveryTime: {
+        type: Date,
+        default: null
+    },
+    actualDeliveryTime: {
+        type: Date,
+        default: null
+    },
+    compensationStatus: {
+        type: String,
+        enum: ['None', 'Eligible', 'Issued'],
+        default: 'None'
     }
 });
 

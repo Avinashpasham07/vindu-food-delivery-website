@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create an Axios instance
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'https://vindu-food-delivery.onrender.com/api',
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api', // Fallback for safety
     withCredentials: true, // Send cookies with requests
     headers: {
         'Content-Type': 'application/json',
@@ -10,8 +10,6 @@ const apiClient = axios.create({
 });
 
 // Request Interceptor
-
-
 
 apiClient.interceptors.request.use(
     (config) => {

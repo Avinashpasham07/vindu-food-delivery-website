@@ -1,5 +1,6 @@
 const DeliveryPartner = require('../models/deliveryPartner.model');
 const Order = require('../models/order.model');
+const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const NotificationService = require('../services/notification.service');
@@ -113,7 +114,7 @@ async function acceptOrder(req, res) {
             const existingOrder = await Order.findById(partner.currentOrder)
                 .populate('items.foodId')
                 .populate('userId', 'fullname phone address');
-
+            i
             if (existingOrder) {
                 return res.json({ message: 'Restored active order', order: existingOrder });
             } else {
@@ -169,7 +170,7 @@ async function acceptOrder(req, res) {
             // Safety check: userId might be null if user was deleted
             if (populatedOrder.userId) {
                 io.to(`user-${populatedOrder.userId._id}`).emit('order-updated', populatedOrder);
-                
+
                 // [PUSH NOTIFICATION] Notify User
                 NotificationService.sendToUser(populatedOrder.userId._id, 'User', {
                     title: 'Rider Assigned! 🛵',
@@ -193,21 +194,55 @@ async function acceptOrder(req, res) {
 
 async function updateOrderStatus(req, res) {
     try {
-        const { orderId, status } = req.body; // 'PickedUp', 'Delivered'
+        const { orderId, status, stopPartnerId } = req.body; // 'PickedUp', 'Delivered', option stopPartnerId
         const partner = req.deliveryPartner;
 
         const order = await Order.findOne({ _id: orderId, deliveryPartner: partner._id });
         if (!order) return res.status(404).json({ message: 'Order not found or not assigned to you' });
 
-        order.deliveryStatus = status;
-        if (status === 'Delivered') {
-            order.status = 'Delivered';
-            partner.currentOrder = null;
-            partner.status = 'online';
-            partner.earnings += 40; // Flat fee for now
-            await partner.save();
-        } else if (status === 'PickedUp') {
-            order.status = 'Out for Delivery';
+        if (status === 'PickedUp' && stopPartnerId) {
+            // Update individual stop status
+            const stop = order.restaurantStops.find(s => s.partnerId.toString() === stopPartnerId);
+            if (stop) {
+                stop.status = 'PickedUp';
+                console.log(`Stop PickedUp: ${stop.name}`);
+            }
+
+            // Check if all stops are now picked up to transition the whole order
+            const allPicked = order.restaurantStops.every(s => s.status === 'PickedUp');
+            if (allPicked) {
+                order.deliveryStatus = 'PickedUp';
+                order.status = 'Out for Delivery';
+            }
+        } else {
+            // Traditional bulk status update
+            order.deliveryStatus = status;
+            if (status === 'Delivered') {
+                order.status = 'Delivered';
+                partner.currentOrder = null;
+                partner.status = 'online';
+                // Calculate dynamic payout: 25 base + 15 per extra stop
+                const multiStopBonus = Math.max(0, (order.restaurantStops.length - 1) * 15);
+                partner.earnings += (25 + multiStopBonus);
+                await partner.save();
+
+                // --- OnTime Guarantee: Delay Check ---
+                order.actualDeliveryTime = new Date();
+                if (order.estimatedDeliveryTime && order.actualDeliveryTime > new Date(order.estimatedDeliveryTime.getTime() + 5 * 60000)) {
+                    // Late by more than 5 mins
+                    order.compensationStatus = 'Issued';
+                    const user = await User.findById(order.userId);
+                    if (user) {
+                        user.vinduCoins = (user.vinduCoins || 0) + 50; // issue 50 Coins
+                        await user.save();
+                        console.log(`Issued delay compensation to user ${user.fullname}`);
+                    }
+                }
+            } else if (status === 'PickedUp') {
+                // Bulk pickup - mark all as picked up
+                order.restaurantStops.forEach(s => s.status = 'PickedUp');
+                order.status = 'Out for Delivery';
+            }
         }
 
         await order.save();

@@ -49,6 +49,10 @@ const userSchema = new mongoose.Schema({
     fcmTokens: {
         type: [String],
         default: []
+    },
+    vinduCoins: {
+        type: Number,
+        default: 0
     }
 },
     {

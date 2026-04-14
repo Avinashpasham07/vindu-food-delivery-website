@@ -83,7 +83,7 @@ const PartnerDashboard = () => {
             fetchOrders(parsedPartner.id || parsedPartner._id);
 
             // Socket Setup
-            const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
+            const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
             const socket = io(socketUrl);
             socket.emit('join_partner_room', parsedPartner.id || parsedPartner._id); // Assume room logic exists or broadcast globally
 

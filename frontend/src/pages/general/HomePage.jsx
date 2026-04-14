@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../../api/client';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 
 import { useCart } from '../../context/CartContext';
@@ -14,8 +15,9 @@ import { useTranslation } from 'react-i18next';
 
 
 const HomePage = () => {
+    const navigate = useNavigate();
     const { t, i18n } = useTranslation();
-    const { addToCart, decrementItem, getItemQuantity } = useCart();
+    const { addToCart, decrementItem, getItemQuantity, clearCart } = useCart();
     const { startSquad, joinSquad, roomId, isHost, squadMembers } = useSquad();
     const [partners, setPartners] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -517,6 +519,18 @@ const HomePage = () => {
                                             image: item.image,
                                             video: item.video
                                         }, item.quantity));
+                                        
+                                        // Visual Feedback
+                                        toast.success(`Reordering items from your ${new Date(order.createdAt).toLocaleDateString()} order!`, {
+                                            icon: '🔄',
+                                            style: {
+                                                borderRadius: '16px',
+                                                background: '#1a1a1a',
+                                                color: '#fff',
+                                                border: '1px solid rgba(255,94,0,0.5)'
+                                            }
+                                        });
+
                                         navigate('/cart');
                                     }}
                                     className="w-full py-2 bg-white/5 hover:bg-[var(--accent)] text-white rounded-xl text-xs font-bold transition-all border border-white/5 hover:border-[var(--accent)]"

@@ -73,7 +73,7 @@ async function getallfood(req, res) {
     // Ideally, implement pagination (limit/page query params)
     const limit = parseInt(req.query.limit) || 100;
     const fooditems = await foodmodel.find({})
-        .populate('foodpartner', 'name')
+        .populate('foodpartner', 'name location')
         .sort({ createdAt: -1 }) // Newest first
         .limit(limit);
 
@@ -146,7 +146,7 @@ async function getFoodByPartner(req, res) {
 async function getFoodById(req, res) {
     try {
         const { id } = req.params;
-        const food = await foodmodel.findById(id).populate('foodpartner', 'name email address'); // Populate partner details
+        const food = await foodmodel.findById(id).populate('foodpartner', 'name email address location'); // Populate partner details
 
         if (!food) {
             return res.status(404).json({ message: "Food item not found" });

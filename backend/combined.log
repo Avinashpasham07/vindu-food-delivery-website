@@ -64,3 +64,28 @@
 {"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-10 17:33:24"}
 {"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-10 18:55:57"}
 {"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-10 19:40:17"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-13 19:21:22"}
+{"level":"info","message":"User Registered: 69dcf7af1dca574e57ebaa35","service":"vindu-backend","timestamp":"2026-04-13 19:33:27"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-13 21:20:04"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-13 21:25:57"}
+{"level":"info","message":"Updating Partner Profile for ID: 69dd1421db9ae912866ed601","service":"vindu-backend","timestamp":"2026-04-13 21:36:11"}
+{"level":"info","message":"Updating Partner Profile for ID: 69dd1421db9ae912866ed601","service":"vindu-backend","timestamp":"2026-04-13 21:36:15"}
+{"level":"info","message":"Updating Partner Profile for ID: 69dd1421db9ae912866ed601","service":"vindu-backend","timestamp":"2026-04-13 21:36:22"}
+{"level":"warn","message":"Login Failed: User not found - admin@vindu.com","service":"vindu-backend","timestamp":"2026-04-13 21:40:18"}
+{"level":"warn","message":"Login Failed: Password mismatch - avi@gmail.com","service":"vindu-backend","timestamp":"2026-04-13 21:40:35"}
+{"level":"warn","message":"Login Failed: User not found - admin@vindu.com","service":"vindu-backend","timestamp":"2026-04-13 21:40:41"}
+{"level":"warn","message":"Login Failed: User not found - admin@vindu.com","service":"vindu-backend","timestamp":"2026-04-13 21:40:42"}
+{"level":"warn","message":"Login Failed: User not found - admin@vindu.com","service":"vindu-backend","timestamp":"2026-04-13 21:40:48"}
+{"level":"warn","message":"Login Failed: User not found - admin@vindu.com","service":"vindu-backend","timestamp":"2026-04-13 21:40:49"}
+{"level":"info","message":"User Logged In: 69dd170db834532652a44507","service":"vindu-backend","timestamp":"2026-04-13 21:47:27"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-13 21:48:10"}
+{"level":"info","message":"Updating Partner Profile for ID: 69dd17997f6f60c4b801cf5c","service":"vindu-backend","timestamp":"2026-04-13 21:51:34"}
+{"level":"info","message":"User Logged In: 69dd170db834532652a44507","service":"vindu-backend","timestamp":"2026-04-13 21:51:57"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-13 21:53:31"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-14 13:54:45"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-14 14:00:42"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-14 14:02:29"}
+{"level":"info","message":"Updating Partner Profile for ID: 69d69bcd56715ae14f37a1fc","service":"vindu-backend","timestamp":"2026-04-14 14:08:03"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-14 14:20:35"}
+{"level":"info","message":"Updating Partner Profile for ID: 69dd1421db9ae912866ed601","service":"vindu-backend","timestamp":"2026-04-14 14:26:15"}
+{"level":"info","message":"User Logged In: 69770fc72e9fe36166d51b24","service":"vindu-backend","timestamp":"2026-04-14 14:29:18"}

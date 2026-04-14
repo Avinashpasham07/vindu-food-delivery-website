@@ -7,7 +7,7 @@ import OrderMap from '../../components/OrderMap';
 import toast from 'react-hot-toast';
 import ChatWindow from '../../components/ChatWindow';
 
-const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
+const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
 const socket = io(socketUrl);
 
 const OrderTracking = () => {
@@ -98,8 +98,11 @@ const OrderTracking = () => {
     }, [order?.deliveryStatus]);
 
 
+    // Google Maps Smart ETA & Distance Engine
+
+    // Google Maps Smart ETA & Distance Engine
     const calculateHaversine = (lat1, lon1, lat2, lon2) => {
-        const R = 6371;
+        const R = 6371; // km
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -109,32 +112,39 @@ const OrderTracking = () => {
         return R * c;
     };
 
-    // New: Fetch actual road distance from OSRM
+    // Fetch actual road distance from Google Maps
     const fetchRoadDistance = async (start, end) => {
+        // Geometric Fallback (calculated first as baseline)
+        const geoDistance = calculateHaversine(start.lat, start.lng, end.lat, end.lng);
+        const geoEta = Math.ceil(geoDistance * 4 + 5); // 4 mins per km + 5 mins buffer
+
         try {
-            const url = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?overview=false`;
+            const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+            const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${start.lat},${start.lng}&destinations=${end.lat},${end.lng}&key=${apiKey}`;
             const resp = await fetch(url);
             const data = await resp.json();
-            if (data.routes && data.routes.length > 0) {
-                const distanceKm = data.routes[0].distance / 1000;
-                // OSRM duration is in seconds
-                const durationMins = Math.ceil(data.routes[0].duration / 60);
-                return { distance: distanceKm, eta: durationMins };
+            
+            if (data.status === 'OK' && data.rows?.[0]?.elements?.[0]?.status === 'OK') {
+                const element = data.rows[0].elements[0];
+                const distanceKm = element.distance.value / 1000;
+                const durationMins = Math.ceil(element.duration.value / 60);
+                return { distance: distanceKm, eta: durationMins, isRoadAware: true };
             }
         } catch (err) {
-            console.error("OSRM Route Error:", err);
+            console.error("Google Maps Route Error:", err);
         }
-        // Fallback to Haversine
-        const havDist = calculateHaversine(start.lat, start.lng, end.lat, end.lng);
-        return { distance: havDist, eta: Math.ceil(havDist * 4 + 10), isFallback: true };
+        
+        // Return fallback data if API fails or is denied
+        return { distance: geoDistance, eta: geoEta, isRoadAware: false };
     };
 
     // Update Road Stats whenever mission state changes
     useEffect(() => {
         const updateStats = async () => {
-            if (!order?.restaurantLocation?.lat || !order?.customerLocation?.lat) return;
+            const primaryStop = order?.restaurantStops?.[0]?.location;
+            if (!primaryStop?.lat || !order?.customerLocation?.lat) return;
 
-            let start = order.restaurantLocation;
+            let start = primaryStop;
             let end = order.customerLocation;
 
             // If rider is out for delivery, track from rider to customer
@@ -146,18 +156,19 @@ const OrderTracking = () => {
             setRoadStats({
                 distance: stats.distance,
                 eta: stats.eta,
-                isRoadAware: !stats.isFallback
+                isRoadAware: stats.isRoadAware
             });
         };
 
         updateStats();
-    }, [order?.restaurantLocation, order?.customerLocation, order?.deliveryStatus, riderLocation]);
+    }, [order?.restaurantStops, order?.customerLocation, order?.deliveryStatus, riderLocation]);
 
     const fetchOrderDetails = async () => {
         try {
             const data = await OrderService.getOrderDetails(orderId);
+            const primaryStop = data.restaurantStops?.[0]?.location;
             setOrder(data);
-            setRiderLocation(data.riderLocation || data.restaurantLocation);
+            setRiderLocation(data.riderLocation || primaryStop);
             setLoading(false);
             // Initial progress set
             if (data.deliveryStatus === 'Out_for_Delivery') setProgress(20);
@@ -171,7 +182,8 @@ const OrderTracking = () => {
 
     // --- Simulation Logic ---
     const startSimulation = () => {
-        if (!order?.restaurantLocation?.lat || !order?.customerLocation?.lat) {
+        const primaryStop = order.restaurantStops?.[0]?.location;
+        if (!primaryStop?.lat || !order?.customerLocation?.lat) {
             toast.error("Real coordinates missing for tracking!");
             return;
         }
@@ -182,8 +194,8 @@ const OrderTracking = () => {
         
         const interval = setInterval(() => {
             step++;
-            const lat = order.restaurantLocation.lat + (order.customerLocation.lat - order.restaurantLocation.lat) * (step / totalSteps);
-            const lng = order.restaurantLocation.lng + (order.customerLocation.lng - order.restaurantLocation.lng) * (step / totalSteps);
+            const lat = primaryStop.lat + (order.customerLocation.lat - primaryStop.lat) * (step / totalSteps);
+            const lng = primaryStop.lng + (order.customerLocation.lng - primaryStop.lng) * (step / totalSteps);
             
             socket.emit('update-location', {
                 orderId,
@@ -256,7 +268,7 @@ const OrderTracking = () => {
 
             {/* Real Map Area */}
             <div className="flex-1 relative w-full h-[50vh] min-h-[400px] overflow-hidden bg-[#1a1a1a]">
-                {(!order?.restaurantLocation?.lat && !order?.customerLocation?.lat) && (
+                {(!order.restaurantStops?.length && !order?.customerLocation?.lat) && (
                     <div className="absolute inset-0 z-[2000] bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
                         <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10">
                             <span className="text-3xl">📍</span>
@@ -269,20 +281,20 @@ const OrderTracking = () => {
                 )}
                 
                 {/* Warning for partial data */}
-                {((!order?.restaurantLocation?.lat && order?.customerLocation?.lat) || (order?.restaurantLocation?.lat && !order?.customerLocation?.lat)) && (
+                {((!order.restaurantStops?.length && order?.customerLocation?.lat) || (order.restaurantStops?.length && !order?.customerLocation?.lat)) && (
                     <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[2000] bg-yellow-500/20 backdrop-blur border border-yellow-500/30 px-4 py-2 rounded-full flex items-center gap-2">
                         <span className="text-sm text-yellow-500 font-bold">⚠️ Partial Tracking Data</span>
                     </div>
                 )}
 
                 <OrderMap 
-                    restaurant={order.restaurantLocation}
+                    restaurants={order?.restaurantStops?.map(s => ({ ...s.location, name: s.name }))}
                     customer={order.customerLocation}
                     rider={riderLocation}
                 />
 
                 {/* Simulation Button Overlay */}
-                {order?.restaurantLocation?.lat && (
+                {order.restaurantStops?.length > 0 && (
                     <div className="absolute bottom-10 right-6 z-[1000]">
                         <button 
                             onClick={startSimulation}
@@ -299,25 +311,47 @@ const OrderTracking = () => {
             <div className="bg-[#111] border-t border-white/10 rounded-t-[32px] p-6 pb-10 shadow-[0_-10px_40px_rgba(0,0,0,0.8)] animate-slide-up z-10 relative -mt-6">
 
                 {/* ETA Header */}
-                <div className="flex justify-between items-end mb-8 bg-[#1a1a1a] p-5 rounded-2xl border border-white/5 relative overflow-hidden">
-                    {/* Progress Background */}
-                    <div className="absolute top-0 left-0 bottom-0 bg-[#FF5E00]/5 transition-all duration-1000" style={{ width: `${progress}%` }}></div>
-                    
-                    <div className="relative z-10">
-                        <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">{t('estimated_arrival')}</p>
-                        <h2 className="text-4xl font-black text-white leading-none">
-                            {order.deliveryStatus === 'Delivered' ? '0' : eta} 
-                            <span className="text-lg text-gray-500 font-bold ml-1">{t('min')}</span>
-                        </h2>
+                <div className="mb-4">
+                    <div className="flex justify-between items-end bg-[#1a1a1a] p-5 rounded-2xl border border-white/5 relative overflow-hidden">
+                        {/* Progress Background */}
+                        <div className="absolute top-0 left-0 bottom-0 bg-[#FF5E00]/5 transition-all duration-1000" style={{ width: `${progress}%` }}></div>
+                        
+                        <div className="relative z-10">
+                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">{t('estimated_arrival')}</p>
+                            <h2 className="text-4xl font-black text-white leading-none">
+                                {order.deliveryStatus === 'Delivered' ? '0' : eta} 
+                                <span className="text-lg text-gray-500 font-bold ml-1">{t('min')}</span>
+                            </h2>
+                        </div>
+                        <div className="text-right relative z-10">
+                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">
+                                {order.deliveryStatus === 'Out_for_Delivery' ? 'Remaining Distance' : 'Total Distance'}
+                            </p>
+                            <p className="text-white text-xl font-black">
+                                {(order.deliveryStatus === 'Out_for_Delivery' ? remainingDistance : totalDistance).toFixed(1)} 
+                                <span className="text-xs text-gray-500 uppercase ml-1">km</span>
+                            </p>
+                        </div>
                     </div>
-                    <div className="text-right relative z-10">
-                        <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">
-                            {order.deliveryStatus === 'Out_for_Delivery' ? 'Remaining Distance' : 'Total Distance'}
-                        </p>
-                        <p className="text-white text-xl font-black">
-                            {(order.deliveryStatus === 'Out_for_Delivery' ? remainingDistance : totalDistance).toFixed(1)} 
-                            <span className="text-xs text-gray-500 uppercase ml-1">km</span>
-                        </p>
+
+                    {/* AI Predict+ Guarantee Badge */}
+                    <div className="mt-3 flex items-center justify-between px-4 py-3 bg-[#FF5E00]/10 border border-[#FF5E00]/20 rounded-xl">
+                        <div className="flex items-center gap-2">
+                            <span className="text-lg">🛡️</span>
+                            <div>
+                                <p className="text-white text-[11px] font-bold leading-tight">OnTime Guarantee AI</p>
+                                <p className="text-[#FF5E00] text-[9px] font-medium opacity-80">On time, or 50 Coins back</p>
+                            </div>
+                        </div>
+                        {order.compensationStatus === 'Issued' ? (
+                            <div className="flex items-center gap-1.5 bg-green-500 px-2 py-1 rounded-full animate-bounce">
+                                <span className="text-[10px] font-black text-black">+50 COINS</span>
+                            </div>
+                        ) : (
+                            <div className="text-[10px] font-bold text-gray-500 bg-white/5 px-2 py-1 rounded-full">
+                                Promised by {order.estimatedDeliveryTime ? new Date(order.estimatedDeliveryTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'calculating...'}
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -355,22 +389,48 @@ const OrderTracking = () => {
                     </div>
                 </div>
 
-                {/* Restaurant Info */}
-                <div className="mb-8 p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-[#FF5E00]/30 transition-all">
-                    <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-xl flex-shrink-0">
-                            🍳
+                {/* Restaurant Info - Multi Stop Support */}
+                <div className="mb-8 space-y-3">
+                    {order.restaurantStops && order.restaurantStops.length > 0 ? (
+                        order.restaurantStops.map((stop, idx) => (
+                            <div key={idx} className="p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-[#FF5E00]/30 transition-all">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-xl flex-shrink-0">
+                                        {idx === 0 ? '🍳' : '🏢'}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[#FF5E00] text-[10px] font-black uppercase tracking-[0.2em] mb-1">
+                                            {idx === 0 ? 'Primary Pickup' : `Stop #${idx + 1}`}
+                                        </p>
+                                        <h3 className="text-white font-bold truncate">
+                                            {stop.name || 'Vindu Restaurant'}
+                                        </h3>
+                                        <p className="text-gray-500 text-xs mt-0.5 line-clamp-2 leading-relaxed">
+                                            Partner ID: {stop.partnerId?.toString().slice(-6).toUpperCase()}
+                                        </p>
+                                    </div>
+                                    {stop.status === 'PickedUp' && (
+                                        <div className="bg-green-500/10 text-green-500 text-[10px] font-bold px-2 py-1 rounded-full border border-green-500/20">
+                                            Picked Up
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-xl flex-shrink-0">
+                                    🍳
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[#FF5E00] text-[10px] font-black uppercase tracking-[0.2em] mb-1">Coming From</p>
+                                    <h3 className="text-white font-bold truncate">Vindu Restaurant</h3>
+                                    <p className="text-gray-500 text-xs mt-0.5">Address updating...</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-[#FF5E00] text-[10px] font-black uppercase tracking-[0.2em] mb-1">Coming From</p>
-                            <h3 className="text-white font-bold truncate">
-                                {order.items?.[0]?.foodId?.foodpartner?.businessName || 'Vindu Restaurant'}
-                            </h3>
-                            <p className="text-gray-500 text-xs mt-0.5 line-clamp-2 leading-relaxed">
-                                {order.items?.[0]?.foodId?.foodpartner?.address || 'Address updating...'}
-                            </p>
-                        </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Driver Card */}

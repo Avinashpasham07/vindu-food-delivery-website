@@ -89,9 +89,9 @@ const PartnerProfile = () => {
         const map = useMap();
         useEffect(() => {
             if (center) {
-                map.flyTo(center, 15, { duration: 1.5 });
+                map.setView(center, 15);
             }
-        }, [center, map]);
+        }, [center]); // Only fires when center prop changes (from search)
         return null;
     };
 
@@ -185,31 +185,30 @@ const PartnerProfile = () => {
                                         const loadingToast = toast.loading("Finding address...");
                                         try {
                                             // Search with address + restaurant name for better accuracy
-                                            const query = `${formData.address}, ${formData.name || ''}`;
-                                            const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+                                            const query = `${formData.address}${formData.city ? ', ' + formData.city : ''}`;
+                                            const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+                                            const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&key=${apiKey}`);
                                             const data = await res.json();
                                             
-                                            if (data && data.length > 0) {
-                                                const { lat, lon } = data[0];
+                                            if (data.status === 'OK' && data.results.length > 0) {
+                                                const result = data.results[0];
+                                                const { lat, lng } = result.geometry.location;
+                                                
+                                                // Clean up Plus Codes if present
+                                                let bestAddress = result.formatted_address;
+                                                if (bestAddress.includes('+') && data.results[1]) {
+                                                   bestAddress = data.results[1].formatted_address;
+                                                }
+                                                
                                                 setFormData(prev => ({
                                                     ...prev,
-                                                    location: { lat: parseFloat(lat), lng: parseFloat(lon) }
+                                                    location: { lat, lng },
+                                                    address: bestAddress // Proactively update to clean address
                                                 }));
-                                                toast.success("Location found!", { id: loadingToast });
+                                                toast.success("Location locked from address!", { id: loadingToast });
                                             } else {
-                                                // Try again with just the address if combined search fails
-                                                const res2 = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(formData.address)}&format=json&limit=1`);
-                                                const data2 = await res2.json();
-                                                if (data2 && data2.length > 0) {
-                                                    const { lat, lon } = data2[0];
-                                                    setFormData(prev => ({
-                                                        ...prev,
-                                                        location: { lat: parseFloat(lat), lng: parseFloat(lon) }
-                                                    }));
-                                                    toast.success("Address found!", { id: loadingToast });
-                                                } else {
-                                                    toast.error("Could not find that location. Please pin it manually.", { id: loadingToast });
-                                                }
+                                                toast.error(`Google Maps Error: ${data.status}. Please click on the map to pin manually.`, { id: loadingToast });
+                                                console.warn("Google Maps Geocoding failed:", data);
                                             }
                                         } catch (err) {
                                             toast.error("Geocoding failed", { id: loadingToast });
@@ -229,8 +228,37 @@ const PartnerProfile = () => {
 
                 {/* Location Picker Map */}
                 <div className="mt-8">
-                    <label className="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-4">Restaurant GPS Location</label>
-                    <div className="h-64 rounded-2xl overflow-hidden border border-white/10 bg-[#111]">
+                    <div className="flex justify-between items-end mb-4">
+                        <div>
+                            <label className="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-1">Restaurant GPS Location</label>
+                            <p className="text-[10px] text-[#10B981] font-bold">Current Link: {formData.location?.lat?.toFixed(6)}, {formData.location?.lng?.toFixed(6)}</p>
+                        </div>
+                        {isEditing && (
+                            <button 
+                                onClick={() => {
+                                    if (navigator.geolocation) {
+                                        toast.loading("detecting...", { duration: 1000 });
+                                        navigator.geolocation.getCurrentPosition((pos) => {
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                location: { lat: pos.coords.latitude, lng: pos.coords.longitude }
+                                            }));
+                                            toast.success("Located at current position!");
+                                        });
+                                    }
+                                }}
+                                className="text-[10px] font-black bg-[#10B981]/10 text-[#10B981] px-3 py-1.5 rounded-lg border border-[#10B981]/20 hover:bg-[#10B981] hover:text-white transition-all uppercase"
+                            >
+                                Use My Current Device Location 📍
+                            </button>
+                        )}
+                    </div>
+                    <div className="h-72 rounded-3xl overflow-hidden border border-white/10 bg-[#111] shadow-inner relative group">
+                        {isEditing && (
+                            <div className="absolute top-4 left-4 z-[500] bg-black/80 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 text-[10px] font-bold text-gray-400 group-hover:text-[#10B981] transition-colors">
+                                Map Interaction: Click to Drop Pin
+                            </div>
+                        )}
                         <MapContainer
                             key={mapKey}
                             center={mapCenter}
@@ -239,7 +267,8 @@ const PartnerProfile = () => {
                             scrollWheelZoom={false}
                         >
                             <TileLayer
-                                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
+                                url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                                attribution='&copy; Google Maps'
                             />
                             {isEditing && <MapAutoCenter center={mapCenter} />}
                             {isEditing && <LocationMarker />}

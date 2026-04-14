@@ -23,7 +23,7 @@ const UserProfile = () => {
             const parsedUser = JSON.parse(storedUser);
             setUser(parsedUser);
 
-            const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
+            const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
             const socket = io(socketUrl);
             socket.emit('join_user_room', parsedUser.id || parsedUser._id);
 
@@ -32,11 +32,29 @@ const UserProfile = () => {
                 setOrders(prevOrders => prevOrders.map(o => o._id === updatedOrder._id ? updatedOrder : o));
             });
 
+            // Fetch fresh profile data to get coins/gold status
+            fetchProfile();
+
             return () => socket.disconnect();
         } else {
             navigate('/user/login');
         }
     }, [navigate]);
+
+    const fetchProfile = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+            const response = await apiClient.get('/auth/user/me', { headers });
+            if (response.data && response.data.user) {
+                setUser(response.data.user);
+                // Sync back to localStorage
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+            }
+        } catch (err) {
+            console.error("Error fetching fresh profile:", err);
+        }
+    };
 
     useEffect(() => {
         if (activeTab === 'orders' || activeTab === 'overview') {
@@ -206,7 +224,14 @@ const UserProfile = () => {
 
                         {activeTab === 'overview' && (
                             <div className="space-y-6 animate-fade-in-up">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div className="bg-[#111] p-6 rounded-[24px] border border-white/5 hover:border-[#FF5E00]/30 transition-all group relative overflow-hidden">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <span className="text-3xl font-black text-white relative z-10">{user.vinduCoins || 0}</span>
+                                            <span className="text-xl">💰</span>
+                                        </div>
+                                        <span className="text-xs uppercase font-bold text-gray-500 relative z-10">Vindu Coins</span>
+                                        <p className="text-[10px] text-[var(--accent)] font-bold mt-1 uppercase tracking-tight">Vindu Wallet Active</p>
+                                    </div>
                                     <div className="bg-[#111] p-6 rounded-[24px] border border-white/5 hover:border-[#FF5E00]/30 transition-all group relative overflow-hidden">
                                         <span className="text-3xl font-black text-white block mb-1 relative z-10">{orders.length}</span>
                                         <span className="text-xs uppercase font-bold text-gray-500 relative z-10">Total Orders</span>
@@ -215,11 +240,6 @@ const UserProfile = () => {
                                         <span className="text-3xl font-black text-white block mb-1 relative z-10">{favorites.length}</span>
                                         <span className="text-xs uppercase font-bold text-gray-500 relative z-10">Favorites</span>
                                     </div>
-                                    <div className="bg-[#111] p-6 rounded-[24px] border border-white/5 hover:border-[#FF5E00]/30 transition-all group relative overflow-hidden">
-                                        <span className="text-3xl font-black text-white block mb-1 relative z-10">0</span>
-                                        <span className="text-xs uppercase font-bold text-gray-500 relative z-10">Reviews</span>
-                                    </div>
-                                </div>
 
                                 <div className="w-full bg-gradient-to-r from-[#FF5E00] to-orange-600 rounded-[32px] p-8 md:p-10 relative overflow-hidden shadow-2xl">
                                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-40 mix-blend-overlay"></div>

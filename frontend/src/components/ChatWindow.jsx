@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import apiClient from '../api/client';
 import toast from 'react-hot-toast';
 
-const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
+const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
 const socket = io(socketUrl);
 
 const ChatWindow = ({ orderId, currentUser, senderModel }) => {
@@ -70,7 +70,7 @@ const ChatWindow = ({ orderId, currentUser, senderModel }) => {
     return (
         <div className="fixed bottom-6 right-6 z-[2000] font-['Plus_Jakarta_Sans']">
             {/* Chat Bubble */}
-            <button 
+            <button
                 onClick={toggleChat}
                 className="w-16 h-16 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-2xl shadow-2xl hover:scale-110 active:scale-95 transition-all relative group"
             >
@@ -100,7 +100,7 @@ const ChatWindow = ({ orderId, currentUser, senderModel }) => {
                     </div>
 
                     {/* Messages Area */}
-                    <div 
+                    <div
                         ref={scrollRef}
                         className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth"
                     >
@@ -114,11 +114,10 @@ const ChatWindow = ({ orderId, currentUser, senderModel }) => {
                                 const isMe = msg.senderId === (currentUser.id || currentUser._id);
                                 return (
                                     <div key={i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                                        <div className={`max-w-[80%] p-4 rounded-2xl text-sm ${
-                                            isMe 
-                                            ? 'bg-[#FF5E00] text-white rounded-br-none shadow-lg shadow-orange-500/10' 
-                                            : 'bg-white/5 text-gray-300 border border-white/5 rounded-bl-none'
-                                        }`}>
+                                        <div className={`max-w-[80%] p-4 rounded-2xl text-sm ${isMe
+                                                ? 'bg-[#FF5E00] text-white rounded-br-none shadow-lg shadow-orange-500/10'
+                                                : 'bg-white/5 text-gray-300 border border-white/5 rounded-bl-none'
+                                            }`}>
                                             {!isMe && (
                                                 <p className="text-[9px] font-black uppercase tracking-tighter opacity-50 mb-1">{msg.senderName}</p>
                                             )}
@@ -136,14 +135,14 @@ const ChatWindow = ({ orderId, currentUser, senderModel }) => {
                     {/* Input Area */}
                     <form onSubmit={handleSendMessage} className="p-6 bg-white/[0.02] border-t border-white/5">
                         <div className="flex items-center gap-3 bg-black/40 border border-white/10 rounded-2xl p-2 pl-4 focus-within:border-[#FF5E00]/50 transition-all">
-                            <input 
+                            <input
                                 type="text"
                                 value={inputText}
                                 onChange={(e) => setInputText(e.target.value)}
                                 placeholder="Send signal..."
                                 className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-gray-700"
                             />
-                            <button 
+                            <button
                                 type="submit"
                                 className="w-10 h-10 bg-[#FF5E00] text-black rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
                             >

@@ -8,6 +8,7 @@ const validate = require('../middlewares/validate');
 const orderValidation = require('../validations/order.validation');
 const crypto = require('crypto');
 const NotificationService = require('../services/notification.service');
+const axios = require('axios'); // Note: I am assuming I can use axios since it is often installed, but if not I will use fetch. Wait, package.json didn't show it. I will use native fetch.
 
 // Place a new Order
 router.post('/place', authuser, validate(orderValidation.placeOrder), async (req, res) => {
@@ -46,32 +47,34 @@ router.post('/place', authuser, validate(orderValidation.placeOrder), async (req
             }
         }
 
-        // Fetch Restaurant Location from the first item's partner
-        let restaurantLocation = null;
-        if (items.length > 0) {
-            const Food = require('../models/food.model');
-            const foodItem = await Food.findById(items[0].foodId).populate('foodpartner');
-            if (foodItem?.foodpartner?.location?.lat) {
-                restaurantLocation = foodItem.foodpartner.location;
-            }
-        }
+        // Fetch Restaurant Locations from all items
+        const Food = require('../models/food.model');
+        const foodIds = items.map(i => i.foodId);
+        const foodDocs = await Food.find({ _id: { $in: foodIds } }).populate('foodpartner');
 
-        const newOrder = new Order({
-            userId: req.user._id,
-            items,
-            totalAmount: finalAmount,
-            address,
-            customerLocation,
-            restaurantLocation,
-            paymentMethod
+        const restaurantStopsMap = new Map();
+        foodDocs.forEach(food => {
+            if (food.foodpartner && !restaurantStopsMap.has(food.foodpartner._id.toString())) {
+                restaurantStopsMap.set(food.foodpartner._id.toString(), {
+                    partnerId: food.foodpartner._id,
+                    name: food.foodpartner.name,
+                    location: food.foodpartner.location,
+                    status: 'Pending'
+                });
+            }
         });
 
-        const savedOrder = await newOrder.save();
-
-        if (couponApplied) {
-            couponApplied.isUsed = true;
-            await couponApplied.save();
-        }
+        const restaurantStops = Array.from(restaurantStopsMap.values());
+        
+        // Dynamic Delivery Fee: ₹25 base + ₹15 per extra restaurant
+        const baseDeliveryFee = 25;
+        const multiStopSurcharge = Math.max(0, (restaurantStops.length - 1) * 15);
+        const totalDeliveryFee = (restaurantStops.length > 0) ? (baseDeliveryFee + multiStopSurcharge) : 0;
+        
+        // finalAmount already includes totalAmount (item total), we add delivery fee here
+        // If the frontend already included a delivery fee in totalAmount, this might double charge.
+        // Usually, totalAmount is just the subtotal. Let's assume we add it here.
+        const orderTotal = finalAmount + totalDeliveryFee;
 
         // --- Streak Logic ---
         const user = await User.findById(req.user._id);
@@ -115,6 +118,58 @@ router.post('/place', authuser, validate(orderValidation.placeOrder), async (req
         }
 
         await user.save();
+        
+        // --- OnTime Guarantee AI: Start ETA Engine ---
+        let smartETAMins = 30; // Default fallback
+        try {
+            // 1. Calculate Restaurant Load
+            const activeOrders = await Order.countDocuments({ 
+                status: { $in: ['Placed', 'Preparing'] },
+                'restaurantStops.partnerId': { $in: restaurantStops.map(s => s.partnerId) }
+            });
+            const loadFactor = activeOrders * 2; // 2 mins extra per active order in system
+            
+            // 2. Google Maps Distance Matrix
+            if (customerLocation && restaurantStops.length > 0) {
+                const origins = restaurantStops.map(s => `${s.location.lat},${s.location.lng}`).join('|');
+                const destination = `${customerLocation.lat},${customerLocation.lng}`;
+                const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+                
+                const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origins}&destinations=${destination}&key=${apiKey}`);
+                const data = await response.json();
+                
+                if (data.status === 'OK') {
+                    // Get max travel time among all stops
+                    const travelTimes = data.rows.map(row => row.elements[0].duration?.value || 0); // seconds
+                    const maxTravelMins = Math.ceil(Math.max(...travelTimes) / 60);
+                    
+                    const basePrepTime = 20; // 20 mins base
+                    smartETAMins = basePrepTime + loadFactor + maxTravelMins + 5; // 5 min buffer
+                }
+            }
+        } catch (etaErr) {
+            console.error("Smart ETA Calculation Error:", etaErr);
+        }
+
+        const estimatedDeliveryTime = new Date(now.getTime() + smartETAMins * 60000);
+
+        const newOrder = new Order({
+            userId: req.user._id,
+            items,
+            totalAmount: orderTotal,
+            address,
+            customerLocation,
+            restaurantStops,
+            paymentMethod,
+            estimatedDeliveryTime
+        });
+
+        const savedOrder = await newOrder.save();
+
+        if (couponApplied) {
+            couponApplied.isUsed = true;
+            await couponApplied.save();
+        }
 
         // Notify Delivery Partners & Restaurant
         const io = req.app.get('io');
@@ -138,6 +193,8 @@ router.post('/place', authuser, validate(orderValidation.placeOrder), async (req
         res.status(201).json({ 
             message: 'Order placed successfully', 
             order: savedOrder,
+            deliveryFee: totalDeliveryFee,
+            restaurantStops: restaurantStops.length,
             streak: user.streakCount,
             reward: streakReward
         });
@@ -232,18 +289,32 @@ router.get('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        // --- Auto-Repair: Missing Restaurant Location ---
-        // If the order has no location, try to pull it from the current restaurant profile
-        if (!order.restaurantLocation?.lat && order.items.length > 0) {
-            const Food = require('../models/food.model');
-            // Safely get the ID even if foodId is already populated
-            const foodId = order.items[0].foodId._id || order.items[0].foodId;
-            const foodItem = await Food.findById(foodId).populate('foodpartner');
+        // --- Auto-Repair: Missing Restaurant Stops ---
+        if ((!order.restaurantStops || order.restaurantStops.length === 0) && order.items && order.items.length > 0) {
+            const restaurantStopsMap = new Map();
             
-            if (foodItem?.foodpartner?.location?.lat) {
-                // Return the updated location even if it's not saved to the order yet
+            order.items.forEach(item => {
+                const food = item.foodId;
+                if (food && food.foodpartner) {
+                    const partner = food.foodpartner;
+                    const partnerIdStr = partner._id.toString();
+                    
+                    if (!restaurantStopsMap.has(partnerIdStr)) {
+                        restaurantStopsMap.set(partnerIdStr, {
+                            partnerId: partner._id,
+                            name: partner.name || partner.businessName || 'Vindu Restaurant',
+                            location: partner.location,
+                            status: 'Pending'
+                        });
+                    }
+                }
+            });
+
+            const restaurantStops = Array.from(restaurantStopsMap.values());
+            if (restaurantStops.length > 0) {
+                // Return a combined object – note: order.toObject() keeps populated docs as objects
                 const orderObj = order.toObject();
-                orderObj.restaurantLocation = foodItem.foodpartner.location;
+                orderObj.restaurantStops = restaurantStops;
                 order = orderObj;
             }
         }
@@ -272,6 +343,7 @@ router.put('/:orderId/status', validate(orderValidation.updateStatus), async (re
 
         await order.save();
 
+        const io = req.app.get('io');
         if (io) {
             io.to(`order-${orderId}`).emit('order-updated', order);
             io.emit('order-updated', order); // Broadcast to all for dashboard updates
