@@ -34,7 +34,9 @@ async function registerUser(req, res) {
 
         res.cookie("token", token, {
             httpOnly: true,
-            // secure: process.env.NODE_ENV === 'production', 
+            secure: true, // Required for cross-site cookies
+            sameSite: 'none', // Required for cross-site cookies
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
         res.status(201).json({
@@ -95,6 +97,9 @@ async function loginUser(req, res) {
 
         res.cookie("token", token, {
             httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
         logger.info(`User Logged In: ${user._id}`);
@@ -152,6 +157,9 @@ async function registerfoodpartner(req, res) {
 
     res.cookie("token", token, {
         httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 7 * 24 * 60 * 60 * 1000
     });
     await foodpartner.save();
 
@@ -193,6 +201,9 @@ async function loginfoodpartner(req, res) {
 
     res.cookie("token", token, {
         httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
     return res.status(200).json({

@@ -46,6 +46,7 @@ const DeliveryProfile = () => {
     const handleLogout = () => {
         if (window.confirm("Are you sure you want to logout?")) {
             localStorage.removeItem('deliveryPartner');
+            localStorage.removeItem('token');
             navigate('/delivery/login');
         }
     };

@@ -15,6 +15,7 @@ const DeliveryLogin = () => {
         try {
             const res = await apiClient.post('/delivery/login', formData);
             localStorage.setItem('deliveryPartner', JSON.stringify(res.data.partner));
+            localStorage.setItem('token', res.data.token);
             navigate('/delivery/dashboard');
         } catch (err) {
             console.error(err);

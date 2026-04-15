@@ -13,6 +13,12 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
     (config) => {
+        // Fallback: Attach token from localStorage if present
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        
         // Browser handles cookies automatically with 'withCredentials: true'
         return config;
     },
