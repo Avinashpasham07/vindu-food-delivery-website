@@ -4,6 +4,24 @@ import { io } from 'socket.io-client';
 import apiClient from '../../api/client';
 import { useCart } from '../../context/CartContext';
 import Skeleton from '../../components/Skeleton';
+import { 
+    Crown, 
+    Sparkles, 
+    Coins, 
+    MapPin, 
+    Phone, 
+    Check, 
+    X, 
+    ArrowLeft,
+    ChevronRight,
+    Package,
+    Heart,
+    Calendar,
+    Settings,
+    LogOut,
+    CreditCard,
+    Circle
+} from 'lucide-react';
 
 const UserProfile = () => {
     const navigate = useNavigate();
@@ -154,9 +172,7 @@ const UserProfile = () => {
                     <div>
                         <Link to="/home" className="inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-6 group">
                             <div className="p-2 rounded-full border border-white/5 bg-white/5 group-hover:border-[#FF5E00]/50 group-hover:text-[#FF5E00] transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                                </svg>
+                                <ArrowLeft className="w-4 h-4" />
                             </div>
                             <span className="text-sm font-medium">Back to Home</span>
                         </Link>
@@ -169,12 +185,12 @@ const UserProfile = () => {
                     <div className="flex items-center gap-3">
                         {user.isGoldMember ? (
                             <div className="px-4 py-2 rounded-full bg-[#1a1a1a] border border-[#FFD700]/40 flex items-center gap-2 shadow-lg shadow-[#FFD700]/10 animate-pulse-slow">
-                                <span className="text-xl">👑</span>
+                                <Crown className="w-5 h-5 text-[#FFD700]" />
                                 <span className="text-xs font-bold text-[#FFD700] uppercase tracking-wider">Vindu Gold Member</span>
                             </div>
                         ) : (
                             <Link to="/user/gold" className="px-4 py-2 rounded-full bg-gradient-to-r from-[#FFD700] to-[#FDB931] text-black font-bold text-xs shadow-lg hover:shadow-[#FFD700]/40 transition-all flex items-center gap-2 transform hover:scale-105">
-                                <span>✨</span> Upgrade to Gold
+                                <Sparkles className="w-4 h-4" /> Upgrade to Gold
                             </Link>
                         )}
                     </div>
@@ -227,7 +243,7 @@ const UserProfile = () => {
                                     <div className="bg-[#111] p-6 rounded-[24px] border border-white/5 hover:border-[#FF5E00]/30 transition-all group relative overflow-hidden">
                                         <div className="flex justify-between items-start mb-1">
                                             <span className="text-3xl font-black text-white relative z-10">{user.vinduCoins || 0}</span>
-                                            <span className="text-xl">💰</span>
+                                            <Coins className="w-6 h-6 text-amber-500 fill-amber-500/20" />
                                         </div>
                                         <span className="text-xs uppercase font-bold text-gray-500 relative z-10">Vindu Coins</span>
                                         <p className="text-[10px] text-[var(--accent)] font-bold mt-1 uppercase tracking-tight">Vindu Wallet Active</p>
@@ -288,9 +304,9 @@ const UserProfile = () => {
                                                         {order.status !== 'Delivered' && order.status !== 'Cancelled' && (
                                                             <button
                                                                 onClick={() => navigate(`/order/tracking/${order._id}`)}
-                                                                className="ml-auto px-3 py-1 bg-[#FF5E00] text-white text-[10px] font-bold rounded-full hover:bg-orange-600 transition-colors animate-pulse"
+                                                                className="ml-auto px-4 py-1.5 bg-[#FF5E00] text-white text-[10px] font-bold rounded-full hover:bg-orange-600 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20 active:scale-95"
                                                             >
-                                                                Track Live 📍
+                                                                <MapPin className="w-3 h-3" /> Track Live
                                                             </button>
                                                         )}
                                                     </div>
@@ -323,7 +339,10 @@ const UserProfile = () => {
                                                     <div>
                                                         <p className="text-xs text-gray-500 font-bold uppercase mb-1">Delivery Partner</p>
                                                         <p className="text-white font-bold text-lg">{order.deliveryPartner.fullname}</p>
-                                                        <p className="text-green-500 text-xs font-bold">● {order.deliveryStatus || 'Assigned'}</p>
+                                                        <p className="text-green-500 text-xs font-bold flex items-center gap-1.5">
+                                                            <Circle className="w-2 h-2 fill-current" />
+                                                            {order.deliveryStatus || 'Assigned'}
+                                                        </p>
                                                     </div>
                                                     <button
                                                         onClick={() => setSelectedContact({
@@ -332,7 +351,7 @@ const UserProfile = () => {
                                                         })}
                                                         className="px-4 py-2 bg-white text-black text-sm font-bold rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
                                                     >
-                                                        <span>📞</span> Call
+                                                        <Phone className="w-4 h-4" /> Call Partner
                                                     </button>
                                                 </div>
                                             )}
@@ -432,10 +451,10 @@ const UserProfile = () => {
                                             {user.isGoldMember ? (
                                                 <>
                                                     <li className="flex items-center gap-3 text-sm text-gray-400">
-                                                        <span className="text-green-500">✓</span> Free Delivery on all orders
+                                                        <Check className="w-4 h-4 text-emerald-500" /> Free Delivery on all orders
                                                     </li>
                                                     <li className="flex items-center gap-3 text-sm text-gray-400">
-                                                        <span className="text-green-500">✓</span> Priority Support Access
+                                                        <Check className="w-4 h-4 text-emerald-500" /> Priority Support Access
                                                     </li>
                                                 </>
                                             ) : (
@@ -464,12 +483,12 @@ const UserProfile = () => {
                             onClick={() => setSelectedContact(null)}
                             className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition-all"
                         >
-                            ✕
+                            <X className="w-4 h-4" />
                         </button>
 
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-[#FF5E00]/10 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                                📞
+                            <div className="w-16 h-16 bg-[#FF5E00]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Phone className="w-8 h-8 text-[#FF5E00]" />
                             </div>
                             <h3 className="text-xl font-bold text-white mb-1">{selectedContact.name}</h3>
                             <p className="text-gray-500 text-sm mb-6">Contact Details</p>

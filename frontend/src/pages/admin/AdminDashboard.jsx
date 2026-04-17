@@ -3,6 +3,21 @@ import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../../api/client';
 import Skeleton from '../../components/Skeleton';
 import { useToast } from '../../context/ToastContext';
+import { 
+    BarChart3, 
+    Utensils, 
+    Bike, 
+    Users, 
+    ShoppingCart, 
+    Settings, 
+    LogOut, 
+    Flame,
+    Box,
+    LayoutDashboard,
+    ChevronRight,
+    Search,
+    Bell
+} from 'lucide-react';
 
 // Sub-components for Admin Dashboard
 
@@ -196,7 +211,7 @@ const UsersView = () => {
                             </td>
                             <td className="py-6 px-8">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-lg">🔥</span>
+                                    <Flame className="w-5 h-5 text-orange-500 fill-orange-500/20" />
                                     <span className="font-black text-white">{u.streakCount}</span>
                                 </div>
                             </td>
@@ -361,12 +376,12 @@ const AdminDashboard = () => {
 
                 <nav className="space-y-1">
                     {[
-                        { id: 'overview', name: 'Overview', icon: '📊' },
-                        { id: 'partners', name: 'Restaurants', icon: '🍽️', badge: stats?.pendingPartners },
-                        { id: 'delivery', name: 'Delivery Partners', icon: '🛵', badge: stats?.pendingRiders },
-                        { id: 'users', name: 'Customers', icon: '👥' },
-                        { id: 'orders', name: 'Global Orders', icon: '🛒' },
-                        { id: 'settings', name: 'Platform Settings', icon: '⚙️' }
+                        { id: 'overview', name: 'Overview', icon: BarChart3 },
+                        { id: 'partners', name: 'Restaurants', icon: Utensils, badge: stats?.pendingPartners },
+                        { id: 'delivery', name: 'Delivery Partners', icon: Bike, badge: stats?.pendingRiders },
+                        { id: 'users', name: 'Customers', icon: Users },
+                        { id: 'orders', name: 'Global Orders', icon: ShoppingCart },
+                        { id: 'settings', name: 'Platform Settings', icon: Settings }
                     ].map(item => (
                         <button
                             key={item.id}
@@ -374,7 +389,7 @@ const AdminDashboard = () => {
                             className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === item.id ? 'bg-[#FF5E00] text-white shadow-lg shadow-[#FF5E00]/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
                         >
                             <div className="flex items-center gap-4">
-                                <span>{item.icon}</span>
+                                <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-white' : 'text-gray-500 group-hover:text-white'}`} />
                                 {item.name}
                             </div>
                             {item.badge > 0 && (
@@ -388,7 +403,7 @@ const AdminDashboard = () => {
 
                 <div className="pt-20">
                     <button onClick={() => navigate('/home')} className="w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-sm text-gray-500 hover:text-red-500 transition-all border border-dashed border-white/10 hover:border-red-500/30">
-                        <span>👋</span> Exit Dashboard
+                        <LogOut className="w-4 h-4" /> Exit Dashboard
                     </button>
                 </div>
             </aside>

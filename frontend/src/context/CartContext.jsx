@@ -1,5 +1,10 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import toast from 'react-hot-toast';
+import { 
+    MapPin, 
+    Truck, 
+    Star 
+} from 'lucide-react';
 
 const CartContext = createContext();
 
@@ -60,9 +65,10 @@ export const CartProvider = ({ children }) => {
                     });
 
                     if (!isWithinRange) {
-                        toast.error(`${item.name} is too far! Items must be within 3km of each other for grouped delivery. 📍`, {
+                        toast.error(`${item.name} is too far! Items must be within 3km of each other for grouped delivery.`, {
                             duration: 4000,
-                            position: 'bottom-center'
+                            position: 'bottom-center',
+                            icon: <MapPin className="w-5 h-5 text-red-500" />
                         });
                         return prevCart; // Block adding
                     }
@@ -70,8 +76,8 @@ export const CartProvider = ({ children }) => {
                     // Success Feedback for cluster addition
                     const firstPartner = existingPartners[0];
                     if (newPartner._id !== firstPartner._id) {
-                         toast.success(`Cluster expanded! ${newPartner.name} added to your route. 🚗`, {
-                            icon: '🌟',
+                         toast.success(`Cluster expanded! ${newPartner.name} added to your route.`, {
+                            icon: <Star className="w-5 h-5 text-amber-500 fill-amber-500" />,
                             position: 'bottom-center'
                          });
                     }

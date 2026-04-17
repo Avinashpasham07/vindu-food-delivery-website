@@ -3,6 +3,19 @@ import { useCart } from '../../context/CartContext';
 import { useSquad } from '../../context/SquadContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts';
+import { 
+    ShoppingBag, 
+    ArrowLeft, 
+    X, 
+    Minus, 
+    Plus, 
+    BarChart3, 
+    ArrowRight, 
+    ReceiptText, 
+    Crown,
+    PlusCircle,
+    CreditCard
+} from 'lucide-react';
 
 const CartPage = () => {
     const { cart, addToCart, decrementItem, removeFromCart, cartTotal, cartCount } = useCart();
@@ -92,9 +105,7 @@ const CartPage = () => {
 
                 <div className="relative z-10 flex flex-col items-center">
                     <div className="w-32 h-32 bg-[#1a1a1a]/50 backdrop-blur-xl border border-white/5 rounded-full flex items-center justify-center mb-8 shadow-2xl animate-fade-in-up">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-12 h-12 text-[var(--accent)]/80">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                        </svg>
+                        <ShoppingBag className="w-12 h-12 text-[var(--accent)]/80" />
                     </div>
                     <h2 className="text-4xl font-black mb-4 tracking-tight animate-slide-up">Your cart is empty</h2>
                     <p className="text-gray-400 mb-10 max-w-md text-lg animate-slide-up animation-delay-100">Looks like you haven't added anything to your cart yet. Discover delicious meals near you.</p>
@@ -118,9 +129,7 @@ const CartPage = () => {
                 {/* Header */}
                 <div className="flex items-center gap-4 md:gap-6 mb-6 md:mb-12 animate-fade-in">
                     <button onClick={() => navigate(-1)} className="group p-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                        </svg>
+                        <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
                     </button>
                     <div>
                         <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-1">{roomId ? 'Squad Cart' : 'Your Cart'}</h1>
@@ -151,9 +160,7 @@ const CartPage = () => {
                                         <div className="flex justify-between items-start">
                                             <h3 className="font-bold text-white text-lg md:text-xl truncate pr-2 md:pr-4 group-hover:text-[#FF5E00] transition-colors">{item.name}</h3>
                                             <button onClick={() => roomId ? handleSquadUpdate(item, 0) : removeFromCart(item._id)} className="text-gray-600 hover:text-red-500 transition-colors p-2 -mr-2 -mt-2 rounded-full hover:bg-red-500/10">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
+                                                <X className="w-5 h-5" />
                                             </button>
                                         </div>
                                         <p className="text-[#FF5E00] font-bold text-base md:text-lg">₹{item.price}</p>
@@ -166,7 +173,7 @@ const CartPage = () => {
                                                 onClick={() => roomId ? handleSquadUpdate(item, -1) : decrementItem(item._id)}
                                                 className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors active:scale-90"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M18 12H6" /></svg>
+                                                <Minus className="w-3.5 h-3.5" />
                                             </button>
                                             <span className="w-8 text-center font-bold text-white text-sm">
                                                 {item.quantity}
@@ -175,7 +182,7 @@ const CartPage = () => {
                                                 onClick={() => roomId ? handleSquadUpdate(item, 1) : addToCart(item)}
                                                 className="w-8 h-8 flex items-center justify-center text-white bg-[var(--accent)] hover:bg-[var(--accent)]/80 rounded-full transition-all shadow-lg shadow-[var(--accent-glow)] active:scale-90"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                                <Plus className="w-3.5 h-3.5" />
                                             </button>
                                         </div>
                                         <div className="text-right flex-1">
@@ -192,9 +199,7 @@ const CartPage = () => {
                             onClick={() => navigate('/home')}
                             className="w-full py-4 rounded-3xl border-2 border-dashed border-white/10 text-gray-400 hover:text-white hover:border-[#FF5E00]/50 hover:bg-[#FF5E00]/5 transition-all flex items-center justify-center gap-2 group font-bold"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 group-hover:scale-110 transition-transform">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
+                            <PlusCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
                             Add More Items
                         </button>
                     </div>
@@ -206,7 +211,7 @@ const CartPage = () => {
                             <div className="bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[32px] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
                                 <div className="flex items-center justify-between mb-6">
                                     <h3 className="font-extrabold text-lg flex items-center gap-2">
-                                        <span className="text-xl">📊</span> Nutrition Center
+                                        <BarChart3 className="w-5 h-5 text-[#FF5E00]" /> Nutrition Center
                                     </h3>
                                     <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest bg-white/5 px-2 py-1 rounded-full">Fuel Analysis</span>
                                 </div>
@@ -305,16 +310,13 @@ const CartPage = () => {
                                     className="w-full mt-8 bg-white text-black hover:bg-[var(--accent)] hover:text-white py-5 rounded-2xl font-bold text-xl shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group"
                                 >
                                     {roomId ? 'Pay My Share' : 'Proceed to Checkout'}
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5 group-hover:translate-x-1 transition-transform">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                                    </svg>
+                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </button>
 
                                 <div className="mt-6 flex justify-center items-center gap-2 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-                                    <div className="flex -space-x-2">
-                                        <div className="w-8 h-5 bg-gray-600 rounded"></div>
-                                        <div className="w-8 h-5 bg-gray-500 rounded"></div>
-                                        <div className="w-8 h-5 bg-gray-400 rounded"></div>
+                                    <div className="flex items-center gap-1.5">
+                                        <CreditCard className="w-5 h-5 text-gray-400" />
+                                        <div className="w-8 h-1.5 bg-gray-600 rounded-full"></div>
                                     </div>
                                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest ml-2">Secure Payment</span>
                                 </div>
@@ -324,7 +326,7 @@ const CartPage = () => {
                             {roomId && (
                                 <div className="mt-6 bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-[32px] p-5 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.5)] relative overflow-hidden animate-fade-in-up animation-delay-200">
                                     <h3 className="font-extrabold text-xl mb-6 flex items-center gap-3 text-white">
-                                        <span className="text-2xl">🧾</span> Itemized Bill Split
+                                        <ReceiptText className="w-6 h-6 text-[#FF5E00]" /> Itemized Bill Split
                                     </h3>
 
                                     <div className="flex items-center justify-between mb-6 bg-white/5 p-4 rounded-xl border border-white/5">
@@ -347,8 +349,8 @@ const CartPage = () => {
                                                             {member.avatar ? <img src={member.avatar} className="w-full h-full rounded-full" /> : member.name[0]}
                                                         </div>
                                                         <div className="flex flex-col min-w-0">
-                                                            <span className={`${member.id === socket?.id ? "text-[#FF5E00] font-bold" : "text-gray-300"} text-sm truncate`}>
-                                                                {member.name} {member.isHost && '👑'}
+                                                            <span className={`${member.id === socket?.id ? "text-[#FF5E00] font-bold" : "text-gray-300"} text-sm truncate flex items-center gap-1.5`}>
+                                                                {member.name} {member.isHost && <Crown className="w-3 h-3 text-yellow-500" />}
                                                             </span>
                                                             {memberItems.length > 0 && (
                                                                 <span className="text-[11px] text-gray-500 truncate block">

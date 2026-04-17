@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { MapPin, Search, ChevronDown, Check, Flame } from 'lucide-react';
 import apiClient from '../api/client';
 
 const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocation }) => {
@@ -60,9 +61,7 @@ const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocati
                             onClick={() => setIsLocationOpen(!isLocationOpen)}
                         >
                             <div className="p-1 rounded-full bg-[#FF5E00]/10 group-hover:bg-[#FF5E00]/20 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-[#FF5E00]">
-                                    <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                                </svg>
+                                <MapPin className="w-5 h-5 text-[#FF5E00]" />
                             </div>
 
                             <div className="flex flex-col items-start overflow-hidden">
@@ -70,9 +69,7 @@ const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocati
                                 <span className="text-sm font-bold text-gray-200 truncate w-full group-hover:text-white transition-colors">{selectedLocation || 'Hyderabad'}</span>
                             </div>
 
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className={`w-3 h-3 text-gray-500 ml-auto transition-transform duration-300 ${isLocationOpen ? 'rotate-180 text-[#FF5E00]' : ''}`}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                            </svg>
+                            <ChevronDown className={`w-3 h-3 text-gray-500 ml-auto transition-transform duration-300 ${isLocationOpen ? 'rotate-180 text-[#FF5E00]' : ''}`} strokeWidth={2.5} />
 
                             {/* Dropdown Menu */}
                             {isLocationOpen && (
@@ -97,9 +94,7 @@ const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocati
                                                     </div>
 
                                                     {selectedLocation === loc && (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 text-[#FF5E00]">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                                        </svg>
+                                                        <Check className="w-4 h-4 text-[#FF5E00]" strokeWidth={2.5} />
                                                     )}
                                                 </div>
                                             ))}
@@ -112,9 +107,7 @@ const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocati
 
                         {/* Search Input */}
                         <div className="flex-1 flex items-center px-3 relative h-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 text-gray-500 mr-3">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                            </svg>
+                            <Search className="w-5 h-5 text-gray-500 mr-3" />
                             <div className="relative w-full h-full flex items-center overflow-hidden">
                                 {!searchTerm && (
                                     <div className="absolute inset-0 flex items-center pointer-events-none">
@@ -156,7 +149,7 @@ const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocati
                                     <span className="text-gray-200 font-bold hidden sm:block text-sm">{user.fullname}</span>
                                     {user.streakCount > 0 && (
                                         <span className="flex items-center gap-1 text-[10px] font-black text-[#FF5E00] uppercase tracking-tighter bg-[#FF5E00]/10 px-1.5 rounded-full border border-[#FF5E00]/20">
-                                            <span className="animate-pulse">🔥</span> {user.streakCount} Day Streak
+                                            <Flame className="w-3 h-3 animate-pulse" /> {user.streakCount} Day Streak
                                         </span>
                                     )}
                                 </div>
@@ -175,9 +168,7 @@ const Header = ({ searchTerm, setSearchTerm, selectedLocation, setSelectedLocati
             {isHome && (
                 <div className="md:hidden px-5 pb-4 bg-[#0d0d0d]">
                     <div className="flex items-center bg-[#1a1a1a] border border-white/10 rounded-xl px-3 h-12">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 text-[#FF5E00] mr-3">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                        </svg>
+                        <Search className="w-5 h-5 text-[#FF5E00] mr-3" />
                         <input
                             type="text"
                             placeholder="Search..."

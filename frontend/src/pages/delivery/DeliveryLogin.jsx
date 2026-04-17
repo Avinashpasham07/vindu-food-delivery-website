@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Bike } from 'lucide-react';
 import apiClient from '../../api/client';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -37,7 +38,7 @@ const DeliveryLogin = () => {
                 {/* Logo & Branding */}
                 <div className="text-center mb-12">
                     <div className="w-24 h-24 bg-white/5 rounded-[32px] flex items-center justify-center mx-auto mb-6 border border-white/10 shadow-2xl relative group hover:scale-110 transition-transform">
-                        <span className="text-5xl animate-bounce">🛵</span>
+                        <Bike className="w-16 h-16 text-[#FF5E00] animate-bounce" strokeWidth={1.5} />
                         <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#FF5E00] rounded-full animate-ping"></div>
                     </div>
                     <h1 className="text-6xl font-black tracking-tighter text-white mb-2 italic">

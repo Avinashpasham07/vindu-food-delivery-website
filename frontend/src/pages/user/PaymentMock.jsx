@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '../../context/ToastContext';
 import apiClient from '../../api/client';
+import { 
+    Lock, 
+    Crown, 
+    Check, 
+    CreditCard, 
+    Landmark,
+    ShieldCheck
+} from 'lucide-react';
 
 const PaymentMock = () => {
     const navigate = useNavigate();
@@ -38,7 +46,7 @@ const PaymentMock = () => {
 
                     // Auto redirect after success animation
                     setTimeout(() => {
-                        showToast("Upgrade Successful! Welcome to Gold. 👑", "success");
+                        showToast("Upgrade Successful! Welcome to Gold.", "success");
                         navigate('/user/profile');
                     }, 3000);
                 }
@@ -58,7 +66,10 @@ const PaymentMock = () => {
                 <p className="text-gray-500 mt-2">Please do not close this window.</p>
                 <div className="mt-8 flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg">
                     <span className="text-sm font-bold text-gray-600">Secure Gateway</span>
-                    <span className="text-green-500 text-xs">🔒 256-bit SSL</span>
+                    <div className="flex items-center gap-1.5 text-green-500 font-bold text-xs">
+                        <Lock className="w-3.5 h-3.5" />
+                        <span>256-bit SSL</span>
+                    </div>
                 </div>
             </div>
         );
@@ -68,7 +79,7 @@ const PaymentMock = () => {
         return (
             <div className="min-h-screen bg-green-50 flex flex-col items-center justify-center font-sans text-center px-6">
                 <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mb-8 shadow-lg animate-bounce">
-                    <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                    <Check className="w-12 h-12 text-white" strokeWidth={3} />
                 </div>
                 <h2 className="text-3xl font-black text-gray-900 mb-2">Payment Successful!</h2>
                 <p className="text-gray-600 text-lg mb-8">You are now a <span className="text-[#FFD700] font-black bg-black px-2 py-0.5 rounded">Vindu Gold</span> Member.</p>
@@ -95,7 +106,9 @@ const PaymentMock = () => {
 
                         <div className="flex justify-between items-center mb-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-[#FFD700]/10 rounded-lg flex items-center justify-center text-lg">👑</div>
+                                <div className="w-10 h-10 bg-[#FFD700]/10 rounded-lg flex items-center justify-center">
+                                    <Crown className="w-5 h-5 text-[#FFD700]" />
+                                </div>
                                 <div>
                                     <div className="font-bold text-sm">Vindu Gold</div>
                                     <div className="text-xs text-gray-400">Monthly Plan</div>
@@ -122,7 +135,8 @@ const PaymentMock = () => {
                     </div>
 
                     <div className="mt-6 flex items-center justify-center gap-2 text-gray-400 text-xs">
-                        <span>🔒 Secure Transaction</span>
+                        <ShieldCheck className="w-4 h-4 text-green-500" />
+                        <span>Secure Transaction</span>
                         <span>•</span>
                         <span>Powered by MockPay</span>
                     </div>
@@ -148,8 +162,8 @@ const PaymentMock = () => {
                         {/* Card */}
                         <label className={`flex items-center gap-4 p-6 rounded-2xl border-2 cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-[#FF5E00] bg-[#FF5E00]/5' : 'border-gray-200 hover:border-gray-300 bg-white'}`}>
                             <input type="radio" name="payment" value="card" onChange={(e) => setPaymentMethod(e.target.value)} className="w-5 h-5 text-[#FF5E00]" />
-                            <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-xl">
-                                💳
+                            <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-[#FF5E00]">
+                                <CreditCard className="w-6 h-6" />
                             </div>
                             <div className="flex-1">
                                 <div className="font-bold">Credit / Debit Card</div>
@@ -160,8 +174,8 @@ const PaymentMock = () => {
                         {/* Net Banking */}
                         <label className={`flex items-center gap-4 p-6 rounded-2xl border-2 cursor-pointer transition-all ${paymentMethod === 'netbanking' ? 'border-[#FF5E00] bg-[#FF5E00]/5' : 'border-gray-200 hover:border-gray-300 bg-white'}`}>
                             <input type="radio" name="payment" value="netbanking" onChange={(e) => setPaymentMethod(e.target.value)} className="w-5 h-5 text-[#FF5E00]" />
-                            <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-xl">
-                                🏦
+                            <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-[#FF5E00]">
+                                <Landmark className="w-6 h-6" />
                             </div>
                             <div className="flex-1">
                                 <div className="font-bold">Net Banking</div>

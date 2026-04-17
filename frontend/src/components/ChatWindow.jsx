@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import apiClient from '../api/client';
-import toast from 'react-hot-toast';
+import { 
+    MessageSquare, 
+    X, 
+    Send, 
+    MessageCircle,
+    SignalHigh 
+} from 'lucide-react';
 
 const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
 const socket = io(socketUrl);
@@ -72,11 +78,16 @@ const ChatWindow = ({ orderId, currentUser, senderModel }) => {
             {/* Chat Bubble */}
             <button
                 onClick={toggleChat}
-                className="w-16 h-16 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-2xl shadow-2xl hover:scale-110 active:scale-95 transition-all relative group"
+                className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all relative group border ${
+                    isOpen ? 'bg-[#FF5E00] border-[#FF5E00] text-white' : 'bg-[#111] border-white/10 text-[#FF5E00]'
+                } hover:scale-110 active:scale-95`}
             >
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#FF5E00] to-orange-400 opacity-0 group-hover:opacity-20 rounded-full transition-opacity"></div>
-                💬
-                {unreadCount > 0 && (
+                {!isOpen && (
+                    <div className="absolute inset-0 bg-[#FF5E00] opacity-0 group-hover:opacity-10 rounded-full transition-opacity"></div>
+                )}
+                {isOpen ? <X className="w-8 h-8" /> : <MessageSquare className="w-8 h-8" />}
+                
+                {unreadCount > 0 && !isOpen && (
                     <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-[10px] font-black flex items-center justify-center rounded-full border-2 border-[#050505] animate-bounce">
                         {unreadCount}
                     </span>
@@ -92,22 +103,20 @@ const ChatWindow = ({ orderId, currentUser, senderModel }) => {
                             <p className="text-[#FF5E00] text-[10px] font-black uppercase tracking-widest leading-none mb-1">Live Chat</p>
                             <h3 className="text-white font-bold">Mission Comms</h3>
                         </div>
-                        <button onClick={toggleChat} className="text-gray-500 hover:text-white transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                        <button onClick={toggleChat} className="p-2 text-gray-500 hover:text-white hover:bg-white/5 rounded-full transition-all">
+                            <X className="w-5 h-5" />
                         </button>
                     </div>
 
                     {/* Messages Area */}
                     <div
                         ref={scrollRef}
-                        className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth"
+                        className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth no-scrollbar"
                     >
                         {messages.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center opacity-20 grayscale scale-90">
-                                <span className="text-4xl mb-2">💬</span>
-                                <p className="text-[10px] font-black uppercase tracking-widest">No signals received yet...</p>
+                            <div className="h-full flex flex-col items-center justify-center opacity-10 scale-90">
+                                <MessageCircle className="w-16 h-16 mb-4" />
+                                <p className="text-[10px] font-black uppercase tracking-widest">No signals received yet</p>
                             </div>
                         ) : (
                             messages.map((msg, i) => {
@@ -146,9 +155,7 @@ const ChatWindow = ({ orderId, currentUser, senderModel }) => {
                                 type="submit"
                                 className="w-10 h-10 bg-[#FF5E00] text-black rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                                </svg>
+                                <Send className="w-4 h-4" />
                             </button>
                         </div>
                     </form>

@@ -4,6 +4,18 @@ import apiClient from '../../api/client';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
 import Skeleton from '../../components/Skeleton';
+import { 
+    ChevronLeft, 
+    Heart, 
+    Star, 
+    ShoppingBag, 
+    Minus, 
+    Plus, 
+    ArrowRight,
+    MessageCircle,
+    Info,
+    CheckCircle2
+} from 'lucide-react';
 
 const FoodDetails = () => {
     const { id } = useParams();
@@ -69,7 +81,7 @@ const FoodDetails = () => {
     const handleAddToCart = () => {
         const user = localStorage.getItem('user');
         if (!user) {
-            showToast("Please login to order 🍔", 'error');
+            showToast("Please login to order", 'error');
             navigate('/user/login');
             return;
         }
@@ -234,17 +246,13 @@ const FoodDetails = () => {
                     onClick={() => navigate(-1)}
                     className="pointer-events-auto w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/10 active:scale-95 transition-all hover:bg-black/60"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6 text-white">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                    </svg>
+                    <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-white" />
                 </button>
                 <button
                     onClick={handleToggleLike}
                     className="pointer-events-auto w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/10 active:scale-95 transition-all hover:bg-black/60"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill={isLiked ? "#EF4444" : "none"} viewBox="0 0 24 24" strokeWidth={2.5} stroke={isLiked ? "none" : "currentColor"} className={`w-5 h-5 md:w-6 md:h-6 ${isLiked ? 'text-red-500' : 'text-white'}`}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                    </svg>
+                    <Heart className={`w-5 h-5 md:w-6 md:h-6 ${isLiked ? 'text-red-500 fill-red-500' : 'text-white'}`} />
                 </button>
             </div>
 
@@ -275,9 +283,7 @@ const FoodDetails = () => {
                     <div className="flex flex-col items-end gap-1.5 pt-1">
                         <div className="bg-white/10 backdrop-blur-xl px-3 py-1.5 rounded-2xl border border-white/20 flex items-center gap-1.5 shadow-lg">
                             <span className="text-sm md:text-base font-black">{food.averageRating || 0}</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-yellow-500">
-                                <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                            </svg>
+                            <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
                         </div>
                         <span className="text-[10px] md:text-xs font-medium text-gray-400 uppercase tracking-widest">{food.totalReviews || 0} Reviews</span>
                     </div>
@@ -365,9 +371,7 @@ const FoodDetails = () => {
                                         onClick={() => setReviewForm({ ...reviewForm, rating: star })}
                                         className="focus:outline-none transition-transform hover:scale-110"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`w-6 h-6 ${star <= reviewForm.rating ? 'text-yellow-500' : 'text-gray-600'}`}>
-                                            <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                                        </svg>
+                                        <Star className={`w-6 h-6 ${star <= reviewForm.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-600'}`} />
                                     </button>
                                 ))}
                             </div>
@@ -408,9 +412,7 @@ const FoodDetails = () => {
                                     <p className="text-gray-400 text-xs leading-relaxed mb-3">"{review.comment}"</p>
                                     <div className="flex gap-0.5">
                                         {[...Array(5)].map((_, i) => (
-                                            <svg key={i} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`w-3 h-3 ${i < review.rating ? 'text-yellow-500' : 'text-gray-700'}`}>
-                                                <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                                            </svg>
+                                            <Star key={i} className={`w-3 h-3 ${i < review.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-700'}`} />
                                         ))}
                                     </div>
                                 </div>
@@ -455,16 +457,14 @@ const FoodDetails = () => {
                                     onClick={() => decrementItem(food._id)}
                                     className="w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/5 hover:bg-white/10 transition-all active:scale-95"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
-                                    </svg>
+                                    <Minus className="w-5 h-5" />
                                 </button>
                                 <span className="text-white font-bold text-xl w-8 text-center tabular-nums">{getItemQuantity(food._id)}</span>
                                 <button
                                     onClick={() => {
                                         const user = localStorage.getItem('user');
                                         if (!user) {
-                                            showToast("Please login to order 🍔", 'error');
+                                            showToast("Please login to order", 'error');
                                             navigate('/user/login');
                                             return;
                                         }
@@ -480,9 +480,7 @@ const FoodDetails = () => {
                                     }}
                                     className="w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/5 hover:bg-white/10 transition-all active:scale-95"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                    </svg>
+                                    <Plus className="w-5 h-5" />
                                 </button>
                             </div>
 
@@ -496,9 +494,7 @@ const FoodDetails = () => {
                                     <span className="text-xl font-black">₹{(food.price || 0) * getItemQuantity(food._id)}</span>
                                 </div>
                                 <div className="bg-white/20 p-2 rounded-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                                    </svg>
+                                    <ArrowRight className="w-5 h-5" />
                                 </div>
                             </button>
                         </div>

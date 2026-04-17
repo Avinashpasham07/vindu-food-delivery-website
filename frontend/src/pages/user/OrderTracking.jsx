@@ -6,6 +6,21 @@ import { useTranslation } from 'react-i18next';
 import OrderMap from '../../components/OrderMap';
 import toast from 'react-hot-toast';
 import ChatWindow from '../../components/ChatWindow';
+import { 
+    ArrowLeft, 
+    Sparkles, 
+    MapPin, 
+    AlertTriangle, 
+    Satellite, 
+    ShieldCheck, 
+    ChefHat, 
+    Building2, 
+    Star, 
+    Phone,
+    Clock,
+    CheckCircle2,
+    Truck
+} from 'lucide-react';
 
 const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
 const socket = io(socketUrl);
@@ -248,16 +263,14 @@ const OrderTracking = () => {
             {/* Header Actions */}
             <div className="p-4 flex justify-between items-center absolute top-0 left-0 right-0 z-[1000] pointer-events-none">
                 <button onClick={() => navigate('/home')} className="w-10 h-10 pointer-events-auto bg-[#111]/80 backdrop-blur rounded-full flex items-center justify-center border border-white/10 shadow-lg active:scale-95 transition-transform">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-gray-200">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                    </svg>
+                    <ArrowLeft className="w-5 h-5 text-gray-200" />
                 </button>
                 <div className="flex items-center gap-2">
                     {/* Gold Priority Badge */}
                     {JSON.parse(localStorage.getItem('user') || '{}').isGoldMember && (
                         <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gold-gradient rounded-full shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-white/20 animate-pulse">
                             <span className="text-black text-[9px] font-black uppercase tracking-tighter">Priority Dispatch</span>
-                            <span className="text-black text-[10px]">✨</span>
+                            <Sparkles className="w-3 h-3 text-black" />
                         </div>
                     )}
                     <div className="px-4 py-1.5 bg-[var(--accent)] rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-[var(--accent-glow)]">
@@ -271,7 +284,7 @@ const OrderTracking = () => {
                 {(!order.restaurantStops?.length && !order?.customerLocation?.lat) && (
                     <div className="absolute inset-0 z-[2000] bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center">
                         <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10">
-                            <span className="text-3xl">📍</span>
+                            <MapPin className="w-8 h-8 text-gray-400" />
                         </div>
                         <h3 className="text-xl font-bold text-white mb-2">Tracking Unavailable</h3>
                         <p className="text-gray-400 text-sm max-w-xs">
@@ -283,7 +296,8 @@ const OrderTracking = () => {
                 {/* Warning for partial data */}
                 {((!order.restaurantStops?.length && order?.customerLocation?.lat) || (order.restaurantStops?.length && !order?.customerLocation?.lat)) && (
                     <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[2000] bg-yellow-500/20 backdrop-blur border border-yellow-500/30 px-4 py-2 rounded-full flex items-center gap-2">
-                        <span className="text-sm text-yellow-500 font-bold">⚠️ Partial Tracking Data</span>
+                        <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                        <span className="text-sm text-yellow-500 font-bold">Partial Tracking Data</span>
                     </div>
                 )}
 
@@ -299,9 +313,13 @@ const OrderTracking = () => {
                         <button 
                             onClick={startSimulation}
                             disabled={isSimulating}
-                            className={`px-4 py-2 rounded-xl border border-white/10 font-bold text-xs shadow-2xl backdrop-blur-md transition-all active:scale-95 ${isSimulating ? 'bg-orange-500/20 text-orange-400' : 'bg-[#111]/80 text-white hover:bg-[#FF5E00]'}`}
+                            className={`px-4 py-2 rounded-xl border border-white/10 font-bold text-xs shadow-2xl backdrop-blur-md transition-all active:scale-95 flex items-center gap-2 ${isSimulating ? 'bg-orange-500/20 text-orange-400' : 'bg-[#111]/80 text-white hover:bg-[#FF5E00]'}`}
                         >
-                            {isSimulating ? '🛰️ Tracking Active...' : '📍 Simulate Rider'}
+                            {isSimulating ? (
+                                <><Satellite className="w-4 h-4 animate-pulse" /> Tracking Active...</>
+                            ) : (
+                                <><MapPin className="w-4 h-4" /> Simulate Rider</>
+                            )}
                         </button>
                     </div>
                 )}
@@ -336,8 +354,8 @@ const OrderTracking = () => {
 
                     {/* AI Predict+ Guarantee Badge */}
                     <div className="mt-3 flex items-center justify-between px-4 py-3 bg-[#FF5E00]/10 border border-[#FF5E00]/20 rounded-xl">
-                        <div className="flex items-center gap-2">
-                            <span className="text-lg">🛡️</span>
+                        <div className="flex items-center gap-3">
+                            <ShieldCheck className="w-5 h-5 text-[#FF5E00]" />
                             <div>
                                 <p className="text-white text-[11px] font-bold leading-tight">OnTime Guarantee AI</p>
                                 <p className="text-[#FF5E00] text-[9px] font-medium opacity-80">On time, or 50 Coins back</p>
@@ -395,8 +413,8 @@ const OrderTracking = () => {
                         order.restaurantStops.map((stop, idx) => (
                             <div key={idx} className="p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-[#FF5E00]/30 transition-all">
                                 <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-xl flex-shrink-0">
-                                        {idx === 0 ? '🍳' : '🏢'}
+                                    <div className="w-10 h-10 rounded-full bg-[#111] border border-white/10 flex items-center justify-center flex-shrink-0">
+                                        {idx === 0 ? <ChefHat className="w-5 h-5 text-[#FF5E00]" /> : <Building2 className="w-5 h-5 text-gray-400" />}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-[#FF5E00] text-[10px] font-black uppercase tracking-[0.2em] mb-1">
@@ -420,8 +438,8 @@ const OrderTracking = () => {
                     ) : (
                         <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
                             <div className="flex items-start gap-4">
-                                <div className="w-10 h-10 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-xl flex-shrink-0">
-                                    🍳
+                                <div className="w-10 h-10 rounded-full bg-[#111] border border-white/10 flex items-center justify-center flex-shrink-0">
+                                    <ChefHat className="w-5 h-5 text-[#FF5E00]" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-[#FF5E00] text-[10px] font-black uppercase tracking-[0.2em] mb-1">Coming From</p>
@@ -446,13 +464,14 @@ const OrderTracking = () => {
                                 <p className="text-white font-bold">{DeliveryPartner.fullname}</p>
                                 <p className="text-xs text-gray-500 font-bold uppercase">Delivery Partner</p>
                                 <div className="flex items-center gap-1 mt-1">
-                                    <span className="text-yellow-500 text-xs">★ 4.8</span>
+                                    <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                                    <span className="text-yellow-500 text-xs font-bold">4.8</span>
                                     <span className="text-gray-600 text-[10px]">• 500+ Trips</span>
                                 </div>
                             </div>
                         </div>
                         <a href={`tel:${DeliveryPartner.phone}`} className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-black hover:bg-gray-200 transition-colors shadow-lg">
-                            📞
+                            <Phone className="w-5 h-5" />
                         </a>
                     </div>
                 ) : (

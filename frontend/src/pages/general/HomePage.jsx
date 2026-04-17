@@ -12,6 +12,19 @@ import SkeletonCard from '../../components/SkeletonCard';
 import MoodSelector from '../../components/MoodSelector';
 import AiAssistant from '../../components/AiAssistant';
 import { useTranslation } from 'react-i18next';
+import { 
+    MapPin, 
+    ChevronDown, 
+    Search, 
+    X, 
+    Mic, 
+    Users, 
+    Flame, 
+    Check, 
+    RefreshCw, 
+    LayoutGrid,
+    Languages
+} from 'lucide-react';
 
 
 const HomePage = () => {
@@ -218,13 +231,9 @@ const HomePage = () => {
                                 className="flex items-center gap-1.5 px-2.5 py-1 bg-[#1a1a1a] rounded-full border border-white/5 active:bg-[#222] transition-colors"
                                 onClick={() => setIsLocationOpen(!isLocationOpen)}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-[#FF5E00]">
-                                    <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                                </svg>
+                                <MapPin className="w-3.5 h-3.5 text-[#FF5E00]" />
                                 <span className="text-[10px] font-black text-gray-200 truncate max-w-[60px]">{selectedLocation}</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className={`w-2.5 h-2.5 text-gray-500 transition-transform duration-300 ${isLocationOpen ? 'rotate-180 text-[#FF5E00]' : ''}`}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                </svg>
+                                <ChevronDown className={`w-2.5 h-2.5 text-gray-500 transition-transform duration-300 ${isLocationOpen ? 'rotate-180 text-[#FF5E00]' : ''}`} />
                             </div>
                         </div>
 
@@ -248,9 +257,7 @@ const HomePage = () => {
                                     onClick={() => setIsLocationOpen(!isLocationOpen)}
                                 >
                                     <div className="p-1 rounded-full bg-[#FF5E00]/10 group-hover:bg-[#FF5E00]/20 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-[#FF5E00]">
-                                            <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                                        </svg>
+                                        <MapPin className="w-5 h-5 text-[#FF5E00]" />
                                     </div>
 
                                     <div className="flex flex-col items-start overflow-hidden">
@@ -258,16 +265,12 @@ const HomePage = () => {
                                         <span className="text-sm font-bold text-gray-200 truncate w-full group-hover:text-white transition-colors">{selectedLocation}</span>
                                     </div>
 
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className={`w-3 h-3 text-gray-500 ml-auto transition-transform duration-300 ${isLocationOpen ? 'rotate-180 text-[#FF5E00]' : ''}`}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                    </svg>
+                                    <ChevronDown className={`w-3 h-3 text-gray-500 ml-auto transition-transform duration-300 ${isLocationOpen ? 'rotate-180 text-[#FF5E00]' : ''}`} />
                                 </div>
 
                                 {/* Search Input */}
                                 <div className="flex-1 flex items-center px-3 relative h-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 text-gray-500 mr-3">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                                    </svg>
+                                    <Search className="w-5 h-5 text-gray-500 mr-3" />
                                     <div className="relative w-full h-full flex items-center overflow-hidden">
                                         {!searchTerm && (
                                             <div className="absolute inset-0 flex items-center pointer-events-none">
@@ -294,9 +297,7 @@ const HomePage = () => {
                                         />
                                         {searchTerm && (
                                             <button onClick={() => setSearchTerm('')} className="absolute right-10 z-20 p-1 text-gray-500 hover:text-white">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                                                    <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                                                </svg>
+                                                <X className="w-4 h-4" />
                                             </button>
                                         )}
                                         <button
@@ -304,10 +305,7 @@ const HomePage = () => {
                                             className={`absolute right-2 z-20 p-2 rounded-full transition-all ${isListening ? 'bg-red-500/20 text-red-500 animate-pulse' : 'hover:bg-white/10 text-gray-400 hover:text-white'}`}
                                             title={t('voice_search')}
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                                                <path d="M8.25 4.5a3.75 3.75 0 117.5 0v8.25a3.75 3.75 0 11-7.5 0V4.5z" />
-                                                <path d="M6 10.5a.75.75 0 01.75.75v1.5a5.25 5.25 0 1010.5 0v-1.5a.75.75 0 011.5 0v1.5a6.751 6.751 0 01-6 6.709v2.291h3a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5h3v-2.291a6.751 6.751 0 01-6-6.709v-1.5A.75.75 0 016 10.5z" />
-                                            </svg>
+                                            <Mic className="w-5 h-5" />
                                         </button>
                                     </div>
                                 </div>
@@ -335,9 +333,7 @@ const HomePage = () => {
                                         onClick={() => setShowJoinModal(true)}
                                         className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm md:text-base font-bold text-white bg-[#FF5E00] px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-full cursor-pointer hover:bg-orange-600 transition-all active:scale-95 shadow-md shadow-orange-900/20"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5">
-                                            <path d="M4.5 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM14.25 8.625a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0zM1.5 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM17.25 19.128l-.001.144a2.25 2.25 0 01-.233.96 10.088 10.088 0 005.06-4.42 6.753 6.753 0 01-1.454-3.321 .75.75 0 00-.539-.641 9.776 9.776 0 00-2.833-.422z" />
-                                        </svg>
+                                        <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                                         <span className="hidden min-[380px]:inline whitespace-nowrap">{t('squad_mode')}</span>
                                     </button>
                                 )}
@@ -353,7 +349,7 @@ const HomePage = () => {
                                             <span className="text-gray-300 font-bold hidden sm:block text-sm">{user.fullname}</span>
                                             {user.streakCount > 0 && (
                                                 <span className="flex items-center gap-1 text-[10px] font-black text-[var(--accent)] uppercase tracking-tighter bg-[var(--accent)]/10 px-1.5 rounded-full border border-[var(--accent)]/20">
-                                                    <span className="animate-pulse">🔥</span> {user.streakCount} Day Streak
+                                                    <Flame className="w-2.5 h-2.5 animate-pulse" /> {user.streakCount} Day Streak
                                                 </span>
                                             )}
                                         </div>
@@ -372,9 +368,7 @@ const HomePage = () => {
                     <div className="md:hidden px-5 pb-4">
                         {/* Same as before... */}
                         <div className="flex items-center bg-[#1a1a1a] border border-white/10 rounded-xl px-3 h-12">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 text-[#FF5E00] mr-3">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                            </svg>
+                            <Search className="w-5 h-5 text-[#FF5E00] mr-3" />
                             <input
                                 type="text"
                                 placeholder={t('search_placeholder')}
@@ -384,19 +378,14 @@ const HomePage = () => {
                             />
                             {searchTerm && (
                                 <button onClick={() => setSearchTerm('')} className="p-1 text-gray-500 hover:text-white">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                                        <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                                    </svg>
+                                    <X className="w-4 h-4" />
                                 </button>
                             )}
                             <button
                                 onClick={startListening}
                                 className={`p-2 rounded-full transition-all ml-1 ${isListening ? 'bg-red-500/20 text-red-500 animate-pulse' : 'hover:bg-white/10 text-gray-400 hover:text-white'}`}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                                    <path d="M8.25 4.5a3.75 3.75 0 117.5 0v8.25a3.75 3.75 0 11-7.5 0V4.5z" />
-                                    <path d="M6 10.5a.75.75 0 01.75.75v1.5a5.25 5.25 0 1010.5 0v-1.5a.75.75 0 011.5 0v1.5a6.751 6.751 0 01-6 6.709v2.291h3a.75.75 0 010 1.5h-7.5a.75.75 0 010-1.5h3v-2.291a6.751 6.751 0 01-6-6.709v-1.5A.75.75 0 016 10.5z" />
-                                </svg>
+                                <Mic className="w-5 h-5" />
                             </button>
                         </div>
                     </div>
@@ -424,9 +413,7 @@ const HomePage = () => {
                                             </div>
 
                                             {selectedLocation === loc && (
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 text-[#FF5E00]">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                                </svg>
+                                                <Check className="w-4 h-4 text-[#FF5E00]" />
                                             )}
                                         </div>
                                     ))}
@@ -522,7 +509,7 @@ const HomePage = () => {
                                         
                                         // Visual Feedback
                                         toast.success(`Reordering items from your ${new Date(order.createdAt).toLocaleDateString()} order!`, {
-                                            icon: '🔄',
+                                            icon: <RefreshCw className="w-5 h-5 text-[#FF5E00] animate-spin" />,
                                             style: {
                                                 borderRadius: '16px',
                                                 background: '#1a1a1a',
@@ -555,9 +542,7 @@ const HomePage = () => {
                         className="snap-start flex flex-col items-center gap-3 min-w-[76px] ml-2 px-2 py-3 cursor-pointer group"
                     >
                         <div className={`w-[76px] h-[76px] rounded-full flex items-center justify-center py-3 transition-all duration-300 ${selectedCategory === null ? 'bg-[#1a1a1a] text-[#FF5E00] ring-2 ring-[#FF5E00] ring-offset-2 ring-offset-[#0d0d0d] shadow-[0_10px_20px_rgba(255,94,0,0.2)]' : 'bg-[#1a1a1a] text-white border border-white/5 hover:border-[#FF5E00] hover:border-2 hover:text-white'}`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-                            </svg>
+                            <LayoutGrid className="w-6 h-6" />
                         </div>
                         <span className={`text-xs font-semibold tracking-wide ${selectedCategory === null ? 'text-[#FF5E00]' : 'text-white group-hover:text-white'}`}>{t('all')}</span>
                     </div>

@@ -2,28 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../../components/Footer';
 import FoodCursor from '../../components/FoodCursor';
+import { 
+    MapPin, 
+    Search, 
+    ArrowRight, 
+    Users, 
+    ShoppingBag, 
+    Star, 
+    TrendingUp,
+    Flame,
+    Pizza,
+    Utensils,
+    Clock,
+    Check
+} from 'lucide-react';
 
-// --- Icons (Inline SVGs to prevent version errors) ---
-const MapPin = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
-);
-const Search = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-);
-const ArrowRight = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
-);
-const Users = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
-);
-const ShoppingBag = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
-);
-const Star = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
-);
-const TrendingUp = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>
+const BurgerIcon = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M11 17a1 1 0 0 1 2 0c0 .5-.2 1-.5 1.5l-.5.5c-.3 0-.5-.2-.5-.5a1 1 0 1 0-2 0c0 .5.2 1 .5 1.5l.5.5c.3 0 .5-.2.5-.5Z"/><path d="M18 12c.6 0 1.2.1 1.7.3L21 13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2l1.3-.7c.5-.2 1.1-.3 1.7-.3h12Z"/><path d="M7 12V9a5 5 0 0 1 10 0v3"/></svg>
 );
 
 const Accordion = ({ items }) => {
@@ -156,7 +151,9 @@ const LandingPage = () => {
                                         <div className="w-8 h-8 rounded-full bg-white"></div>
                                         <span className="font-bold text-sm">Bella Italia</span>
                                     </div>
-                                    <p className="text-white font-black text-xl leading-tight mb-4">Cheesy Pepperoni Explosion 🍕</p>
+                                    <p className="text-white font-black text-xl leading-tight mb-4 flex items-center gap-2">
+                                        Cheesy Pepperoni Explosion <Pizza className="w-5 h-5 text-[#FF5E00]" />
+                                    </p>
                                     <button className="w-full py-3 bg-[#FF5E00] text-white rounded-xl font-bold text-sm">Order Now • ₹450</button>
                                 </div>
                             </div>
@@ -176,16 +173,16 @@ const LandingPage = () => {
                 </div>
             </header>
 
-            {/* --- Live Ticker (NEW) --- */}
+            {/* --- Live Ticker --- */}
             <div className="bg-[#FF5E00] py-3 overflow-hidden">
                 <div className="flex whitespace-nowrap animate-marquee">
                     {[...Array(5)].map((_, i) => (
                         <div key={i} className="flex items-center gap-8 mx-4 text-black font-bold text-sm uppercase tracking-wider">
-                            <span>🔥 Arjun just ordered Chicken 65</span>
+                            <span className="flex items-center gap-2"><Flame className="w-4 h-4" /> Arjun just ordered Chicken 65</span>
                             <span>•</span>
-                            <span>🍔 Sarah just joined Squad "Office Lunch"</span>
+                            <span className="flex items-center gap-2"><ShoppingBag className="w-4 h-4" /> Sarah just joined Squad "Office Lunch"</span>
                             <span>•</span>
-                            <span>🍕 50% OFF on Pizza Hut</span>
+                            <span className="flex items-center gap-2"><Pizza className="w-4 h-4" /> 50% OFF on Pizza Hut</span>
                             <span>•</span>
                         </div>
                     ))}
@@ -209,7 +206,7 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* --- Collections (NEW SECTION) --- */}
+            {/* --- Collections --- */}
             <section className="py-20 relative">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="flex justify-between items-end mb-10">
@@ -264,7 +261,7 @@ const LandingPage = () => {
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex justify-between">
-                                            <span className="font-bold">Team Lunch 🍔</span>
+                                            <span className="font-bold flex items-center gap-2">Team Lunch <ShoppingBag className="w-4 h-4 text-[#FF5E00]" /></span>
                                             <span className="text-[#FF5E00] text-xs font-bold px-2 py-1 bg-[#FF5E00]/10 rounded">LIVE</span>
                                         </div>
                                         <div className="text-xs text-gray-400">Created by You</div>
@@ -292,7 +289,7 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* --- Top Brands (NEW SECTION) --- */}
+            {/* --- Top Brands --- */}
             <section className="py-20">
                 <div className="max-w-7xl mx-auto px-6">
                     <h2 className="text-2xl font-bold mb-8 text-gray-200">Top Brands in Your Area</h2>
@@ -303,14 +300,14 @@ const LandingPage = () => {
                                     {brand[0]}
                                 </div>
                                 <span className="font-bold text-sm">{brand}</span>
-                                <div className="text-xs text-gray-400 flex items-center gap-1"><span className="w-4 h-4 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center text-[10px]">⏱</span> 25 min</div>
+                                <div className="text-xs text-gray-400 flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-[#FF5E00]" /> 25 min</div>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* --- Vindu Gold (NEW USER SECTION) --- */}
+            {/* --- Vindu Gold --- */}
             <section className="py-20 bg-gradient-to-r from-yellow-900/20 to-black border-y border-white/5 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-yellow-600/10 rounded-full blur-[120px] -z-10"></div>
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -323,7 +320,7 @@ const LandingPage = () => {
                         <ul className="space-y-4 mb-8">
                             {['0 Delivery Fee on all orders', 'Extra 30% OFF on dining out', 'Priority delivery during rush hours'].map((item, i) => (
                                 <li key={i} className="flex items-center gap-3 text-gray-300">
-                                    <div className="w-5 h-5 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-500 text-xs">✓</div>
+                                    <div className="w-5 h-5 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-500 text-xs"><Check className="w-3 h-3" /></div>
                                     {item}
                                 </li>
                             ))}
@@ -353,9 +350,7 @@ const LandingPage = () => {
                 </div>
             </section>
 
-
-
-            {/* --- FAQ Section (NEW) --- */}
+            {/* --- FAQ Section --- */}
             <section className="py-20 border-t border-white/5">
                 <div className="max-w-3xl mx-auto px-6">
                     <h2 className="text-3xl font-black mb-12 text-center">Frequently Asked Questions</h2>
@@ -368,7 +363,7 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* --- Customer Love (Testimonials) --- */}
+            {/* --- Customer Love --- */}
             <section className="py-24">
                 <div className="max-w-7xl mx-auto px-6">
                     <h2 className="text-3xl font-black mb-12 text-center">Loved by Foodies in Hyderabad</h2>
@@ -396,13 +391,14 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* --- CTA Footer (Web First) --- */}
+            {/* --- CTA Footer --- */}
             <section className="py-24 text-center">
                 <h2 className="text-5xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-600 mb-8">
                     HUNGRY? Order Now..
                 </h2>
-                <Link to="/user/register" className="inline-flex items-center gap-3 px-12 py-5 bg-[#FF5E00] text-white text-xl font-extrabold rounded-full ">
-                    Start Ordering Now <ArrowRight />
+                <Link to="/user/register" className="inline-flex items-center gap-3 px-12 py-5 bg-[#FF5E00] text-white text-xl font-extrabold rounded-full transition-transform hover:scale-105 active:scale-95 shadow-xl shadow-orange-500/20">
+                    <span>Start Ordering Now</span>
+                    <ArrowRight className="w-6 h-6" />
                 </Link>
             </section>
 

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { Sparkles, Coffee, PartyPopper, Zap, Heart, Pizza, X } from 'lucide-react';
 
 const MOODS = [
-    { label: 'Happy', image: 'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?q=80&w=600&auto=format&fit=crop', color: 'from-orange-400 to-yellow-500', tags: ['Comfort Food', 'Desserts', 'Burger'], icon: '✨' },
-    { label: 'Relaxed', image: 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=600&auto=format&fit=crop', color: 'from-indigo-400 to-blue-500', tags: ['Soup', 'Tea', 'Snacks'], icon: '🍵' },
-    { label: 'Party', image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=600&auto=format&fit=crop', color: 'from-purple-500 to-pink-600', tags: ['Non-Veg', 'Biryani', 'Starters'], icon: '🎉' },
-    { label: 'Energetic', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=600&auto=format&fit=crop', color: 'from-red-500 to-orange-600', tags: ['Protein', 'Healthy', 'Coffee'], icon: '⚡' },
-    { label: 'Romantic', image: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=600&auto=format&fit=crop', color: 'from-rose-500 to-pink-600', tags: ['Pizza', 'Desserts', 'Beverages'], icon: '🌹' },
-    { label: 'Lazy', image: 'https://images.unsplash.com/photo-1517093602195-b40af9688b46?q=80&w=600&auto=format&fit=crop', color: 'from-gray-500 to-slate-600', tags: ['Snacks', 'Burger', 'Fast Food'], icon: '🍕' },
+    { label: 'Happy', image: 'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?q=80&w=600&auto=format&fit=crop', color: 'from-orange-400 to-yellow-500', tags: ['Comfort Food', 'Desserts', 'Burger'], icon: Sparkles },
+    { label: 'Relaxed', image: 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=600&auto=format&fit=crop', color: 'from-indigo-400 to-blue-500', tags: ['Soup', 'Tea', 'Snacks'], icon: Coffee },
+    { label: 'Party', image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=600&auto=format&fit=crop', color: 'from-purple-500 to-pink-600', tags: ['Non-Veg', 'Biryani', 'Starters'], icon: PartyPopper },
+    { label: 'Energetic', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=600&auto=format&fit=crop', color: 'from-red-500 to-orange-600', tags: ['Protein', 'Healthy', 'Coffee'], icon: Zap },
+    { label: 'Romantic', image: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=600&auto=format&fit=crop', color: 'from-rose-500 to-pink-600', tags: ['Pizza', 'Desserts', 'Beverages'], icon: Heart },
+    { label: 'Lazy', image: 'https://images.unsplash.com/photo-1517093602195-b40af9688b46?q=80&w=600&auto=format&fit=crop', color: 'from-gray-500 to-slate-600', tags: ['Snacks', 'Burger', 'Fast Food'], icon: Pizza },
 ];
 
 const MoodSelector = ({ onMoodSelect }) => {
@@ -34,9 +35,7 @@ const MoodSelector = ({ onMoodSelect }) => {
                         className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-black text-orange-500 uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all active:scale-95"
                     >
                         <span>RESET VIBE</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
-                            <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                        </svg>
+                        <X className="w-3 h-3" />
                     </button>
                 )}
             </div>
@@ -66,9 +65,10 @@ const MoodSelector = ({ onMoodSelect }) => {
                         
                         {/* Content */}
                         <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10">
-                            <span className="text-3xl mb-2 transform group-hover:scale-125 transition-transform duration-500 drop-shadow-xl">
-                                {mood.icon}
-                            </span>
+                            {(() => {
+                                const Icon = mood.icon;
+                                return <Icon className="w-10 h-10 mb-2 transform group-hover:scale-125 transition-transform duration-500 text-white fill-white/20 drop-shadow-xl" />;
+                            })()}
                             <span className="text-white font-black text-lg tracking-tight drop-shadow-lg scale-90 group-hover:scale-100 transition-transform">
                                 {mood.label}
                             </span>

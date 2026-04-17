@@ -6,6 +6,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import { createControlComponent } from "@react-leaflet/core";
 import "leaflet-routing-machine";
 import L from 'leaflet';
+import { Building, Home, Phone, Banknote, Sparkles, TrendingUp, Bike, ShoppingBag, Trophy, ArrowLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import ChatWindow from '../../components/ChatWindow';
 
 const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://vindu-food-delivery.onrender.com';
@@ -62,9 +63,7 @@ const SwipeToAccept = ({ onAccept, text = "Swipe to Accept Mission" }) => {
                 onMouseDown={handleStart}
                 onTouchStart={handleStart}
             >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="4" stroke="currentColor" className="w-8 h-8 animate-pulse">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" />
-                </svg>
+                <ChevronRight className="w-8 h-8 animate-pulse" strokeWidth={3} />
             </div>
         </div>
     );
@@ -107,7 +106,7 @@ const MissionMap = ({ stops = [], customerLoc }) => {
     const center = [(startCoords[0] + dropoffCoords[0]) / 2, (startCoords[1] + dropoffCoords[1]) / 2];
  
     const pickupIcon = new L.DivIcon({
-        html: `<div style="background-color: #FF5E00; border: 2px solid white; border-radius: 12px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 0 15px rgba(255,94,0,0.5); transform: rotate(45deg);"><div style="transform: rotate(-45deg);">🏬</div></div>`,
+        html: `<div style="background-color: #FF5E00; border: 2px solid white; border-radius: 12px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 0 15px rgba(255,94,0,0.5); transform: rotate(45deg);"><div style="transform: rotate(-45deg);">🏢</div></div>`,
         className: 'custom-div-icon',
         iconSize: [32, 32],
         iconAnchor: [16, 32],
@@ -391,7 +390,7 @@ const DeliveryDashboard = () => {
                                     <div className="flex justify-between items-start mb-6">
                                         <div className="flex items-center gap-5">
                                             <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-3xl">
-                                                {stop.status === 'PickedUp' ? '✅' : '🏬'}
+                                                {stop.status === 'PickedUp' ? <CheckCircle2 className="w-8 h-8 text-green-500" /> : <Building className="w-8 h-8 text-[#FF5E00]" />}
                                             </div>
                                             <div>
                                                 <h3 className="text-xl font-black text-white italic uppercase">{stop.name}</h3>
@@ -406,7 +405,7 @@ const DeliveryDashboard = () => {
                                                 })} 
                                                 className="w-12 h-12 bg-[#FF5E00]/10 text-[#FF5E00] border border-[#FF5E00]/20 rounded-2xl flex items-center justify-center text-xl shadow-lg active:scale-95 transition-all hover:bg-[#FF5E00] hover:text-white"
                                             >
-                                                📞
+                                                <Phone className="w-6 h-6" />
                                             </button>
                                         </div>
                                     </div>
@@ -424,13 +423,13 @@ const DeliveryDashboard = () => {
                             <div className={`w-full bg-[#111] border rounded-[45px] p-10 transition-all duration-500 shadow-2xl ${activeOrder.deliveryStatus === 'PickedUp' ? 'border-[#FF5E00] shadow-[0_20px_80px_rgba(255,94,0,0.15)]' : 'border-white/5 opacity-40'}`}>
                                 <div className="flex justify-between items-center mb-8">
                                     <div className="flex items-center gap-5">
-                                        <div className="w-16 h-16 rounded-3xl bg-[#FF5E00]/10 flex items-center justify-center text-4xl">🏠</div>
+                                        <div className="w-16 h-16 rounded-3xl bg-[#FF5E00]/10 flex items-center justify-center text-4xl"><Home className="w-8 h-8 text-[#FF5E00]" /></div>
                                         <div>
                                             <h3 className="text-2xl font-black text-white">DROP: {activeOrder.userId?.fullname}</h3>
                                             <p className="text-gray-500 font-bold text-sm mt-1">{activeOrder.address?.address || activeOrder.address?.street}</p>
                                         </div>
                                     </div>
-                                    <button onClick={() => setSelectedContact({ name: activeOrder.userId?.fullname, phone: activeOrder.userId?.phone })} className="w-14 h-14 bg-green-500 text-black rounded-2xl flex items-center justify-center text-2xl shadow-lg active:scale-90 transition-all">📞</button>
+                                    <button onClick={() => setSelectedContact({ name: activeOrder.userId?.fullname, phone: activeOrder.userId?.phone })} className="w-14 h-14 bg-green-500 text-black rounded-2xl flex items-center justify-center text-2xl shadow-lg active:scale-90 transition-all"><Phone className="w-7 h-7" /></button>
                                 </div>
                                 {activeOrder.deliveryStatus === 'PickedUp' && (
                                     <button onClick={() => updateStatus('Delivered')} className="w-full py-6 bg-[#FF5E00] text-white font-black rounded-3xl text-2xl hover:scale-[1.01] active:scale-95 transition-all shadow-xl uppercase">Mission Accomplished</button>
@@ -445,13 +444,13 @@ const DeliveryDashboard = () => {
                         {/* Stats Hub - No empty space! */}
                         <section className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in slide-in-from-top duration-700">
                             {[
-                                { lab: 'Today Revenue', val: `₹${stats.todayEarnings}`, ico: '💰', col: 'text-white' },
-                                { lab: 'Missions Done', val: stats.todayDeliveries, ico: '✨', col: 'text-white' },
-                                { lab: 'Lifetime Gain', val: `₹${stats.totalEarnings}`, ico: '📈', col: 'text-gray-500' },
-                                { lab: 'Total Trips', val: stats.totalDeliveries, ico: '🛵', col: 'text-gray-500' }
+                                { lab: 'Today Revenue', val: `₹${stats.todayEarnings}`, ico: <Banknote className="w-8 h-8 text-green-500" />, col: 'text-white' },
+                                { lab: 'Missions Done', val: stats.todayDeliveries, ico: <Sparkles className="w-8 h-8 text-yellow-500" />, col: 'text-white' },
+                                { lab: 'Lifetime Gain', val: `₹${stats.totalEarnings}`, ico: <TrendingUp className="w-8 h-8 text-blue-500" />, col: 'text-gray-500' },
+                                { lab: 'Total Trips', val: stats.totalDeliveries, ico: <Bike className="w-8 h-8 text-gray-500" />, col: 'text-gray-500' }
                             ].map((s, i) => (
                                 <div key={i} className="bg-[#111] border border-white/5 rounded-[35px] p-8 shadow-2xl relative overflow-hidden group hover:border-[#FF5E00]/20 transition-all">
-                                    <div className="absolute top-0 right-0 p-6 opacity-[0.05] text-4xl group-hover:scale-125 transition-transform">{s.ico}</div>
+                                    <div className="absolute top-0 right-0 p-6 opacity-[0.05] group-hover:scale-125 transition-transform">{s.ico}</div>
                                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">{s.lab}</p>
                                     <h3 className={`text-4xl font-black ${s.col} tracking-tighter`}>{s.val}</h3>
                                 </div>
@@ -464,7 +463,7 @@ const DeliveryDashboard = () => {
                                 <div className="w-56 h-56 mb-12 relative">
                                     <div className="absolute inset-0 bg-[#FF5E00]/5 rounded-full animate-pulse-slow"></div>
                                     <div className="absolute inset-6 bg-[#050505] rounded-full flex items-center justify-center border border-white/5 shadow-inner">
-                                        <span className="text-8xl grayscale opacity-20">🛵</span>
+                                        <Bike className="w-24 h-24 text-gray-800 opacity-20" />
                                     </div>
                                 </div>
                                 <h2 className="text-6xl font-black tracking-tighter mb-6">Off The Grid</h2>
@@ -479,7 +478,7 @@ const DeliveryDashboard = () => {
                                     <div className="absolute inset-[20%] border-2 border-[#FF5E00]/20 rounded-full animate-ping-slow [animation-delay:0.5s]"></div>
                                     <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,transparent_0deg,rgba(255,94,0,0.5)_90deg,transparent_91deg)] animate-spin-radar opacity-40"></div>
                                     <div className="absolute inset-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-[#FF5E00] rounded-full flex items-center justify-center shadow-[0_0_80px_#FF5E00] z-10 transition-transform">
-                                        <span className="text-4xl animate-bounce">🛵</span>
+                                        <Bike className="w-10 h-10 text-white animate-bounce" />
                                     </div>
                                 </div>
                                 <h3 className="text-4xl font-black tracking-tighter mb-4 uppercase italic">Scanning For Pings</h3>
@@ -504,7 +503,7 @@ const DeliveryDashboard = () => {
                                             <div className="absolute top-0 right-0 p-10 opacity-[0.03] select-none text-9xl font-black italic -mr-8 -mt-8 uppercase">Fast</div>
                                             
                                             <div className="flex items-center gap-6 mb-10">
-                                                <div className="w-20 h-20 rounded-[35px] bg-[#1a1a1a] flex items-center justify-center text-5xl shadow-inner border border-white/5 transition-transform group-hover:scale-110">🍔</div>
+                                                <div className="w-20 h-20 rounded-[35px] bg-[#1a1a1a] flex items-center justify-center text-5xl shadow-inner border border-white/5 transition-transform group-hover:scale-110"><ShoppingBag className="w-10 h-10 text-[#FF5E00]" /></div>
                                                 <div>
                                                     <h3 className="text-5xl font-black text-white tracking-tighter leading-none mb-2">₹{order.totalAmount}</h3>
                                                     <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest">
@@ -542,7 +541,7 @@ const DeliveryDashboard = () => {
                                     {history.map(order => (
                                         <div key={order._id} className="bg-[#1a1a1a] p-8 rounded-[40px] border border-white/5 flex items-center justify-between shadow-xl hover:bg-white/[0.03] transition-all">
                                             <div className="flex items-center gap-5">
-                                                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-3xl">🏆</div>
+                                                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-3xl"><Trophy className="w-8 h-8 text-yellow-400" /></div>
                                                 <div>
                                                     <p className="text-white text-lg font-black leading-none">{order.items[0]?.foodId?.foodpartner?.name || order.restaurantName || "Mission Victory"}</p>
                                                     <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1">Success • ID: {order._id.slice(-6).toUpperCase()}</p>
@@ -564,7 +563,7 @@ const DeliveryDashboard = () => {
                     <div className="w-full max-w-[1400px] mx-auto min-h-full flex flex-col gap-10">
                         <header className="flex justify-between items-center">
                             <button onClick={() => setSelectedBriefing(null)} className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center text-white border border-white/10 hover:bg-white/10 transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="w-8 h-8"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+                                <ArrowLeft className="w-8 h-8" />
                             </button>
                             <div className="text-right">
                                 <p className="text-[#FF5E00] text-[10px] font-black uppercase tracking-[0.4em] leading-none mb-1 text-sky-400">Tactical Briefing</p>
@@ -589,7 +588,7 @@ const DeliveryDashboard = () => {
                                         {selectedBriefing.items.map((item, idx) => (
                                             <div key={idx} className="flex items-center justify-between group">
                                                 <div className="flex items-center gap-6">
-                                                    <div className="w-20 h-20 rounded-[35px] bg-[#1a1a1a] flex items-center justify-center text-4xl shadow-inner border border-white/5">🍱</div>
+                                                    <div className="w-20 h-20 rounded-[35px] bg-[#1a1a1a] flex items-center justify-center text-4xl shadow-inner border border-white/5"><ShoppingBag className="w-10 h-10 text-[#FF5E00]" /></div>
                                                     <div>
                                                         <p className="text-xl font-black text-white leading-none mb-2">{item.foodId?.name || "Order Item"}</p>
                                                         <p className="text-xs font-black text-gray-500 uppercase tracking-widest">{item.quantity} Unit(s) • Handled with Care</p>
@@ -658,7 +657,7 @@ const DeliveryDashboard = () => {
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
                     <div className="bg-[#111] w-full max-w-lg rounded-[60px] p-12 border border-white/10 shadow-3xl relative animate-in zoom-in-95">
                         <div className="text-center">
-                            <div className="w-32 h-32 bg-gradient-to-tr from-[#FF5E00] to-orange-400 rounded-full flex items-center justify-center mx-auto mb-10 text-6xl shadow-3xl border-[6px] border-[#111]">📞</div>
+                            <div className="w-32 h-32 bg-gradient-to-tr from-[#FF5E00] to-orange-400 rounded-full flex items-center justify-center mx-auto mb-10 text-6xl shadow-3xl border-[6px] border-[#111]"><Phone className="w-16 h-16 text-white" /></div>
                             <h3 className="text-5xl font-black text-white mb-4 tracking-tighter">{selectedContact.name}</h3>
                             <p className="text-gray-500 text-xs font-black uppercase tracking-[0.4em] mb-12">Secured Voice Terminal</p>
 

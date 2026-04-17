@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Crown, Check } from 'lucide-react';
 import apiClient from '../../api/client';
 import { useToast } from '../../context/ToastContext';
 
@@ -29,7 +30,7 @@ const GoldMembership = () => {
 
                 {/* Header Badge */}
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FFD700]/10 border border-[#FFD700]/40 text-[#FFD700] font-bold text-sm mb-8 animate-fade-in-up">
-                    <span className="animate-pulse">👑</span> OFFICIAL MEMBERSHIP
+                    <Crown className="w-4 h-4 animate-pulse" /> OFFICIAL MEMBERSHIP
                 </div>
 
                 <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter flex items-center justify-center gap-4 bg-clip-text text-transparent bg-gradient-to-b from-[#FFD700] via-[#FDB931] to-[#9E7204] drop-shadow-2xl animate-fade-in-up animation-delay-100">
@@ -51,7 +52,7 @@ const GoldMembership = () => {
                         </div>
                         <ul className="space-y-4 text-left flex-1 mb-10">
                             {["Unlimited Free Delivery", "No Surge Fees", "Priority Support"].map((b, i) => (
-                                <li key={i} className="flex items-center gap-3 text-gray-300"><span className="text-[#FFD700]">✓</span> {b}</li>
+                                <li key={i} className="flex items-center gap-3 text-gray-300"><Check className="w-4 h-4 text-[#FFD700]" /> {b}</li>
                             ))}
                         </ul>
                         <button
@@ -75,7 +76,7 @@ const GoldMembership = () => {
                         <p className="text-left text-green-500 font-bold text-sm mb-6">You save ₹889/year</p>
                         <ul className="space-y-4 text-left flex-1 mb-10">
                             {["Everything in Monthly", "Exclusive Dining Invites", "Birthday Special Gift", "Dedicated Relationship Manager"].map((b, i) => (
-                                <li key={i} className="flex items-center gap-3 text-white"><span className="w-5 h-5 rounded-full bg-[#FFD700] flex items-center justify-center text-black font-bold text-xs">✓</span> {b}</li>
+                                <li key={i} className="flex items-center gap-3 text-white"><div className="w-5 h-5 rounded-full bg-[#FFD700] flex items-center justify-center text-black font-bold text-xs"><Check className="w-3 h-3" /></div> {b}</li>
                             ))}
                         </ul>
                         <button

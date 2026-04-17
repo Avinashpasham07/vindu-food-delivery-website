@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import apiClient from '../../api/client';
 import { Link, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import { Plus, AlertTriangle, MapPin, Coffee, Radio, UtensilsCrossed, CheckCircle2, Bike, Pencil, X } from 'lucide-react';
 import AnalyticsChart from '../../components/AnalyticsChart';
 import TopItemsChart from '../../components/TopItemsChart';
 import OrderMap from '../../components/OrderMap';
@@ -183,9 +184,7 @@ const PartnerDashboard = () => {
                         Logout
                     </button>
                     <Link to="/create-food" className="bg-[#10B981] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#059669] transition shadow-lg flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
+                        <Plus className="w-5 h-5" />
                         Add New Dish
                     </Link>
                 </div>
@@ -195,7 +194,9 @@ const PartnerDashboard = () => {
             {(!partner?.location || !partner?.location?.lat) && (
                 <div className="mb-10 p-6 bg-red-500/10 border border-red-500/20 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 animate-pulse">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-2xl">⚠️</div>
+                        <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-2xl text-white">
+                            <AlertTriangle className="w-6 h-6" />
+                        </div>
                         <div>
                             <h3 className="text-lg font-bold text-red-500">Business Location Not Set!</h3>
                             <p className="text-gray-400 text-sm">Customers cannot track their orders accurately until you set your restaurant's GPS location.</p>
@@ -205,7 +206,7 @@ const PartnerDashboard = () => {
                         to="/partner/profile"
                         className="px-8 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-red-500/20"
                     >
-                        Set Location Now 📍
+                        Set Location Now <MapPin className="w-4 h-4 inline-block mb-1" />
                     </Link>
                 </div>
             )}
@@ -264,7 +265,7 @@ const PartnerDashboard = () => {
                     {orders.length === 0 ? (
                         <div className="col-span-full text-center py-20 bg-[#1a1a1a] rounded-2xl border border-dashed border-white/10">
                             <div className="text-gray-500 text-lg">No active orders right now.</div>
-                            <div className="text-gray-600 text-sm">Time to relax! ☕</div>
+                            <div className="text-gray-600 text-sm flex items-center justify-center gap-2">Time to relax! <Coffee className="w-4 h-4" /></div>
                         </div>
                     ) : (
                         orders.map(order => (
@@ -309,7 +310,7 @@ const PartnerDashboard = () => {
                                             onClick={() => setTrackingOrder(order)}
                                             className="col-span-2 mt-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 py-3 rounded-xl font-bold transition-all border border-blue-500/20"
                                         >
-                                            Track Deliverer 📍
+                                            Track Deliverer <MapPin className="w-4 h-4 inline-block" />
                                         </button>
                                     )}
 
@@ -318,7 +319,7 @@ const PartnerDashboard = () => {
                                         onClick={() => setChatOrderId(order._id)}
                                         className="col-span-2 bg-white/5 hover:bg-white/10 text-gray-400 py-3 rounded-xl font-bold transition-all border border-white/5 flex items-center justify-center gap-2"
                                     >
-                                        📡 Send Signal
+                                        <Radio className="w-4 h-4" /> Send Signal
                                     </button>
 
                                     {/* Status Flow Buttons */}
@@ -327,7 +328,7 @@ const PartnerDashboard = () => {
                                             onClick={() => updateOrderStatus(order._id, 'Preparing')}
                                             className="col-span-2 bg-[#FF5E00] hover:bg-orange-600 text-white py-3 rounded-xl font-bold transition-all shadow-lg shadow-orange-500/20"
                                         >
-                                            Accept & Start Cooking 👨‍🍳
+                                            Accept & Start Cooking <UtensilsCrossed className="w-4 h-4 inline-block" />
                                         </button>
                                     )}
 
@@ -336,13 +337,13 @@ const PartnerDashboard = () => {
                                             onClick={() => updateOrderStatus(order._id, 'Ready')}
                                             className="col-span-2 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold transition-all shadow-lg shadow-green-500/20"
                                         >
-                                            Mark Ready for Pickup ✅
+                                            Mark Ready for Pickup <CheckCircle2 className="w-4 h-4 inline-block" />
                                         </button>
                                     )}
 
                                     {order.status === 'Ready' && (
                                         <div className="col-span-2 text-center p-3 bg-green-500/10 border border-green-500/20 rounded-xl text-green-500 font-bold text-sm animate-pulse">
-                                            Waiting for Delivery Partner... 🛵
+                                            Waiting for Delivery Partner... <Bike className="w-4 h-4 inline-block animate-bounce" />
                                         </div>
                                     )}
 
@@ -382,9 +383,7 @@ const PartnerDashboard = () => {
                                         )}
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                             <button className="bg-white/20 p-2 rounded-full backdrop-blur-md hover:bg-white/40 text-white">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                                </svg>
+                                                <Pencil className="w-5 h-5" />
                                             </button>
                                         </div>
                                     </div>
@@ -492,7 +491,7 @@ const PartnerDashboard = () => {
                                 onClick={() => setTrackingOrder(null)}
                                 className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center transition-all text-white"
                             >
-                                ✕
+                                <X />
                             </button>
                         </div>
 
@@ -506,7 +505,7 @@ const PartnerDashboard = () => {
 
                         <div className="p-6 bg-[#1a1a1a] flex justify-between items-center border-t border-white/10">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-[#FF5E00] rounded-full flex items-center justify-center text-xl font-bold">🛵</div>
+                                <div className="w-12 h-12 bg-[#FF5E00] rounded-full flex items-center justify-center text-xl font-bold text-white"><Bike className="w-6 h-6" /></div>
                                 <div>
                                     <p className="text-white font-bold">{trackingOrder.deliveryPartner?.fullname || 'Driver Searching...'}</p>
                                     <p className="text-xs text-gray-500 uppercase font-black">{trackingOrder.deliveryStatus}</p>

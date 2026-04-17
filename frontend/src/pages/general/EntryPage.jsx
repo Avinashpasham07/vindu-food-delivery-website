@@ -2,23 +2,23 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../../components/Footer';
 import FoodCursor from '../../components/FoodCursor';
-
-// --- Assets & Icons ---
-const ArrowRight = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>;
-const Star = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>;
-const ChevronDown = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="6 9 12 15 18 9" /></svg>;
-const Users = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>;
-const Search = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>;
-const Utensils = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" /><path d="M7 2v20" /><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" /></svg>;
-const ClipboardList = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="8" y="2" width="8" height="4" rx="1" ry="1" /><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><path d="M12 11h4" /><path d="M12 16h4" /><path d="M8 11h.01" /><path d="M8 16h.01" /></svg>;
-const Sparkles = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></svg>;
-const TrendingUp = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>;
-const Smartphone = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="5" y="2" width="14" height="20" rx="2" ry="2" /><line x1="12" y1="18" x2="12.01" y2="18" /></svg>;
-const Zap = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>;
-const Wallet = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" /><path d="M4 6v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H4z" /><path d="M12 12h8" /></svg>;
-const Play = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none" className={className}><polygon points="5 3 19 12 5 21 5 3" /></svg>;
-const Pizza = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M15 11h.01" /><path d="M11 15h.01" /><path d="M16 16h.01" /><path d="M2 16a5 5 0 0 0 10.9 0L13 7 2 16Z" /><path d="m22 17-9-8" /><path d="M15 6a3 3 0 1 0-4.243 4.243" /></svg>;
-const Rocket = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" /><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" /><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" /><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" /></svg>;
+import { 
+    ArrowRight, 
+    Star, 
+    ChevronDown, 
+    Users, 
+    Search, 
+    Utensils, 
+    ClipboardList, 
+    Sparkles, 
+    TrendingUp, 
+    Smartphone, 
+    Zap, 
+    Wallet, 
+    Play, 
+    Pizza, 
+    Rocket 
+} from 'lucide-react';
 
 // --- Helper Components ---
 
@@ -125,7 +125,7 @@ const Roadmap = () => {
                 {content[activeTab].steps.map((step, idx) => (
                     <Reveal key={idx} delay={idx * 100}>
                         <div className={`relative flex flex-col md:flex-row items-center justify-between gap-8 mb-16 ${idx % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
-                            <SpotlightCard className="w-full md:w-[45%] bg-[#0f0f0f] border border-white/5 p-8 rounded-[32px] hover:border-[#FF5E00]/30 transition-all duration-500 hover:-translate-y-2 shadow-2xl">
+                            <SpotlightCard className="w-full md:w-[45%] bg-[#0f0f0f] border border-white/5 p-8 rounded-[32px] hover:border-[#FF5E00]/30 transition-all duration-500 hover:-translate-y-2 shadow-2xl text-left">
                                 <div className="text-[#FF5E00] mb-4 transform group-hover:scale-110 transition-transform">{step.icon}</div>
                                 <h3 className="text-2xl font-black text-white mb-2">{step.title}</h3>
                                 <p className="text-gray-400 leading-relaxed text-sm">{step.desc}</p>
@@ -144,7 +144,7 @@ const Roadmap = () => {
 const BentoGrid = () => (
     <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-6 h-auto md:h-[600px]">
         {/* Card 1: Squad Mode (Interactive Social) */}
-        <SpotlightCard className="md:col-span-2 md:row-span-2 rounded-[40px] bg-[#0f0f0f] border border-white/5 p-12 relative overflow-hidden group">
+        <SpotlightCard className="md:col-span-2 md:row-span-2 rounded-[40px] bg-[#0f0f0f] border border-white/5 p-12 relative overflow-hidden group text-left">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]"></div>
             <div className="absolute inset-0 bg-gradient-to-br from-[#FF5E00]/5 to-transparent"></div>
 
@@ -178,7 +178,7 @@ const BentoGrid = () => (
         </SpotlightCard>
 
         {/* Card 2: Vindu Gold (Premium Shimmer) */}
-        <SpotlightCard className="rounded-[40px] bg-gradient-to-br from-[#1a1500] to-black border border-yellow-500/20 p-10 relative overflow-hidden group">
+        <SpotlightCard className="rounded-[40px] bg-gradient-to-br from-[#1a1500] to-black border border-yellow-500/20 p-10 relative overflow-hidden group text-left">
             <div className="absolute inset-0 bg-gradient-to-tr from-yellow-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
             <div className="absolute top-0 right-0 p-6"><Star className="w-8 h-8 text-yellow-500 fill-yellow-500" /></div>
 
@@ -206,14 +206,13 @@ const BentoGrid = () => (
                         <div className="text-[#422006] font-black italic text-2xl tracking-widest text-shadow-sm flex items-center gap-2">
                             VINDU <span className="text-xs not-italic font-bold border border-[#422006] px-1 rounded">GOLD</span>
                         </div>
-
                     </div>
                 </div>
             </div>
         </SpotlightCard>
 
         {/* Card 3: Smart Menu (Tech Scanning) */}
-        <SpotlightCard className="rounded-[40px] bg-[#0f0f0f] border border-white/5 p-10 relative overflow-hidden group">
+        <SpotlightCard className="rounded-[40px] bg-[#0f0f0f] border border-white/5 p-10 relative overflow-hidden group text-left">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] opacity-[0.08]"></div>
 
             <div className="relative z-10">
@@ -236,8 +235,6 @@ const BentoGrid = () => (
 
 // --- Main Page ---
 const EntryPage = () => {
-    // Custom Cursor Logic handled by FoodCursor component now
-
     const handleMouseEnter = () => { };
     const handleMouseLeave = () => { };
 
@@ -258,15 +255,12 @@ const EntryPage = () => {
                 </Link>
             </nav>
 
-            {/* 1. Hero Section (Redesigned: Human/Product/Split) */}
+            {/* 1. Hero Section */}
             <section className="relative pt-32 pb-20 min-h-screen flex items-center overflow-hidden">
-                {/* Abstract Background Elements */}
                 <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#FF5E00]/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
                 <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none -z-10"></div>
 
                 <div className="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-
-                    {/* Left: Typography */}
                     <Reveal>
                         <div className="relative z-10 text-left">
                             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-[#1a1a1a] border border-white/10 mb-8 w-fit hover:border-[#FF5E00]/50 transition-colors cursor-crosshair">
@@ -301,10 +295,8 @@ const EntryPage = () => {
                         </div>
                     </Reveal>
 
-                    {/* Right: Floating Product Composition */}
                     <div className="relative h-[600px] w-full hidden lg:block perspective-1000">
-                        {/* Card 1: The Squad Cart */}
-                        <div className="absolute top-[10%] right-[10%] w-[320px] bg-[#1a1a1a] rounded-[32px] border border-white/10 p-6 shadow-2xl rotate-[-6deg] z-20 transition-all duration-700">
+                        <div className="absolute top-[10%] right-[10%] w-[320px] bg-[#1a1a1a] rounded-[32px] border border-white/10 p-6 shadow-2xl rotate-[-6deg] z-20 transition-all duration-700 text-left">
                             <div className="flex justify-between items-center mb-6">
                                 <h4 className="font-bold text-white text-lg">Friday Night </h4>
                                 <div className="flex -space-x-2">
@@ -331,7 +323,6 @@ const EntryPage = () => {
                             </div>
                         </div>
 
-                        {/* Card 2: The Food Reel */}
                         <div className="absolute top-[30%] right-[45%] w-[260px] bg-black rounded-[32px] border-[6px] border-[#222] shadow-2xl rotate-[5deg] transition-all duration-700 overflow-hidden aspect-[9/16]">
                             <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop" className="w-full h-full object-cover opacity-80" />
                             <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black to-transparent">
@@ -339,16 +330,15 @@ const EntryPage = () => {
                                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                                     <span className="text-xs font-bold">Top Rated</span>
                                 </div>
-                                <p className="font-bold text-white leading-tight">Melting Cheese Burst...</p>
+                                <p className="font-bold text-white leading-tight text-left">Melting Cheese Burst...</p>
                             </div>
                         </div>
 
-                        {/* Card 3: Live Status */}
                         <div className="absolute top-[60%] right-[20%] bg-[#0a0a0a] border border-[#FF5E00]/30 p-4 rounded-2xl flex items-center gap-4 shadow-[0_0_30px_rgba(255,94,0,0.1)] animate-bounce-slow z-30">
                             <div className="w-10 h-10 rounded-full bg-[#FF5E00]/20 flex items-center justify-center text-[#FF5E00]">
                                 <Users className="w-5 h-5" />
                             </div>
-                            <div>
+                            <div className="text-left">
                                 <div className="text-xs text-gray-400 font-bold uppercase">Live Activity</div>
                                 <div className="font-bold text-white">Rahul joined the room</div>
                             </div>
@@ -357,10 +347,7 @@ const EntryPage = () => {
                 </div>
             </section>
 
-            {/* 7. Role Gateway (Revised with New 3-Card Design) */}
-
-
-            {/* 2. New Features Showcase (Replaces Stats) */}
+            {/* 2. Features Showcase */}
             <section className="py-24 border-y border-white/5 bg-black/50 backdrop-blur-3xl relative overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[400px] bg-[#FF5E00]/5 blur-[100px] rounded-full pointer-events-none"></div>
                 <Reveal>
@@ -373,8 +360,7 @@ const EntryPage = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                            {/* Feature 1: Squad Mode */}
-                            <div className="bg-[#0f0f0f] p-6 md:p-8 rounded-3xl border border-white/5 hover:border-[#FF5E00]/30 transition-all group">
+                            <div className="bg-[#0f0f0f] p-6 md:p-8 rounded-3xl border border-white/5 hover:border-[#FF5E00]/30 transition-all group text-left">
                                 <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 mb-6 group-hover:scale-110 transition-transform">
                                     <Users className="w-6 h-6" />
                                 </div>
@@ -387,8 +373,7 @@ const EntryPage = () => {
                                 </div>
                             </div>
 
-                            {/* Feature 2: Partner Analytics */}
-                            <div className="bg-[#0f0f0f] p-6 md:p-8 rounded-3xl border border-white/5 hover:border-green-500/30 transition-all group">
+                            <div className="bg-[#0f0f0f] p-6 md:p-8 rounded-3xl border border-white/5 hover:border-green-500/30 transition-all group text-left">
                                 <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-500 mb-6 group-hover:scale-110 transition-transform">
                                     <TrendingUp className="w-6 h-6" />
                                 </div>
@@ -401,8 +386,7 @@ const EntryPage = () => {
                                 </div>
                             </div>
 
-                            {/* Feature 3: Live Tracking */}
-                            <div className="bg-[#0f0f0f] p-6 md:p-8 rounded-3xl border border-white/5 hover:border-yellow-500/30 transition-all group">
+                            <div className="bg-[#0f0f0f] p-6 md:p-8 rounded-3xl border border-white/5 hover:border-yellow-500/30 transition-all group text-left">
                                 <div className="w-12 h-12 bg-yellow-500/10 rounded-2xl flex items-center justify-center text-yellow-500 mb-6 group-hover:scale-110 transition-transform">
                                     <Rocket className="w-6 h-6" />
                                 </div>
@@ -442,6 +426,7 @@ const EntryPage = () => {
                     <Roadmap />
                 </Reveal>
             </section>
+
             <section id="gateway" className="py-20 md:py-40 relative">
                 <Reveal>
                     <div className="max-w-7xl mx-auto px-6 text-center mb-20">
@@ -482,20 +467,17 @@ const EntryPage = () => {
                             <Link
                                 key={card.id}
                                 to={card.link}
-                                className="block relative h-[400px] w-full rounded-[40px] overflow-hidden group cursor-pointer border border-white/10 shadow-2xl transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl"
+                                className="block relative h-[400px] w-full rounded-[40px] overflow-hidden group cursor-pointer border border-white/10 shadow-2xl transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl text-left"
                             >
-                                {/* Background Image */}
                                 <div className="absolute inset-0">
                                     <img
                                         src={card.img}
                                         alt={card.title}
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
-                                    {/* Gradient Overlay */}
                                     <div className={`absolute inset-0 bg-gradient-to-t ${card.color} via-black/40 to-black/80`}></div>
                                 </div>
 
-                                {/* Content */}
                                 <div className="relative h-full flex flex-col justify-end p-8 z-10">
                                     <h2 className="text-4xl font-black text-white leading-none mb-3 drop-shadow-lg">
                                         {card.title}
@@ -504,7 +486,6 @@ const EntryPage = () => {
                                         {card.subtitle}
                                     </p>
 
-                                    {/* Action Button */}
                                     <div className={`w-14 h-14 rounded-full ${card.btnColor} flex items-center justify-center text-white shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-45deg] self-end`}>
                                         <ArrowRight className="w-6 h-6" />
                                     </div>
@@ -514,6 +495,7 @@ const EntryPage = () => {
                     </div>
                 </Reveal>
             </section>
+
             {/* 5. Testimonials */}
             <section className="py-20 md:py-40 border-t border-white/5 bg-[#09090b]">
                 <Reveal>
@@ -525,7 +507,7 @@ const EntryPage = () => {
                                 { name: "Arjun M.", role: "Partner", text: "Weekly payouts help my cash flow immensely. Best partner support.", img: "https://i.pravatar.cc/150?img=11" },
                                 { name: "Rahul K.", role: "Rider", text: "Insurance coverage gives me peace of mind for my family.", img: "https://i.pravatar.cc/150?img=53" }
                             ].map((r, i) => (
-                                <SpotlightCard key={i} className="bg-[#0f0f0f] p-10 rounded-[32px] border border-white/5 hover:border-[#FF5E00]/20 group">
+                                <SpotlightCard key={i} className="bg-[#0f0f0f] p-10 rounded-[32px] border border-white/5 hover:border-[#FF5E00]/20 group text-left">
                                     <div className="flex text-[#FF5E00] gap-1 mb-6"><Star className="w-5 h-5 fill-[#FF5E00]" /><Star className="w-5 h-5 fill-[#FF5E00]" /><Star className="w-5 h-5 fill-[#FF5E00]" /><Star className="w-5 h-5 fill-[#FF5E00]" /><Star className="w-5 h-5 fill-[#FF5E00]" /></div>
                                     <p className="text-gray-300 italic mb-8 text-lg leading-relaxed">"{r.text}"</p>
                                     <div className="flex items-center gap-4">

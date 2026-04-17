@@ -4,6 +4,12 @@ import { toast } from 'react-hot-toast';
 import { useCart } from '../context/CartContext';
 import { useSquad } from '../context/SquadContext';
 import { useTranslation } from 'react-i18next';
+import { Plus, Minus, ShoppingBag, Clock } from 'lucide-react';
+
+const isImageUrl = (url) => {
+    if (!url) return false;
+    return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url.toLowerCase()) || url.includes('images.unsplash.com');
+};
 
 const FoodCard = ({ item }) => {
     const { t } = useTranslation();
@@ -44,7 +50,15 @@ const FoodCard = ({ item }) => {
         } else {
             const user = localStorage.getItem('user');
             if (!user) {
-                toast.error("Please login to order 🍔");
+                toast.error("Please login to order", {
+                    icon: <ShoppingBag className="w-5 h-5 text-[#FF5E00]" />,
+                    style: {
+                        borderRadius: '16px',
+                        background: '#1a1a1a',
+                        color: '#fff',
+                        border: '1px solid rgba(255,94,0,0.5)'
+                    }
+                });
                 navigate('/user/login');
                 return;
             }
@@ -90,9 +104,9 @@ const FoodCard = ({ item }) => {
             <div className="flex items-center justify-between bg-[#1a1a1a] rounded-xl border border-[var(--accent)] h-9 md:h-10 overflow-hidden relative shadow-lg min-w-[90px]">
                 <button
                     onClick={handleDecrement}
-                    className="px-3 h-full flex items-center justify-center text-[var(--accent)] hover:bg-[var(--accent)]/10 font-bold text-lg active:scale-90 transition-transform"
+                    className="px-3 h-full flex items-center justify-center text-[var(--accent)] hover:bg-[var(--accent)]/10 font-bold active:scale-90 transition-transform"
                 >
-                    -
+                    <Minus className="w-4 h-4" />
                 </button>
                 <span className="text-white text-[12px] font-black px-1">
                     {quantity}
@@ -102,9 +116,9 @@ const FoodCard = ({ item }) => {
                 </span>
                 <button
                     onClick={handleAdd}
-                    className="px-3 h-full flex items-center justify-center text-[var(--accent)] hover:bg-[var(--accent)]/10 font-bold text-lg active:scale-90 transition-transform"
+                    className="px-3 h-full flex items-center justify-center text-[var(--accent)] hover:bg-[var(--accent)]/10 font-bold active:scale-90 transition-transform"
                 >
-                    +
+                    <Plus className="w-4 h-4" />
                 </button>
             </div>
         )
@@ -155,7 +169,8 @@ const FoodCard = ({ item }) => {
                                     {item.discount}
                                 </div>
                             )}
-                            <div className="bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded-[6px] text-[9px] font-bold text-black shadow-sm">
+                            <div className="bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded-[6px] text-[9px] font-bold text-black shadow-sm flex items-center gap-1">
+                                <Clock className="w-2 h-2" />
                                 {item.prepTime || '30m'}
                             </div>
                         </div>

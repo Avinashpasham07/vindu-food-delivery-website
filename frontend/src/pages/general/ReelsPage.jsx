@@ -2,6 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client';
 import '../../App.css';
+import { 
+    Heart, 
+    Play, 
+    VolumeX, 
+    Volume2, 
+    Share2, 
+    MoreHorizontal, 
+    Star, 
+    ChevronRight,
+    Loader2
+} from 'lucide-react';
 
 const VideoContent = ({ data, isActive, isMuted, toggleMute }) => {
     const videoRef = useRef(null);
@@ -128,18 +139,14 @@ const VideoContent = ({ data, isActive, isMuted, toggleMute }) => {
             {/* Like Heart Animation */}
             {showHeart && (
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-30 animate-ping duration-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ef4444" className="w-32 h-32 drop-shadow-2xl">
-                        <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.312 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-                    </svg>
+                    <Heart className="w-32 h-32 text-red-500 fill-red-500 drop-shadow-2xl" />
                 </div>
             )}
 
             {/* Play/Pause Indicator */}
             {!isPlaying && (
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/30 w-20 h-20 rounded-full flex items-center justify-center backdrop-blur-sm pointer-events-none z-20 animate-pulse">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" className="w-10 h-10 ml-1">
-                        <path d="M8 5v14l11-7z" />
-                    </svg>
+                    <Play className="w-10 h-10 text-white fill-white ml-1" />
                 </div>
             )}
 
@@ -149,13 +156,9 @@ const VideoContent = ({ data, isActive, isMuted, toggleMute }) => {
                 className="absolute top-16 right-4 p-2 bg-black/20 backdrop-blur-md rounded-full text-white transition-all hover:bg-black/40 z-30"
             >
                 {isMuted ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
-                    </svg>
+                    <VolumeX className="w-5 h-5" />
                 ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
-                    </svg>
+                    <Volume2 className="w-5 h-5" />
                 )}
             </button>
 
@@ -167,9 +170,7 @@ const VideoContent = ({ data, isActive, isMuted, toggleMute }) => {
                         onClick={handleLike}
                         className={`p-3 rounded-full bg-black/20 backdrop-blur-md transition-all active:scale-90 hover:bg-black/40 ${liked ? 'text-red-500' : 'text-white'}`}
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth={liked ? "0" : "2.5"} className="w-7 h-7 filter drop-shadow-md">
-                            <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.312 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-                        </svg>
+                        <Heart className={`w-7 h-7 filter drop-shadow-md ${liked ? 'fill-current' : ''}`} />
                     </button>
                     <span className="text-white text-xs font-bold drop-shadow-md">{likeCount}</span>
                 </div>
@@ -191,18 +192,14 @@ const VideoContent = ({ data, isActive, isMuted, toggleMute }) => {
                         }}
                         className="p-3 rounded-full bg-black/20 backdrop-blur-md text-white transition-all active:scale-90 hover:bg-black/40"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" strokeWidth="2.5" stroke="currentColor" className="w-7 h-7 filter drop-shadow-md">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
-                        </svg>
+                        <Share2 className="w-7 h-7 filter drop-shadow-md" />
                     </button>
                     <span className="text-white text-xs font-bold drop-shadow-md">Share</span>
                 </div>
 
                 {/* More Options */}
                 <button className="p-3 rounded-full bg-black/20 backdrop-blur-md text-white transition-all active:scale-90 hover:bg-black/40">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-7 h-7">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-                    </svg>
+                    <MoreHorizontal className="w-7 h-7" />
                 </button>
             </div>
 
@@ -223,9 +220,7 @@ const VideoContent = ({ data, isActive, isMuted, toggleMute }) => {
                             <span>{data.category}</span>
                             <span className="text-gray-400">•</span>
                             <div className="flex items-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 text-yellow-400">
-                                    <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                                </svg>
+                                <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
                                 <span>{data.averageRating || '4.5'}</span>
                             </div>
                         </div>
@@ -255,9 +250,7 @@ const VideoContent = ({ data, isActive, isMuted, toggleMute }) => {
                     >
                         <span>View Details</span>
                         <div className="bg-white/20 p-1 rounded-full group-hover/btn:translate-x-1 transition-transform">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="w-3 h-3">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                            </svg>
+                            <ChevronRight className="w-3 h-3" />
                         </div>
                     </button>
                 </div>
@@ -334,7 +327,7 @@ const ReelsPage = () => {
     if (loading) {
         return <div className="h-screen w-full flex items-center justify-center bg-[#0d0d0d] text-white">
             <div className="animate-pulse flex flex-col items-center gap-4">
-                <div className="w-12 h-12 border-4 border-[#FF5E00] border-t-transparent rounded-full animate-spin"></div>
+                <Loader2 className="w-12 h-12 text-[#FF5E00] animate-spin" />
                 <div className="text-gray-400 font-medium">Loading Reels...</div>
             </div>
         </div>;

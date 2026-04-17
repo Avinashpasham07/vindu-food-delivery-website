@@ -1,9 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useSquad } from '../../context/SquadContext';
-import { useNavigate, useLocation } from 'react-router-dom';
 import apiClient from '../../api/client';
 import toast from 'react-hot-toast';
+import { 
+    ArrowLeft, 
+    MapPin, 
+    Check, 
+    User, 
+    Phone, 
+    CreditCard, 
+    Smartphone, 
+    Banknote, 
+    Flame, 
+    ArrowRight, 
+    ShieldCheck,
+    Loader2,
+    Star,
+    PartyPopper
+} from 'lucide-react';
 
 const CheckoutPage = () => {
     const { cart, cartTotal, clearCart } = useCart();
@@ -107,7 +123,10 @@ const CheckoutPage = () => {
                             lat: latitude,
                             lng: longitude
                         }));
-                        toast.success("Location locked! 📍", { id: geoToast });
+                        toast.success("Location locked!", {
+                            id: geoToast,
+                            icon: <MapPin className="w-5 h-5 text-[#FF5E00]" />
+                        });
                     } else {
                         // Fallback: Use coordinates even if address resolution fails
                         setFormData(prev => ({ ...prev, lat: latitude, lng: longitude }));
@@ -147,7 +166,7 @@ const CheckoutPage = () => {
         }
 
         if (!formData.lat || !formData.lng) {
-            toast.error('Please click "Use Current Location" to enable real-time tracking! 🗺️');
+            toast.error('Please click "Use Current Location" to enable real-time tracking!');
             return;
         }
 
@@ -192,7 +211,10 @@ const CheckoutPage = () => {
                 }
 
                 if (response.data.reward) {
-                    alert(`WOW! 🎊 ${response.data.reward.message}\nYour Reward Coupon: ${response.data.reward.coupon}`);
+                    toast.success(`${response.data.reward.message}\nYour Reward Coupon: ${response.data.reward.coupon}`, {
+                        icon: <PartyPopper className="w-5 h-5 text-yellow-400" />,
+                        duration: 6000
+                    });
                 }
 
                 setStep(3);
@@ -227,9 +249,7 @@ const CheckoutPage = () => {
 
                 <div className="relative z-10 bg-[#111]/80 backdrop-blur-3xl border border-white/10 p-12 rounded-[40px] shadow-2xl max-w-md w-full animate-fade-in-up">
                     <div className="w-24 h-24 bg-[#10B981] rounded-full flex items-center justify-center mb-8 mx-auto shadow-[0_0_50px_rgba(16,185,129,0.5)] animate-bounce">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="w-10 h-10 text-white">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                        </svg>
+                        <Check className="w-10 h-10 text-white" />
                     </div>
                     <h1 className="text-4xl font-black mb-4 tracking-tight">Order Placed!</h1>
                     <p className="text-gray-400 mb-10 text-lg">Your food is being prepared with love.<br />Estimated delivery: <span className="text-white font-bold">35 mins</span></p>
@@ -240,9 +260,9 @@ const CheckoutPage = () => {
                                     leaveSquad();
                                     navigate(`/order/tracking/${placedOrderId}`);
                                 }}
-                                className="w-full py-4 bg-[#FF5E00] hover:bg-[#ff7b29] rounded-2xl font-bold transition-all text-white text-lg hover:scale-105 active:scale-95 shadow-lg shadow-orange-500/20"
+                                className="w-full py-4 bg-[#FF5E00] hover:bg-[#ff7b29] rounded-2xl font-bold transition-all text-white text-lg hover:scale-105 active:scale-95 shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2"
                             >
-                                Track Live Order 📍
+                                Track Live Order <MapPin className="w-5 h-5" />
                             </button>
                             <button
                                 onClick={() => {
@@ -258,9 +278,9 @@ const CheckoutPage = () => {
                         <div className="space-y-3 w-full">
                             <button
                                 onClick={() => navigate(`/order/tracking/${placedOrderId}`)}
-                                className="w-full py-4 bg-[#FF5E00] hover:bg-[#ff7b29] rounded-2xl font-bold transition-all text-white text-lg hover:scale-105 active:scale-95 shadow-lg shadow-orange-500/20"
+                                className="w-full py-4 bg-[#FF5E00] hover:bg-[#ff7b29] rounded-2xl font-bold transition-all text-white text-lg hover:scale-105 active:scale-95 shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2"
                             >
-                                Track Live Order 📍
+                                Track Live Order <MapPin className="w-5 h-5" />
                             </button>
                             <button
                                 onClick={() => navigate('/home')}
@@ -288,9 +308,7 @@ const CheckoutPage = () => {
                 {/* Header */}
                 <div className="flex items-center gap-6 mb-12 animate-fade-in">
                     <button onClick={() => navigate(-1)} className="group p-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                        </svg>
+                        <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
                     </button>
                     <h1 className="text-4xl font-black tracking-tight">Checkout</h1>
                 </div>
@@ -312,11 +330,9 @@ const CheckoutPage = () => {
                                     className="flex items-center gap-2 px-4 py-2 bg-[#FF5E00]/10 hover:bg-[#FF5E00]/20 text-[#FF5E00] text-sm font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isLocating ? (
-                                        <div className="w-4 h-4 border-2 border-[#FF5E00] border-t-transparent rounded-full animate-spin"></div>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
                                     ) : (
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                                            <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                                        </svg>
+                                        <MapPin className="w-4 h-4" />
                                     )}
                                     {isLocating ? 'Locating...' : 'Use Current Location'}
                                 </button>
@@ -328,14 +344,14 @@ const CheckoutPage = () => {
                                     placeholder="Full Name"
                                     value={formData.name}
                                     onChange={handleInputChange}
-                                    icon={<UserIcon />}
+                                    icon={<User className="w-5 h-5" />}
                                 />
                                 <FormInput
                                     name="phone"
                                     placeholder="Phone Number"
                                     value={formData.phone}
                                     onChange={handleInputChange}
-                                    icon={<PhoneIcon />}
+                                    icon={<Phone className="w-5 h-5" />}
                                 />
                                 <div className="md:col-span-2">
                                     <FormInput
@@ -343,7 +359,7 @@ const CheckoutPage = () => {
                                         placeholder="Street Address / Flat No"
                                         value={formData.address}
                                         onChange={handleInputChange}
-                                        icon={<MapPinIcon />}
+                                        icon={<MapPin className="w-5 h-5" />}
                                     />
                                 </div>
                                 <FormInput
@@ -375,7 +391,7 @@ const CheckoutPage = () => {
                                     desc="Secure payment via Stripe"
                                     selected={paymentMethod}
                                     setSelected={setPaymentMethod}
-                                    icon={<CreditCardIcon />}
+                                    icon={<CreditCard className="w-6 h-6" />}
                                 />
                                 <PaymentOption
                                     id="upi"
@@ -383,7 +399,7 @@ const CheckoutPage = () => {
                                     desc="Google Pay, PhonePe, Paytm"
                                     selected={paymentMethod}
                                     setSelected={setPaymentMethod}
-                                    icon={<UpiIcon />}
+                                    icon={<Smartphone className="w-6 h-6" />}
                                 />
                                 <PaymentOption
                                     id="cod"
@@ -391,7 +407,7 @@ const CheckoutPage = () => {
                                     desc="Pay when you receive"
                                     selected={paymentMethod}
                                     setSelected={setPaymentMethod}
-                                    icon={<CashIcon />}
+                                    icon={<Banknote className="w-6 h-6" />}
                                 />
                             </div>
                         </div>
@@ -495,7 +511,7 @@ const CheckoutPage = () => {
                                         className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:border-[#FF5E00] outline-none transition-all placeholder:text-gray-700 uppercase"
                                     />
                                 </div>
-                                <p className="text-[10px] text-gray-500 mt-2">Earn discounts by maintaining your order streak! 🔥</p>
+                                <p className="text-[10px] text-gray-500 mt-2 flex items-center gap-1">Earn discounts by maintaining your order streak! <Flame className="w-3 h-3 text-[#FF5E00]" /></p>
                             </div>
 
                             <div className="h-px bg-white/10 my-6"></div>
@@ -526,23 +542,19 @@ const CheckoutPage = () => {
                             >
                                 {isPlacingOrder ? (
                                     <>
-                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
                                         Processing...
                                     </>
                                 ) : (
                                     <>
                                         Pay & Place Order
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5 group-hover:translate-x-1 transition-transform">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                                        </svg>
+                                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                     </>
                                 )}
                             </button>
 
                             <div className="mt-6 flex justify-center items-center gap-2 opacity-60">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 text-green-500">
-                                    <path fillRule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.352-.272-2.636-.759-3.985a.75.75 0 00-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08zm3.094 8.016a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
-                                </svg>
+                                <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
                                 <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">SSL Secure Checkout</span>
                             </div>
                         </div>
@@ -604,13 +616,5 @@ const PaymentOption = ({ id, title, desc, selected, setSelected, icon }) => (
         </div>
     </label>
 );
-
-// Icons
-const UserIcon = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>;
-const PhoneIcon = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>;
-const MapPinIcon = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>;
-const CreditCardIcon = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg>;
-const UpiIcon = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>;
-const CashIcon = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 
 export default CheckoutPage;

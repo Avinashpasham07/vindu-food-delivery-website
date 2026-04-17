@@ -1,6 +1,7 @@
 import React from 'react';
 import { toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
+import { ChevronDown, Minus, Plus, ShoppingBag, X, ChevronUp } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useSquad } from '../context/SquadContext';
 
@@ -123,9 +124,7 @@ const SmartCart = () => {
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-xl font-black text-white">Current Order</h3>
                         <button onClick={() => setIsExpanded(false)} className="p-2 bg-white/5 rounded-full hover:bg-white/10">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 text-gray-400">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                            </svg>
+                            <ChevronDown className="w-5 h-5 text-gray-400" />
                         </button>
                     </div>
 
@@ -147,9 +146,9 @@ const SmartCart = () => {
 
                                         {/* Mini Quantity Control */}
                                         <div className="flex items-center bg-black/50 border border-white/10 rounded-full h-7 px-1">
-                                            <button onClick={() => handleSquadUpdate(item, -1)} className="w-6 h-full text-gray-400 hover:text-white">-</button>
+                                            <button onClick={() => handleSquadUpdate(item, -1)} className="w-6 h-full text-gray-400 hover:text-white flex items-center justify-center"><Minus className="w-3 h-3" /></button>
                                             <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
-                                            <button onClick={() => handleSquadUpdate(item, 1)} className="w-6 h-full text-[#FF5E00]">+</button>
+                                            <button onClick={() => handleSquadUpdate(item, 1)} className="w-6 h-full text-[#FF5E00] flex items-center justify-center"><Plus className="w-3 h-3" /></button>
                                         </div>
                                     </div>
                                 </div>
@@ -161,7 +160,7 @@ const SmartCart = () => {
                         onClick={() => {
                             const user = localStorage.getItem('user');
                             if (!user) {
-                                toast.error("Please login to checkout 🛒");
+                                toast.error("Please login to checkout");
                                 navigate('/user/login');
                                 return;
                             }
@@ -192,9 +191,7 @@ const SmartCart = () => {
                         !isExpanded ? (
                             // Mobile FAB Content
                             <>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-7 h-7 text-white">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                                </svg>
+                                <ShoppingBag className="w-7 h-7 text-white" />
                                 {/* Badge */}
                                 <div className="absolute top-2 right-2 w-4 h-4 bg-white text-[#FF5E00] text-[10px] font-black rounded-full flex items-center justify-center">
                                     {activeCount}
@@ -209,17 +206,13 @@ const SmartCart = () => {
                                 onClick={(e) => { e.stopPropagation(); setIsVisible(false); }}
                                 className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-[#1a1a1a] border border-white/10 text-gray-400 flex items-center justify-center hover:bg-[#FF5E00] hover:text-white hover:border-[#FF5E00] transition-all shadow-lg z-10"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                                    <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />
-                                </svg>
+                                <X className="w-4 h-4" />
                             </button>
 
                             <div className="flex flex-col">
                                 <span className="text-xs text-gray-400 font-bold uppercase tracking-wider flex items-center gap-2">
                                     {roomId ? 'Squad Cart' : 'Your Cart'} • {activeCount} Items
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                                    </svg>
+                                    <ChevronUp className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                                 </span>
                                 <span className="text-xl font-black text-white">₹{activeTotal} <span className="text-sm font-medium text-gray-500">plus taxes</span></span>
                             </div>
